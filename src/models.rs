@@ -32,17 +32,18 @@ pub enum ProjectileOwner {
     Ghost,
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Copy, Debug)]
 pub enum WeaponType {
     Bullet,
     Laser,
-    Missile,
-    Plasma,
-    Bombs,
+    Missile, // Not implemented yet
+    Plasma, // Not implemented yet
+    Bombs, // Not implemented yet
 }
 
 impl WeaponType {
-    pub fn get_damage(&self) -> WeaponStats {
+    pub fn get_weapon_stats(&self) -> WeaponStats {
         match self {
             WeaponType::Bullet => WeaponStats {
                 damage: 10.0,
@@ -72,28 +73,16 @@ impl WeaponType {
         }
     }
 
-    pub fn get_fire_rate(&self) -> f32 {
-        match self {
-            WeaponType::Bullet => 0.3,
-            WeaponType::Laser => 2.5,
-            WeaponType::Missile => 1.0,
-            WeaponType::Plasma => 1.5,
-            WeaponType::Bombs => 2.0,
-        }
+    pub fn _get_damage_value(&self) -> f32 {
+        self.get_weapon_stats().damage
     }
 
-    pub fn get_damage_value(&self) -> f32 {
-        match self {
-            WeaponType::Bullet => 10.0,
-            WeaponType::Laser => 60.0,
-            WeaponType::Missile => 30.0,
-            WeaponType::Plasma => 40.0,
-            WeaponType::Bombs => 50.0,
-        }
+    pub fn _get_fire_rate(&self) -> f32 {
+        self.get_weapon_stats().fire_rate
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EntityType {
     BasicFighter,
     Sniper,
@@ -182,6 +171,10 @@ pub struct GameState {
     pub enemies: Vec<Enemy>,
     pub ghosts: Vec<Ghost>,
     pub projectiles: Vec<Projectile>,
+    pub player_fire_timer: f32,
+    pub enemy_fire_timers: Vec<f32>,
+    pub ghost_fire_timers: Vec<f32>,
+    pub spawn_timer: f32,
 }
 
 impl GameState {
@@ -207,6 +200,10 @@ impl GameState {
             enemies: Vec::new(),
             ghosts: Vec::new(),
             projectiles: Vec::new(),
+            player_fire_timer: 0.0,
+            enemy_fire_timers: Vec::new(),
+            ghost_fire_timers: Vec::new(),
+            spawn_timer: 0.0,
         }
     }
 }
