@@ -1,0 +1,96 @@
+# Ghost Ally Shooter - Game Configuration File
+
+[window]
+title = "Ghost Ally Shooter"
+width = 800
+height = 600
+target_fps = 60
+
+[player]
+starting_health = 100.0
+max_health = 100.0
+starting_energy = 1000.0
+max_energy = 2000.0
+movement_speed = 200.0
+starting_weapons = ["Bullet", "Laser"]
+
+[energy]
+regen_rate_idle = 30.0
+regen_rate_active = 10.0
+
+[entities.basic_fighter]
+health = 50.0
+damage = 10.0
+energy_cost = 15.0
+fire_interval = 2.0
+
+[entities.sniper]
+health = 30.0
+damage = 25.0
+energy_cost = 25.0
+fire_interval = 3.0
+
+[entities.tank]
+health = 150.0
+damage = 15.0
+energy_cost = 40.0
+fire_interval = 1.5
+
+[entities.boss]
+health = 500.0
+damage = 50.0
+energy_cost = 80.0
+fire_interval = 0.8
+
+[weapons.bullet]
+damage = 10.0
+fire_rate = 0.3
+projectile_speed = 400.0
+cooldown = 3.0
+
+[weapons.laser]
+damage = 60.0
+fire_rate = 2.5
+projectile_speed = 600.0
+cooldown = 3.0
+
+[weapons.missile]
+damage = 30.0
+fire_rate = 1.0
+projectile_speed = 350.0
+cooldown = 3.0
+
+[weapons.plasma]
+damage = 40.0
+fire_rate = 1.5
+projectile_speed = 450.0
+cooldown = 3.0
+
+[weapons.bombs]
+damage = 50.0
+fire_rate = 2.0
+projectile_speed = 300.0
+cooldown = 3.0
+
+[spawning]
+enemy_spawn_interval = 2.0
+initial_delay = 3.0
+
+[formations]
+v_shape_min = 2
+v_shape_optimal = 6
+line_min = 3
+line_optimal = 5
+circle_min = 4
+circle_optimal = 8
+diamond_min = 4
+diamond_optimal = 5
+scattered_min = 1
+scattered_optimal = 4
+
+[debug]
+god_mode = false
+infinite_energy = false
+instant_ghost_spawn = false
+show_hitboxes = false
+show_fps = true 
