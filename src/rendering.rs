@@ -199,14 +199,41 @@ fn draw_ghosts(ghosts: &[Ghost]) {
     }
 }
 
-/// Draw all projectiles
+/// Draw all projectiles with weapon-specific visuals
 fn draw_projectiles(projectiles: &[Projectile]) {
     for proj in projectiles {
-        let color = match proj.owner {
-            ProjectileOwner::Player | ProjectileOwner::Ghost => SKYBLUE,
-            ProjectileOwner::Enemy => RED,
+        // Determine color/size based on weapon type and owner
+        let (color, size, glow) = match proj.owner {
+            ProjectileOwner::Player | ProjectileOwner::Ghost => {
+                match proj.weapon_type {
+                    WeaponType::Bullet => (YELLOW, 4.0, false),
+                    WeaponType::Laser => (Color::new(0.0, 1.0, 1.0, 1.0), 6.0, true), // Cyan, larger
+                    WeaponType::Missile => (ORANGE, 5.0, true), // Orange glow for homing
+                    WeaponType::Plasma => (PURPLE, 5.0, true),
+                    WeaponType::Bombs => (RED, 8.0, true),
+                }
+            }
+            ProjectileOwner::Enemy => (RED, 5.0, false),
         };
-        draw_circle(proj.pos.x, proj.pos.y, 5.0, color);
+        
+        // Draw glow effect for special weapons
+        if glow {
+            draw_circle(proj.pos.x, proj.pos.y, size + 3.0, Color::new(color.r, color.g, color.b, 0.3));
+        }
+        
+        draw_circle(proj.pos.x, proj.pos.y, size, color);
+        
+        // Draw beam line for lasers (elongated visual)
+        if matches!(proj.weapon_type, WeaponType::Laser) {
+            draw_line(
+                proj.pos.x,
+                proj.pos.y,
+                proj.pos.x,
+                proj.pos.y + 20.0, // Beam trail
+                2.0,
+                Color::new(color.r, color.g, color.b, 0.5),
+            );
+        }
     }
 }
 
