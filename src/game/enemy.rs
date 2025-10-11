@@ -80,6 +80,11 @@ fn fire_enemy_weapon(
             damage: weapon.get_weapon_stats(weapons_config).damage * 0.5,
             weapon_type: weapon,
             owner: ProjectileOwner::Enemy,
+            piercing: false,        // Enemies don't use piercing
+            homing: false,          // Enemies don't use homing
+            explosion_radius: 0.0,  // Enemies don't use explosions
+            locked_target_index: None,
+            lifetime: 0.0,
         });
     }
 }
