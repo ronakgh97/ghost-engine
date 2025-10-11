@@ -36,6 +36,14 @@ pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
     if is_key_down(KeyCode::K) {
         weapons::player_fire_weapon(game_state, 2);
     }
+    // Fire Plasma
+    if is_key_down(KeyCode::L) {
+        weapons::player_fire_weapon(game_state, 3);
+    }
+    // Fire Bombs
+    if is_key_down(KeyCode::Semicolon) {
+        weapons::player_fire_weapon(game_state, 4);
+    }
 
     // Formation switching
     change_formation(game_state);
