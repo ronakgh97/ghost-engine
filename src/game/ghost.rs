@@ -17,9 +17,9 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
     for (idx, ghost) in state.ghosts.iter_mut().enumerate() {
         // Movement logic - ghosts rise upward
         if ghost.pos.y > 200.0 {
-            ghost.pos.y -= 150.0 * delta; // Fast ascent
+            ghost.pos.y -= 50.0 * delta; // Fast ascent
         } else {
-            ghost.pos.y -= 50.0 * delta; // Slow hover
+            ghost.pos.y -= 100.0 * delta; // Slow hover
         }
 
         // Auto-fire at nearest enemy

@@ -6,7 +6,7 @@ use macroquad::prelude::*;
 pub fn update_enemies(state: &mut GameState, delta: f32) {
     // Ensure we have timers for all enemies
     while state.enemy_fire_timers.len() < state.enemies.len() {
-        state.enemy_fire_timers.push(rand::gen_range(1.0, 2.0));
+        state.enemy_fire_timers.push(rand::gen_range(1.0, 3.0));
     }
 
     // Update all fire timers
@@ -18,7 +18,7 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
     for (idx, enemy) in state.enemies.iter_mut().enumerate() {
         // Movement logic
         if enemy.pos.y < 200.0 {
-            enemy.pos.y += 150.0 * delta; // Fast descent
+            enemy.pos.y += 100.0 * delta; // Fast descent
         } else {
             enemy.pos.y += 50.0 * delta; // Slow hover
         }
