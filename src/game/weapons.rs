@@ -23,12 +23,15 @@ pub fn player_fire_weapon(state: &mut GameState, weapon_index: usize) {
         return;
     }
 
-    state.player_fire_timer = weapon.get_weapon_stats().fire_rate;
+    state.player_fire_timer = weapon.get_weapon_stats(&state.config.weapons).fire_rate;
 
     let projectile = Projectile {
         pos: state.player.pos,
-        velocity: Position { x: 0.0, y: -400.0 },
-        damage: weapon.get_weapon_stats().damage,
+        velocity: Position {
+            x: 0.0,
+            y: state.config.projectile_bounds.player_projectile_speed_y,
+        },
+        damage: weapon.get_weapon_stats(&state.config.weapons).damage,
         weapon_type: weapon,
         owner: ProjectileOwner::Player,
     };
@@ -44,10 +47,11 @@ fn update_projectiles(state: &mut GameState, delta: f32) {
     }
 
     // Remove off-screen projectiles
+    let padding = state.config.projectile_bounds.off_screen_padding;
     state.projectiles.retain(|p| {
-        p.pos.y > -50.0
-            && p.pos.y < screen_height() + 50.0
-            && p.pos.x > -50.0
-            && p.pos.x < screen_width() + 50.0
+        p.pos.y > -padding
+            && p.pos.y < screen_height() + padding
+            && p.pos.x > -padding
+            && p.pos.x < screen_width() + padding
     });
 }
