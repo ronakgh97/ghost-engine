@@ -50,6 +50,14 @@ pub fn render_ui(state: &GameState) {
         GREEN,
     );
 
+    draw_text(
+        &format!("Ghosts Available: {:?}", state.player.available_ghosts),
+        10.0,
+        screen_height() - 25.0,
+        15.0,
+        GRAY,
+    );
+
     // Active ghosts count
     draw_text(
         &format!("Active Ghosts: {}", state.ghosts.len()),
@@ -104,7 +112,7 @@ pub fn render_ui(state: &GameState) {
     if available_count >= min_required {
         let mut total_cost = 0.0;
         for i in 0..available_count.min(optimal) {
-            total_cost += state.player.available_ghosts[i].get_energy_cost();
+            total_cost += state.player.available_ghosts[i].get_energy_cost(&state.config.entities);
         }
 
         let energy_color = if state.player.energy >= total_cost {

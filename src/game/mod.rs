@@ -21,27 +21,27 @@ pub use weapons::*;
 
 use crate::models::*;
 
-/// Main game loop - orchestrates all systems
+/// Main game loop
 pub fn update_all_systems(state: &mut GameState, delta: f32) {
-    // 1. Handle input
+    // Handle input
     handle_input(state, delta);
 
-    // 2. Update entities
+    // Update entities
     update_player(state, delta);
     update_enemies(state, delta);
     update_ghosts(state, delta);
 
-    // 3. Update weapons & projectiles
+    // Update weapons & projectiles
     update_weapons(state, delta);
 
-    // 4. Check collisions
+    // Check collisions
     check_projectile_collisions(state);
     check_entity_collisions(state);
 
-    // 5. Manage resources
+    // Manage resources
     manage_energy(state, delta);
     cleanup_dead_entities(state);
 
-    // 6. Spawn new enemies
+    // Spawn new enemies
     spawn_enemies(state, delta);
 }
