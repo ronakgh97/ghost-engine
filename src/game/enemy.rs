@@ -128,28 +128,57 @@ fn fire_enemy_weapon(
                 lifetime: 0.0,
             });
         }
-        WeaponType::Plasma | WeaponType::Bombs => {
-            // TODO: Implement plasma spread and bombs
-            // For now, fallback to bullet behavior
-            let velocity = match enemy.entity_type {
-                EntityType::BasicFighter | EntityType::Tank => Position {
-                    x: 0.0,
-                    y: basic_projectile_speed_y,
-                },
-                EntityType::Sniper | EntityType::Boss => {
-                    calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
+        WeaponType::Plasma => {
+            // Enemy plasma: Fire 3 projectiles toward player
+            let spread_angle = 15.0_f32.to_radians();
+            let angles = [-spread_angle, 0.0, spread_angle];
+
+            for &angle in &angles {
+                // Calculate direction to player, then apply spread
+                let base_dir_x = player_pos.x - enemy.pos.x;
+                let base_dir_y = player_pos.y - enemy.pos.y;
+                let base_distance = (base_dir_x * base_dir_x + base_dir_y * base_dir_y).sqrt();
+
+                if base_distance > 0.1 {
+                    // Normalize base direction
+                    let norm_x = base_dir_x / base_distance;
+                    let norm_y = base_dir_y / base_distance;
+
+                    // Apply angle rotation to spread pattern
+                    let rotated_x = norm_x * angle.cos() - norm_y * angle.sin();
+                    let rotated_y = norm_x * angle.sin() + norm_y * angle.cos();
+
+                    projectiles.push(Projectile {
+                        pos: enemy.pos,
+                        velocity: Position {
+                            x: rotated_x * weapon_stats.projectile_speed,
+                            y: rotated_y * weapon_stats.projectile_speed,
+                        },
+                        damage: weapon_stats.damage * 0.5,
+                        weapon_type: weapon,
+                        owner: ProjectileOwner::Enemy,
+                        piercing: false,
+                        homing: false,
+                        explosion_radius: 0.0,
+                        locked_target_index: None,
+                        lifetime: 0.0,
+                    });
                 }
-            };
+            }
+        }
+        WeaponType::Bombs => {
+            // Enemy bombs: AOE threat aimed at player
+            let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
 
             projectiles.push(Projectile {
                 pos: enemy.pos,
                 velocity,
                 damage: weapon_stats.damage * 0.5,
-                weapon_type: WeaponType::Bullet, // Convert to bullet for now
+                weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
                 piercing: false,
                 homing: false,
-                explosion_radius: 0.0,
+                explosion_radius: 60.0, // Enemy bomb AOE (smaller than player's)
                 locked_target_index: None,
                 lifetime: 0.0,
             });

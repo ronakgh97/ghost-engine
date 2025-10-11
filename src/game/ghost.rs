@@ -69,19 +69,109 @@ fn fire_ghost_weapon(
     weapons_config: &crate::config::WeaponsConfig,
 ) {
     if let Some(&weapon) = ghost.weapon_type.first() {
-        let velocity = calculate_velocity(ghost.pos, target, projectile_speed);
+        let weapon_stats = weapon.get_weapon_stats(weapons_config);
 
-        projectiles.push(Projectile {
-            pos: ghost.pos,
-            velocity,
-            damage: weapon.get_weapon_stats(weapons_config).damage,
-            weapon_type: weapon,
-            owner: ProjectileOwner::Ghost,
-            piercing: false,       // Ghosts use standard projectiles
-            homing: false,         // Ghosts don't use homing (already targeting)
-            explosion_radius: 0.0, // Ghosts don't use explosions
-            locked_target_index: None,
-            lifetime: 0.0,
-        });
+        match weapon {
+            WeaponType::Bullet => {
+                let velocity = calculate_velocity(ghost.pos, target, projectile_speed);
+
+                projectiles.push(Projectile {
+                    pos: ghost.pos,
+                    velocity,
+                    damage: weapon_stats.damage,
+                    weapon_type: weapon,
+                    owner: ProjectileOwner::Ghost,
+                    piercing: false,
+                    homing: false,
+                    explosion_radius: 0.0,
+                    locked_target_index: None,
+                    lifetime: 0.0,
+                });
+            }
+            WeaponType::Laser => {
+                let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
+
+                projectiles.push(Projectile {
+                    pos: ghost.pos,
+                    velocity,
+                    damage: weapon_stats.damage,
+                    weapon_type: weapon,
+                    owner: ProjectileOwner::Ghost,
+                    piercing: true, // Ghost lasers also pierce
+                    homing: false,
+                    explosion_radius: 0.0,
+                    locked_target_index: None,
+                    lifetime: 0.0,
+                });
+            }
+            WeaponType::Missile => {
+                // Ghosts don't use homing (too powerful with formations)
+                let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
+
+                projectiles.push(Projectile {
+                    pos: ghost.pos,
+                    velocity,
+                    damage: weapon_stats.damage,
+                    weapon_type: weapon,
+                    owner: ProjectileOwner::Ghost,
+                    piercing: false,
+                    homing: false, // Aimed shot, not homing
+                    explosion_radius: 0.0,
+                    locked_target_index: None,
+                    lifetime: 0.0,
+                });
+            }
+            WeaponType::Plasma => {
+                // Ghost plasma: 3-projectile spread toward target
+                let spread_angle = 15.0_f32.to_radians();
+                let angles = [-spread_angle, 0.0, spread_angle];
+
+                for &angle in &angles {
+                    let base_dir_x = target.x - ghost.pos.x;
+                    let base_dir_y = target.y - ghost.pos.y;
+                    let base_distance = (base_dir_x * base_dir_x + base_dir_y * base_dir_y).sqrt();
+
+                    if base_distance > 0.1 {
+                        let norm_x = base_dir_x / base_distance;
+                        let norm_y = base_dir_y / base_distance;
+
+                        let rotated_x = norm_x * angle.cos() - norm_y * angle.sin();
+                        let rotated_y = norm_x * angle.sin() + norm_y * angle.cos();
+
+                        projectiles.push(Projectile {
+                            pos: ghost.pos,
+                            velocity: Position {
+                                x: rotated_x * weapon_stats.projectile_speed,
+                                y: rotated_y * weapon_stats.projectile_speed,
+                            },
+                            damage: weapon_stats.damage,
+                            weapon_type: weapon,
+                            owner: ProjectileOwner::Ghost,
+                            piercing: false,
+                            homing: false,
+                            explosion_radius: 0.0,
+                            locked_target_index: None,
+                            lifetime: 0.0,
+                        });
+                    }
+                }
+            }
+            WeaponType::Bombs => {
+                let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
+
+                projectiles.push(Projectile {
+                    pos: ghost.pos,
+                    velocity,
+                    damage: weapon_stats.damage,
+                    weapon_type: weapon,
+                    owner: ProjectileOwner::Ghost,
+                    piercing: false,
+                    homing: false,
+                    explosion_radius: 70.0, // Ghost bomb AOE
+                    locked_target_index: None,
+                    lifetime: 0.0,
+                });
+            }
+        }
     }
 }
