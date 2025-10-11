@@ -15,9 +15,9 @@ pub fn manage_energy(state: &mut GameState, delta: f32) {
 
     // Regenerate energy (slower when ghosts active)
     let regen_rate = if state.ghosts.is_empty() {
-        30.0 // Fast regen
+        state.config.energy.regen_rate_idle // Fast regen
     } else {
-        10.0 // Slow regen
+        state.config.energy.regen_rate_active // Slow regen
     };
 
     state.player.energy = (state.player.energy + regen_rate * delta).min(state.player.max_energy);
