@@ -83,7 +83,7 @@ fn fire_enemy_weapon(
 
             projectiles.push(Projectile {
                 pos: enemy.pos,
-                velocity,
+                velocity, // Straight if Basic Fighter or Tank and aim toward player if Sniper and Boss
                 damage: weapon_stats.damage * 0.5, // Enemies deal half damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,

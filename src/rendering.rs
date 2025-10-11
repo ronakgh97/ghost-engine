@@ -67,7 +67,7 @@ pub fn render_ui(state: &GameState) {
         SKYBLUE,
     );
 
-    // Enemy count (debug)
+    // Enemy count
     draw_text(
         &format!("Enemies: {}", state.enemies.len()),
         10.0,
@@ -207,7 +207,7 @@ fn draw_projectiles(projectiles: &[Projectile]) {
             ProjectileOwner::Player | ProjectileOwner::Ghost => {
                 match proj.weapon_type {
                     WeaponType::Bullet => (YELLOW, 4.0, false),
-                    WeaponType::Laser => (Color::new(0.0, 1.0, 1.0, 1.0), 6.0, true), // Cyan, larger
+                    WeaponType::Laser => (GREEN, 6.0, true), // Green, larger
                     WeaponType::Missile => (ORANGE, 5.0, true), // Orange glow for homing
                     WeaponType::Plasma => (PURPLE, 5.0, true),
                     WeaponType::Bombs => (RED, 8.0, true),
@@ -234,7 +234,7 @@ fn draw_projectiles(projectiles: &[Projectile]) {
                 proj.pos.x,
                 proj.pos.y,
                 proj.pos.x,
-                proj.pos.y + 20.0, // Beam trail
+                proj.pos.y + 30.0, // Beam trail
                 2.0,
                 Color::new(color.r, color.g, color.b, 0.5),
             );
@@ -246,8 +246,8 @@ fn draw_projectiles(projectiles: &[Projectile]) {
 fn get_enemy_color(entity_type: EntityType) -> Color {
     match entity_type {
         EntityType::BasicFighter => RED,
-        EntityType::Sniper => ORANGE,
-        EntityType::Tank => PURPLE,
+        EntityType::Sniper => BLUE,
+        EntityType::Tank => GREEN,
         EntityType::Boss => GOLD,
     }
 }

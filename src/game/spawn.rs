@@ -12,7 +12,8 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
         // Pick random enemy type
         let enemy_types = [
             EntityType::BasicFighter,
-            EntityType::BasicFighter, // More common
+            EntityType::BasicFighter,
+            EntityType::Sniper,
             EntityType::Sniper,
             EntityType::Tank,
             EntityType::Tank,
