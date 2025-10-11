@@ -4,6 +4,8 @@ use macroquad::prelude::*;
 
 /// Update all enemies (movement, firing, cleanup)
 pub fn update_enemies(state: &mut GameState, delta: f32) {
+    let enemy_cfg = &state.config.enemy_behavior;
+
     // Ensure we have timers for all enemies
     while state.enemy_fire_timers.len() < state.enemies.len() {
         state.enemy_fire_timers.push(rand::gen_range(1.0, 3.0));
@@ -17,57 +19,65 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
     // Update each enemy
     for (idx, enemy) in state.enemies.iter_mut().enumerate() {
         // Movement logic
-        if enemy.pos.y < 200.0 {
-            enemy.pos.y += 100.0 * delta; // Fast descent
+        if enemy.pos.y < enemy_cfg.movement_threshold_y {
+            enemy.pos.y += enemy_cfg.fast_descent_speed * delta;
         } else {
-            enemy.pos.y += 50.0 * delta; // Slow hover
+            enemy.pos.y += enemy_cfg.slow_hover_speed * delta;
         }
 
         // Fire based on enemy type
         if idx < state.enemy_fire_timers.len()
             && state.enemy_fire_timers[idx] <= 0.0
-            && enemy.pos.y > 50.0
+            && enemy.pos.y > enemy_cfg.fire_threshold_y
         {
-            fire_enemy_weapon(enemy, state.player.pos, &mut state.projectiles);
-            state.enemy_fire_timers[idx] = get_fire_interval(enemy.entity_type);
+            fire_enemy_weapon(
+                enemy,
+                state.player.pos,
+                &mut state.projectiles,
+                enemy_cfg.basic_projectile_speed_y,
+                &state.config.weapons,
+            );
+            state.enemy_fire_timers[idx] =
+                enemy.entity_type.get_fire_interval(&state.config.entities);
         }
     }
 
     // Remove off-screen enemies
-    state.enemies.retain(|e| e.pos.y < 650.0);
+    state
+        .enemies
+        .retain(|e| e.pos.y < enemy_cfg.screen_boundary_bottom);
 
     // Clean up excess timers
     state.enemy_fire_timers.truncate(state.enemies.len());
 }
 
-/// Get fire interval based on enemy type
-fn get_fire_interval(entity_type: EntityType) -> f32 {
-    match entity_type {
-        EntityType::BasicFighter => 2.0,
-        EntityType::Sniper => 3.0,
-        EntityType::Tank => 1.5,
-        EntityType::Boss => 0.8,
-    }
-}
-
 /// Fire enemy weapon based on type
-fn fire_enemy_weapon(enemy: &Enemy, player_pos: Position, projectiles: &mut Vec<Projectile>) {
+fn fire_enemy_weapon(
+    enemy: &Enemy,
+    player_pos: Position,
+    projectiles: &mut Vec<Projectile>,
+    basic_projectile_speed_y: f32,
+    weapons_config: &crate::config::WeaponsConfig,
+) {
     if let Some(&weapon) = enemy.weapon.first() {
         let velocity = match enemy.entity_type {
             EntityType::BasicFighter | EntityType::Tank => {
                 // Shoot straight down
-                Position { x: 0.0, y: 250.0 }
+                Position {
+                    x: 0.0,
+                    y: basic_projectile_speed_y,
+                }
             }
             EntityType::Sniper | EntityType::Boss => {
-                // Aim at player
-                calculate_velocity(enemy.pos, player_pos, 250.0)
+                // Aim at player (use same speed for consistency)
+                calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
             }
         };
 
         projectiles.push(Projectile {
             pos: enemy.pos,
             velocity,
-            damage: weapon.get_weapon_stats().damage * 0.5,
+            damage: weapon.get_weapon_stats(weapons_config).damage * 0.5,
             weapon_type: weapon,
             owner: ProjectileOwner::Enemy,
         });

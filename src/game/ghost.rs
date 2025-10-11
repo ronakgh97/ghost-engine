@@ -3,6 +3,8 @@ use crate::models::*;
 
 /// Update all ghosts (movement, auto-fire, cleanup)
 pub fn update_ghosts(state: &mut GameState, delta: f32) {
+    let ghost_cfg = &state.config.ghost_behavior;
+
     // Ensure we have timers for all ghosts
     while state.ghost_fire_timers.len() < state.ghosts.len() {
         state.ghost_fire_timers.push(0.0);
@@ -16,10 +18,10 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
     // Update each ghost
     for (idx, ghost) in state.ghosts.iter_mut().enumerate() {
         // Movement logic - ghosts rise upward
-        if ghost.pos.y > 200.0 {
-            ghost.pos.y -= 50.0 * delta; // Fast ascent
+        if ghost.pos.y > ghost_cfg.movement_threshold_y {
+            ghost.pos.y -= ghost_cfg.fast_ascent_speed * delta;
         } else {
-            ghost.pos.y -= 100.0 * delta; // Slow hover
+            ghost.pos.y -= ghost_cfg.slow_hover_speed * delta;
         }
 
         // Auto-fire at nearest enemy
@@ -28,14 +30,22 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
             && !state.enemies.is_empty()
         {
             if let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies) {
-                fire_ghost_weapon(ghost, target, &mut state.projectiles);
-                state.ghost_fire_timers[idx] = 1.0; // Fire every second
+                fire_ghost_weapon(
+                    ghost,
+                    target,
+                    &mut state.projectiles,
+                    ghost_cfg.projectile_speed,
+                    &state.config.weapons,
+                );
+                state.ghost_fire_timers[idx] = ghost_cfg.fire_interval;
             }
         }
     }
 
     // Remove off-screen ghosts
-    state.ghosts.retain(|g| g.pos.y > -50.0);
+    state
+        .ghosts
+        .retain(|g| g.pos.y > ghost_cfg.screen_boundary_top);
 
     // Clean up excess timers
     state.ghost_fire_timers.truncate(state.ghosts.len());
@@ -51,14 +61,20 @@ fn find_nearest_enemy(ghost_pos: Position, enemies: &[Enemy]) -> Option<Position
 }
 
 /// Fire ghost weapon at target
-fn fire_ghost_weapon(ghost: &Ghost, target: Position, projectiles: &mut Vec<Projectile>) {
+fn fire_ghost_weapon(
+    ghost: &Ghost,
+    target: Position,
+    projectiles: &mut Vec<Projectile>,
+    projectile_speed: f32,
+    weapons_config: &crate::config::WeaponsConfig,
+) {
     if let Some(&weapon) = ghost.weapon_type.first() {
-        let velocity = calculate_velocity(ghost.pos, target, 350.0);
+        let velocity = calculate_velocity(ghost.pos, target, projectile_speed);
 
         projectiles.push(Projectile {
             pos: ghost.pos,
             velocity,
-            damage: weapon.get_weapon_stats().damage,
+            damage: weapon.get_weapon_stats(weapons_config).damage,
             weapon_type: weapon,
             owner: ProjectileOwner::Ghost,
         });
