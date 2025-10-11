@@ -18,8 +18,13 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                         collision_cfg.enemy_radius,
                     ) {
                         enemy.stats.health -= projectile.damage;
-                        projectiles_to_remove.push(proj_idx);
-                        break;
+                        
+                        // Only mark for removal if NOT piercing (lasers pierce through)
+                        if !projectile.piercing {
+                            projectiles_to_remove.push(proj_idx);
+                            break;
+                        }
+                        // Piercing projectiles continue after hit (no break)
                     }
                 }
             }
@@ -33,6 +38,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                     collision_cfg.player_radius,
                 ) {
                     state.player.stats.health -= projectile.damage;
+                    // Enemy projectiles never pierce
                     projectiles_to_remove.push(proj_idx);
                 }
 
@@ -54,6 +60,8 @@ pub fn check_projectile_collisions(state: &mut GameState) {
     }
 
     // Remove hit projectiles (reverse order to avoid index issues)
+    projectiles_to_remove.sort_unstable();
+    projectiles_to_remove.dedup(); // Remove duplicates (in case same projectile marked multiple times)
     for &idx in projectiles_to_remove.iter().rev() {
         if idx < state.projectiles.len() {
             state.projectiles.remove(idx);
