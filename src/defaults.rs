@@ -37,7 +37,7 @@ fn default_player() -> PlayerConfig {
         starting_energy: 100.0,
         max_energy: 100.0,
         movement_speed: 200.0,
-        starting_weapons: vec!["Bullet".to_string(), "Laser".to_string()],
+        starting_weapons: vec!["Bullet".to_string(), "Laser".to_string(), "Missile".to_string(), "Plasma".to_string(), "Bombs".to_string()],
     }
 }
 
