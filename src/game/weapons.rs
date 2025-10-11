@@ -31,14 +31,8 @@ pub fn player_fire_weapon(state: &mut GameState, weapon_index: usize) {
         WeaponType::Bullet => fire_bullet(state, weapon_stats),
         WeaponType::Laser => fire_laser(state, weapon_stats),
         WeaponType::Missile => fire_missile(state, weapon_stats),
-        WeaponType::Plasma => {
-            // TODO: Implement plasma spread shot (3 projectiles in cone)
-            fire_bullet(state, weapon_stats); // Placeholder
-        }
-        WeaponType::Bombs => {
-            // TODO: Implement bombs with explosion radius
-            fire_bullet(state, weapon_stats); // Placeholder
-        }
+        WeaponType::Plasma => fire_plasma(state, weapon_stats),
+        WeaponType::Bombs => fire_bombs(state, weapon_stats),
     }
 }
 
@@ -102,6 +96,53 @@ fn fire_missile(state: &mut GameState, weapon_stats: crate::models::WeaponStats)
         homing: true, // KEY: Will track locked enemy
         explosion_radius: 0.0,
         locked_target_index: nearest_idx, // Lock onto target at spawn
+        lifetime: 0.0,
+    };
+
+    state.projectiles.push(projectile);
+}
+
+/// Fire plasma spread shot (3 projectiles in cone pattern)
+fn fire_plasma(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
+    let spread_angle = 15.0_f32.to_radians(); // ±15 degrees
+    let angles = [-spread_angle, 0.0, spread_angle]; // Left, center, right
+
+    for &angle in &angles {
+        let projectile = Projectile {
+            pos: state.player.pos,
+            velocity: Position {
+                x: weapon_stats.projectile_speed * angle.sin(),
+                y: -weapon_stats.projectile_speed * angle.cos(), // Spread pattern
+            },
+            damage: weapon_stats.damage,
+            weapon_type: WeaponType::Plasma,
+            owner: ProjectileOwner::Player,
+            piercing: false,
+            homing: false,
+            explosion_radius: 0.0,
+            locked_target_index: None,
+            lifetime: 0.0,
+        };
+
+        state.projectiles.push(projectile);
+    }
+}
+
+/// Fire bomb with AOE explosion on impact
+fn fire_bombs(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
+    let projectile = Projectile {
+        pos: state.player.pos,
+        velocity: Position {
+            x: 0.0,
+            y: -weapon_stats.projectile_speed, // Shoot upward
+        },
+        damage: weapon_stats.damage,
+        weapon_type: WeaponType::Bombs,
+        owner: ProjectileOwner::Player,
+        piercing: false,
+        homing: false,
+        explosion_radius: 80.0, // AOE damage radius (configurable)
+        locked_target_index: None,
         lifetime: 0.0,
     };
 
