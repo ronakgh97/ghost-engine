@@ -89,8 +89,5 @@ scattered_min = 1
 scattered_optimal = 4
 
 [debug]
-god_mode = false
-infinite_energy = false
-instant_ghost_spawn = false
 show_hitboxes = false
-show_fps = true 
+show_fps = true
