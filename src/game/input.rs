@@ -100,7 +100,7 @@ fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
         .iter()
         .position(|&t| t == desired_type)
     {
-        let energy_cost = desired_type.get_energy_cost();
+        let energy_cost = desired_type.get_energy_cost(&state.config.entities);
 
         // Check if player has enough energy
         if state.player.energy < energy_cost {
@@ -114,17 +114,18 @@ fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
             state.ghosts.len(),
             state.ghosts.len() + 1,
             state.ghost_formation,
+            &state.config.formation_spacing,
         );
 
         // Create ghost
         let template_enemy = Enemy {
             pos: spawn_pos,
-            stats: desired_type.get_stats(),
+            stats: desired_type.get_stats(&state.config.entities),
             entity_type: desired_type,
             weapon: vec![WeaponType::Bullet],
         };
 
-        let ghost = Ghost::from_enemy(&template_enemy);
+        let ghost = Ghost::from_enemy(&template_enemy, &state.config.entities);
 
         // All checks passed - spawn and deduct
         state.ghosts.push(ghost);
@@ -151,7 +152,7 @@ fn spawn_formation(state: &mut GameState) {
     for i in 0..spawn_count {
         if i < state.player.available_ghosts.len() {
             let ghost_type = state.player.available_ghosts[i];
-            total_energy_cost += ghost_type.get_energy_cost();
+            total_energy_cost += ghost_type.get_energy_cost(&state.config.entities);
         }
     }
 
@@ -175,17 +176,18 @@ fn spawn_formation(state: &mut GameState) {
             state.ghosts.len(),
             state.ghosts.len() + (spawn_count - i),
             formation,
+            &state.config.formation_spacing,
         );
 
         // Create ghost
         let template_enemy = Enemy {
             pos: spawn_pos,
-            stats: ghost_type.get_stats(),
+            stats: ghost_type.get_stats(&state.config.entities),
             entity_type: ghost_type,
             weapon: vec![WeaponType::Bullet],
         };
 
-        let ghost = Ghost::from_enemy(&template_enemy);
+        let ghost = Ghost::from_enemy(&template_enemy, &state.config.entities);
         state.ghosts.push(ghost);
     }
 
