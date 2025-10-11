@@ -71,11 +71,10 @@ pub struct WeaponsConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WeaponStats {
-    pub damage: f32,
-    pub fire_rate: f32,
-    pub projectile_speed: f32,
-    pub ammo: f32,
-    pub cooldown: f32,
+    pub damage: f32,            // Base damage per projectile
+    pub fire_rate: f32,         // Cooldown between shots (in seconds)
+    pub projectile_speed: f32,  // How fast projectiles travel (pixels/sec)
+    pub ammo: f32,              // Magazine capacity (TODO: implement reload system)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

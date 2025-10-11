@@ -79,40 +79,40 @@ fn default_entities() -> EntitiesConfig {
 
 fn default_weapons() -> WeaponsConfig {
     WeaponsConfig {
+        // BULLET: Rapid fire, low damage, general purpose
         bullet: WeaponStats {
             damage: 10.0,
-            fire_rate: 0.4,
-            projectile_speed: 400.0,
+            fire_rate: 0.1,         // Fast fire rate
+            projectile_speed: 500.0,
             ammo: 100.0,
-            cooldown: 3.0,
         },
+        // LASER: Piercing beam, high damage, slow fire rate
         laser: WeaponStats {
-            damage: 80.0,
-            fire_rate: 0.05,
-            projectile_speed: 600.0,
+            damage: 60.0,
+            fire_rate: 1.0,         // Slow fire rate
+            projectile_speed: 800.0, // Very fast
             ammo: 100.0,
-            cooldown: 3.0,
         },
+        // MISSILE: Homing, medium damage/fire rate
         missile: WeaponStats {
             damage: 30.0,
-            fire_rate: 1.0,
-            projectile_speed: 350.0,
+            fire_rate: 0.5,
+            projectile_speed: 250.0, // Slow but tracks
             ammo: 100.0,
-            cooldown: 3.0,
         },
+        // PLASMA: Spread shot (TODO: implement 3-projectile cone)
         plasma: WeaponStats {
-            damage: 40.0,
-            fire_rate: 1.5,
-            projectile_speed: 450.0,
+            damage: 25.0,
+            fire_rate: 0.4,
+            projectile_speed: 500.0,
             ammo: 100.0,
-            cooldown: 3.0,
         },
+        // BOMBS: AOE explosion (TODO: implement explosion radius)
         bombs: WeaponStats {
-            damage: 50.0,
-            fire_rate: 2.0,
-            projectile_speed: 300.0,
+            damage: 80.0,
+            fire_rate: 2.0,         // Very slow
+            projectile_speed: 200.0, // Slow drop
             ammo: 100.0,
-            cooldown: 3.0,
         },
     }
 }
