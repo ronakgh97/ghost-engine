@@ -1,6 +1,7 @@
 use crate::defaults::default_config;
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::thread::AccessError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameConfig {
@@ -73,6 +74,7 @@ pub struct WeaponStats {
     pub damage: f32,
     pub fire_rate: f32,
     pub projectile_speed: f32,
+    pub ammo: f32,
     pub cooldown: f32,
 }
 
