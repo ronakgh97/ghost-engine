@@ -13,6 +13,11 @@ pub fn default_config() -> GameConfig {
         spawning: default_spawning(),
         formations: default_formations(),
         debug: default_debug(),
+        collision: default_collision(),
+        ghost_behavior: default_ghost_behavior(),
+        enemy_behavior: default_enemy_behavior(),
+        formation_spacing: default_formation_spacing(),
+        projectile_bounds: default_projectile_bounds(),
     }
 }
 
@@ -122,8 +127,6 @@ fn default_formations() -> FormationsConfig {
         line_optimal: 5,
         circle_min: 4,
         circle_optimal: 8,
-        diamond_min: 4,
-        diamond_optimal: 5,
         scattered_min: 1,
         scattered_optimal: 4,
     }
@@ -133,5 +136,58 @@ fn default_debug() -> DebugConfig {
     DebugConfig {
         show_hitboxes: false,
         show_fps: true,
+    }
+}
+
+fn default_collision() -> CollisionConfig {
+    CollisionConfig {
+        projectile_radius: 5.0,
+        enemy_radius: 15.0,
+        player_radius: 15.0,
+        ghost_radius: 12.0,
+    }
+}
+
+fn default_ghost_behavior() -> GhostBehaviorConfig {
+    GhostBehaviorConfig {
+        fire_interval: 1.0,
+        movement_threshold_y: 200.0,
+        fast_ascent_speed: 50.0,
+        slow_hover_speed: 100.0,
+        projectile_speed: 350.0,
+        screen_boundary_top: -50.0,
+    }
+}
+
+fn default_enemy_behavior() -> EnemyBehaviorConfig {
+    EnemyBehaviorConfig {
+        movement_threshold_y: 200.0,
+        fast_descent_speed: 100.0,
+        slow_hover_speed: 50.0,
+        fire_threshold_y: 50.0,
+        screen_boundary_bottom: 650.0,
+        basic_projectile_speed_y: 250.0,
+    }
+}
+
+fn default_formation_spacing() -> FormationSpacingConfig {
+    FormationSpacingConfig {
+        v_shape_spacing: 40.0,
+        v_shape_vertical_factor: 0.8,
+        line_spacing: 50.0,
+        line_height_offset: 80.0,
+        circle_radius: 70.0,
+        scattered_x_min: -80.0,
+        scattered_x_max: 80.0,
+        scattered_y_min: -100.0,
+        scattered_y_max: -40.0,
+        screen_edge_padding: 30.0,
+    }
+}
+
+fn default_projectile_bounds() -> ProjectileBoundsConfig {
+    ProjectileBoundsConfig {
+        off_screen_padding: 50.0,
+        player_projectile_speed_y: -400.0,
     }
 }

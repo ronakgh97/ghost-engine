@@ -12,6 +12,11 @@ pub struct GameConfig {
     pub spawning: SpawningConfig,
     pub formations: FormationsConfig,
     pub debug: DebugConfig,
+    pub collision: CollisionConfig,
+    pub ghost_behavior: GhostBehaviorConfig,
+    pub enemy_behavior: EnemyBehaviorConfig,
+    pub formation_spacing: FormationSpacingConfig,
+    pub projectile_bounds: ProjectileBoundsConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -85,8 +90,6 @@ pub struct FormationsConfig {
     pub line_optimal: usize,
     pub circle_min: usize,
     pub circle_optimal: usize,
-    pub diamond_min: usize,
-    pub diamond_optimal: usize,
     pub scattered_min: usize,
     pub scattered_optimal: usize,
 }
@@ -97,11 +100,59 @@ pub struct DebugConfig {
     pub show_fps: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CollisionConfig {
+    pub projectile_radius: f32,
+    pub enemy_radius: f32,
+    pub player_radius: f32,
+    pub ghost_radius: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GhostBehaviorConfig {
+    pub fire_interval: f32,
+    pub movement_threshold_y: f32,
+    pub fast_ascent_speed: f32,
+    pub slow_hover_speed: f32,
+    pub projectile_speed: f32,
+    pub screen_boundary_top: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EnemyBehaviorConfig {
+    pub movement_threshold_y: f32,
+    pub fast_descent_speed: f32,
+    pub slow_hover_speed: f32,
+    pub fire_threshold_y: f32,
+    pub screen_boundary_bottom: f32,
+    pub basic_projectile_speed_y: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FormationSpacingConfig {
+    pub v_shape_spacing: f32,
+    pub v_shape_vertical_factor: f32,
+    pub line_spacing: f32,
+    pub line_height_offset: f32,
+    pub circle_radius: f32,
+    pub scattered_x_min: f32,
+    pub scattered_x_max: f32,
+    pub scattered_y_min: f32,
+    pub scattered_y_max: f32,
+    pub screen_edge_padding: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectileBoundsConfig {
+    pub off_screen_padding: f32,
+    pub player_projectile_speed_y: f32,
+}
+
 impl GameConfig {
-    /// Load config with smart fallback strategy
+    /// Load config with smart fallback strategy (ONLY use for hot-reload on R key)
     pub fn load() -> Self {
         // Try to load from file
-        match Self::load_from_file() {
+        match Self::try_load_from_file() {
             Ok(config) => {
                 println!("✅ Loaded config from config.toml");
                 config
@@ -115,7 +166,8 @@ impl GameConfig {
     }
 
     /// Try to load from file (returns error if missing/invalid)
-    fn load_from_file() -> Result<Self, Box<dyn std::error::Error>> {
+    /// Made public for hot-reload error handling in main loop
+    pub fn try_load_from_file() -> Result<Self, Box<dyn std::error::Error>> {
         let contents = fs::read_to_string("config.toml")?;
         let config: GameConfig = toml::from_str(&contents)?;
         Ok(config)
