@@ -77,9 +77,9 @@ fn fire_ghost_weapon(
             damage: weapon.get_weapon_stats(weapons_config).damage,
             weapon_type: weapon,
             owner: ProjectileOwner::Ghost,
-            piercing: false,        // Ghosts use standard projectiles
-            homing: false,          // Ghosts don't use homing (already targeting)
-            explosion_radius: 0.0,  // Ghosts don't use explosions
+            piercing: false,       // Ghosts use standard projectiles
+            homing: false,         // Ghosts don't use homing (already targeting)
+            explosion_radius: 0.0, // Ghosts don't use explosions
             locked_target_index: None,
             lifetime: 0.0,
         });

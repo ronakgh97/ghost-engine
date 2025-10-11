@@ -55,24 +55,32 @@ fn default_entities() -> EntitiesConfig {
             damage: 10.0,
             energy_cost: 15.0,
             fire_interval: 2.0,
+            weapons: vec!["Bullet".to_string()], // Simple shots
         },
         sniper: EntityStats {
             health: 30.0,
             damage: 25.0,
             energy_cost: 25.0,
             fire_interval: 3.0,
+            weapons: vec!["Laser".to_string()], // Piercing beam
         },
         tank: EntityStats {
             health: 150.0,
             damage: 15.0,
             energy_cost: 40.0,
             fire_interval: 1.5,
+            weapons: vec!["Bullet".to_string(), "Missile".to_string()], // Mix
         },
         boss: EntityStats {
             health: 500.0,
             damage: 50.0,
             energy_cost: 80.0,
             fire_interval: 0.8,
+            weapons: vec![
+                "Laser".to_string(),
+                "Missile".to_string(),
+                "Bullet".to_string(),
+            ], // Arsenal
         },
     }
 }
@@ -82,14 +90,14 @@ fn default_weapons() -> WeaponsConfig {
         // BULLET: Rapid fire, low damage, general purpose
         bullet: WeaponStats {
             damage: 10.0,
-            fire_rate: 0.1,         // Fast fire rate
+            fire_rate: 0.1, // Fast fire rate
             projectile_speed: 500.0,
             ammo: 100.0,
         },
         // LASER: Piercing beam, high damage, slow fire rate
         laser: WeaponStats {
             damage: 60.0,
-            fire_rate: 1.0,         // Slow fire rate
+            fire_rate: 1.0,          // Slow fire rate
             projectile_speed: 800.0, // Very fast
             ammo: 100.0,
         },
@@ -110,7 +118,7 @@ fn default_weapons() -> WeaponsConfig {
         // BOMBS: AOE explosion (TODO: implement explosion radius)
         bombs: WeaponStats {
             damage: 80.0,
-            fire_rate: 2.0,         // Very slow
+            fire_rate: 2.0,          // Very slow
             projectile_speed: 200.0, // Slow drop
             ammo: 100.0,
         },

@@ -15,10 +15,35 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             EntityType::BasicFighter, // More common
             EntityType::Sniper,
             EntityType::Tank,
+            EntityType::Tank,
+            EntityType::Tank,
         ];
 
         let random_idx = rand::gen_range(0, enemy_types.len());
         let entity_type = enemy_types[random_idx];
+
+        // Get entity stats from config
+        let entity_stats = entity_type.get_stats(&state.config.entities);
+        let entity_config = match entity_type {
+            EntityType::BasicFighter => &state.config.entities.basic_fighter,
+            EntityType::Sniper => &state.config.entities.sniper,
+            EntityType::Tank => &state.config.entities.tank,
+            EntityType::Boss => &state.config.entities.boss,
+        };
+
+        // Parse weapons from config
+        let weapons: Vec<WeaponType> = entity_config
+            .weapons
+            .iter()
+            .filter_map(|w| WeaponType::from_string(w))
+            .collect();
+
+        // Fallback to Bullet if no valid weapons configured
+        let final_weapons = if weapons.is_empty() {
+            vec![WeaponType::Bullet]
+        } else {
+            weapons
+        };
 
         // Create enemy at random X position
         let enemy = Enemy {
@@ -26,9 +51,9 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
                 x: rand::gen_range(30.0, screen_width() - 30.0),
                 y: -30.0, // Above screen
             },
-            stats: entity_type.get_stats(&state.config.entities),
+            stats: entity_stats,
             entity_type,
-            weapon: vec![WeaponType::Bullet],
+            weapon: final_weapons,
         };
 
         state.enemies.push(enemy);

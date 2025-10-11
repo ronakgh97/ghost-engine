@@ -18,7 +18,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                         collision_cfg.enemy_radius,
                     ) {
                         enemy.stats.health -= projectile.damage;
-                        
+
                         // Only mark for removal if NOT piercing (lasers pierce through)
                         if !projectile.piercing {
                             projectiles_to_remove.push(proj_idx);

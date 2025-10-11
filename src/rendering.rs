@@ -215,14 +215,19 @@ fn draw_projectiles(projectiles: &[Projectile]) {
             }
             ProjectileOwner::Enemy => (RED, 5.0, false),
         };
-        
+
         // Draw glow effect for special weapons
         if glow {
-            draw_circle(proj.pos.x, proj.pos.y, size + 3.0, Color::new(color.r, color.g, color.b, 0.3));
+            draw_circle(
+                proj.pos.x,
+                proj.pos.y,
+                size + 3.0,
+                Color::new(color.r, color.g, color.b, 0.3),
+            );
         }
-        
+
         draw_circle(proj.pos.x, proj.pos.y, size, color);
-        
+
         // Draw beam line for lasers (elongated visual)
         if matches!(proj.weapon_type, WeaponType::Laser) {
             draw_line(

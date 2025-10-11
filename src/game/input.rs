@@ -22,13 +22,19 @@ pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
         game_state.player.pos.x += 200.0 * delta_time;
     }
 
-    // Weapon firing
+    // Fire Bullets
     if is_key_down(KeyCode::H) {
         weapons::player_fire_weapon(game_state, 0);
     }
 
+    // Fire Lasers
     if is_key_down(KeyCode::J) {
         weapons::player_fire_weapon(game_state, 1);
+    }
+
+    // Fire Missiles
+    if is_key_down(KeyCode::K) {
+        weapons::player_fire_weapon(game_state, 2);
     }
 
     // Formation switching

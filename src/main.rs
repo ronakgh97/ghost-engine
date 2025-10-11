@@ -40,7 +40,6 @@ async fn main() {
                     println!("✘ Failed to reload config.toml: {}", e);
                 }
             }
-
         }
 
         // Update game logic

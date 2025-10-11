@@ -58,6 +58,7 @@ pub struct EntityStats {
     pub damage: f32,
     pub energy_cost: f32,
     pub fire_interval: f32,
+    pub weapons: Vec<String>, // Weapon types this entity can use
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -71,10 +72,10 @@ pub struct WeaponsConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WeaponStats {
-    pub damage: f32,            // Base damage per projectile
-    pub fire_rate: f32,         // Cooldown between shots (in seconds)
-    pub projectile_speed: f32,  // How fast projectiles travel (pixels/sec)
-    pub ammo: f32,              // Magazine capacity (TODO: implement reload system)
+    pub damage: f32,           // Base damage per projectile
+    pub fire_rate: f32,        // Cooldown between shots (in seconds)
+    pub projectile_speed: f32, // How fast projectiles travel (pixels/sec)
+    pub ammo: f32,             // Magazine capacity (TODO: implement reload system)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -59,32 +59,100 @@ fn fire_enemy_weapon(
     basic_projectile_speed_y: f32,
     weapons_config: &crate::config::WeaponsConfig,
 ) {
-    if let Some(&weapon) = enemy.weapon.first() {
-        let velocity = match enemy.entity_type {
-            EntityType::BasicFighter | EntityType::Tank => {
-                // Shoot straight down
-                Position {
+    // Pick random weapon from enemy's arsenal
+    if enemy.weapon.is_empty() {
+        return;
+    }
+
+    let random_idx = rand::gen_range(0, enemy.weapon.len());
+    let weapon = enemy.weapon[random_idx];
+    let weapon_stats = weapon.get_weapon_stats(weapons_config);
+
+    match weapon {
+        WeaponType::Bullet => {
+            // Shoot straight down or aimed based on enemy type
+            let velocity = match enemy.entity_type {
+                EntityType::BasicFighter | EntityType::Tank => Position {
                     x: 0.0,
                     y: basic_projectile_speed_y,
+                },
+                EntityType::Sniper | EntityType::Boss => {
+                    calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
                 }
-            }
-            EntityType::Sniper | EntityType::Boss => {
-                // Aim at player (use same speed for consistency)
-                calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
-            }
-        };
+            };
 
-        projectiles.push(Projectile {
-            pos: enemy.pos,
-            velocity,
-            damage: weapon.get_weapon_stats(weapons_config).damage * 0.5,
-            weapon_type: weapon,
-            owner: ProjectileOwner::Enemy,
-            piercing: false,        // Enemies don't use piercing
-            homing: false,          // Enemies don't use homing
-            explosion_radius: 0.0,  // Enemies don't use explosions
-            locked_target_index: None,
-            lifetime: 0.0,
-        });
+            projectiles.push(Projectile {
+                pos: enemy.pos,
+                velocity,
+                damage: weapon_stats.damage * 0.5, // Enemies deal half damage
+                weapon_type: weapon,
+                owner: ProjectileOwner::Enemy,
+                piercing: false,
+                homing: false,
+                explosion_radius: 0.0,
+                locked_target_index: None,
+                lifetime: 0.0,
+            });
+        }
+        WeaponType::Laser => {
+            // Lasers always aim at player (high-threat weapon)
+            let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
+
+            projectiles.push(Projectile {
+                pos: enemy.pos,
+                velocity,
+                damage: weapon_stats.damage * 0.5,
+                weapon_type: weapon,
+                owner: ProjectileOwner::Enemy,
+                piercing: true, // Enemy lasers also pierce
+                homing: false,
+                explosion_radius: 0.0,
+                locked_target_index: None,
+                lifetime: 0.0,
+            });
+        }
+        WeaponType::Missile => {
+            // Enemy missiles home in on the player (high threat!)
+            let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
+
+            projectiles.push(Projectile {
+                pos: enemy.pos,
+                velocity,
+                damage: weapon_stats.damage * 0.5,
+                weapon_type: weapon,
+                owner: ProjectileOwner::Enemy,
+                piercing: false,
+                homing: true, // Enemy missiles now track the player!
+                explosion_radius: 0.0,
+                locked_target_index: Some(0), // Lock onto player (index 0 for enemy projectiles)
+                lifetime: 0.0,
+            });
+        }
+        WeaponType::Plasma | WeaponType::Bombs => {
+            // TODO: Implement plasma spread and bombs
+            // For now, fallback to bullet behavior
+            let velocity = match enemy.entity_type {
+                EntityType::BasicFighter | EntityType::Tank => Position {
+                    x: 0.0,
+                    y: basic_projectile_speed_y,
+                },
+                EntityType::Sniper | EntityType::Boss => {
+                    calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
+                }
+            };
+
+            projectiles.push(Projectile {
+                pos: enemy.pos,
+                velocity,
+                damage: weapon_stats.damage * 0.5,
+                weapon_type: WeaponType::Bullet, // Convert to bullet for now
+                owner: ProjectileOwner::Enemy,
+                piercing: false,
+                homing: false,
+                explosion_radius: 0.0,
+                locked_target_index: None,
+                lifetime: 0.0,
+            });
+        }
     }
 }

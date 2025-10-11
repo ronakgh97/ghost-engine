@@ -15,22 +15,30 @@ pub struct Stats {
 }
 
 pub struct WeaponStats {
-    pub damage: f32,
-    pub fire_rate: f32, // Shots per second
-    pub ammo: f32,
-    pub cooldown: f32,  // Not Used currently
-    pub projectile_speed: f32
+    pub damage: f32,           // Base damage per projectile
+    pub fire_rate: f32,        // Cooldown between shots (in seconds)
+    pub projectile_speed: f32, // How fast projectiles travel (pixels/sec)
+    pub ammo: f32,             // Magazine capacity (TODO: implement reload system)
 }
 
 pub struct Projectile {
     pub pos: Position,
     pub velocity: Position,
     pub damage: f32,
-    pub weapon_type: WeaponType, // Not used currently
+    pub weapon_type: WeaponType, // Determines behavior (piercing, homing, etc)
     pub owner: ProjectileOwner,  // To differentiate between player, ghost and enemy projectiles
+
+    // Weapon-specific behavior flags
+    pub piercing: bool,        // Laser: doesn't despawn on hit
+    pub homing: bool,          // Missile: tracks nearest enemy
+    pub explosion_radius: f32, // Bombs: AOE damage on impact (0.0 = no explosion)
+
+    // Homing missile data
+    pub locked_target_index: Option<usize>, // Which enemy index is locked (None = find new target)
+    pub lifetime: f32,                      // How long projectile has existed (for cleanup)
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ProjectileOwner {
     Player,
     Enemy,
@@ -42,12 +50,24 @@ pub enum ProjectileOwner {
 pub enum WeaponType {
     Bullet,
     Laser,
-    Missile, // Not implemented yet
-    Plasma,  // Not implemented yet
-    Bombs,   // Not implemented yet
+    Missile,
+    Plasma, // Not implemented yet
+    Bombs,  // Not implemented yet
 }
 
 impl WeaponType {
+    /// Parse weapon type from string (for config loading)
+    pub fn from_string(s: &str) -> Option<Self> {
+        match s {
+            "Bullet" => Some(WeaponType::Bullet),
+            "Laser" => Some(WeaponType::Laser),
+            "Missile" => Some(WeaponType::Missile),
+            "Plasma" => Some(WeaponType::Plasma),
+            "Bombs" => Some(WeaponType::Bombs),
+            _ => None,
+        }
+    }
+
     /// Get weapon stats from config (no more hardcoded values!)
     pub fn get_weapon_stats(&self, config: &crate::config::WeaponsConfig) -> WeaponStats {
         let weapon_cfg = match self {
@@ -61,9 +81,8 @@ impl WeaponType {
         WeaponStats {
             damage: weapon_cfg.damage,
             fire_rate: weapon_cfg.fire_rate,
-            cooldown: weapon_cfg.cooldown,
-            ammo: weapon_cfg.ammo,
             projectile_speed: weapon_cfg.projectile_speed,
+            ammo: weapon_cfg.ammo,
         }
     }
 
@@ -228,7 +247,7 @@ impl GameState {
                     max_health: config.player.max_health,
                     damage: 20.0,
                 },
-                weapon: vec![WeaponType::Bullet, WeaponType::Laser],
+                weapon: vec![WeaponType::Bullet, WeaponType::Laser, WeaponType::Missile],
                 energy: config.player.starting_energy,
                 max_energy: config.player.max_energy,
                 available_ghosts: Vec::new(),

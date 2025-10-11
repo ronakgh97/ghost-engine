@@ -23,29 +23,30 @@ health = 50.0
 damage = 10.0
 energy_cost = 15.0
 fire_interval = 2.0
+weapons = ["Bullet"]  # Simple straight shots
 
 [entities.sniper]
 health = 30.0
 damage = 25.0
 energy_cost = 25.0
 fire_interval = 3.0
+weapons = ["Laser"]  # Piercing beam - dangerous!
 
 [entities.tank]
 health = 150.0
 damage = 15.0
 energy_cost = 40.0
 fire_interval = 1.5
+weapons = ["Bullet", "Missile"]  # Mix: 50% bullets, 50% homing
 
 [entities.boss]
 health = 500.0
 damage = 50.0
 energy_cost = 80.0
 fire_interval = 0.8
+weapons = ["Laser", "Missile", "Bullet"]  # Boss arsenal: laser + homing + bullets
 
 # WEAPONS CONFIGURATION
-# fire_rate = Cooldown between shots (in seconds)
-# projectile_speed = How fast projectiles travel (pixels/sec)
-# ammo = Magazine capacity (TODO: implement reload system)
 
 [weapons.bullet]
 # Rapid fire, low damage, general purpose
