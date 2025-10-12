@@ -81,7 +81,6 @@ pub fn render_ui(state: &GameState) {
         GhostFormation::VShape => "V-Shape",
         GhostFormation::Line => "Line",
         GhostFormation::Circle => "Circle",
-        GhostFormation::Scattered => "Scattered",
     };
 
     let available_count = state.player.available_ghosts.len();
@@ -133,7 +132,7 @@ pub fn render_ui(state: &GameState) {
     // Controls hint
     draw_text("SPACE - Deploy Formation", 10.0, 175.0, 16.0, GRAY);
     draw_text("F1-F4 - Spawn Single Ghost", 10.0, 195.0, 16.0, GRAY);
-    draw_text("1-4 - Change Formation", 10.0, 215.0, 16.0, GRAY);
+    draw_text("1-3 - Change Formation", 10.0, 215.0, 16.0, GRAY);
 
     // Controls hint
     draw_controls_hint();
