@@ -7,19 +7,19 @@ use macroquad::input::*;
 pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
     // Player movement
     if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-        game_state.player.pos.y += 200.0 * delta_time;
+        game_state.player.pos.y += game_state.config.player.movement_speed * delta_time;
     }
 
     if is_key_down(KeyCode::Up) || is_key_down(KeyCode::W) {
-        game_state.player.pos.y -= 200.0 * delta_time;
+        game_state.player.pos.y -= game_state.config.player.movement_speed * delta_time;
     }
 
     if is_key_down(KeyCode::Left) || is_key_down(KeyCode::A) {
-        game_state.player.pos.x -= 200.0 * delta_time;
+        game_state.player.pos.x -= game_state.config.player.movement_speed * delta_time;
     }
 
     if is_key_down(KeyCode::Right) || is_key_down(KeyCode::D) {
-        game_state.player.pos.x += 200.0 * delta_time;
+        game_state.player.pos.x += game_state.config.player.movement_speed * delta_time;
     }
 
     // Fire Bullets
