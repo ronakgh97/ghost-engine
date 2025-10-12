@@ -203,13 +203,37 @@ impl GhostFormation {
 }
 
 impl Ghost {
-    pub fn from_enemy(enemy: &Enemy, entities_config: &crate::config::EntitiesConfig) -> Self {
+    /// Create ghost directly from EntityType (no temp Enemy allocation)
+    pub fn from_entity_type(
+        entity_type: EntityType,
+        spawn_pos: Position,
+        config: &crate::config::GameConfig,
+    ) -> Self {
+        // Get entity config
+        let entity_config = match entity_type {
+            EntityType::BasicFighter => &config.entities.basic_fighter,
+            EntityType::Sniper => &config.entities.sniper,
+            EntityType::Tank => &config.entities.tank,
+            EntityType::Boss => &config.entities.boss,
+        };
+
+        // Parse weapons from config (inherit from entity type!)
+        let weapons: Vec<WeaponType> = entity_config
+            .weapons
+            .iter()
+            .filter_map(|w| WeaponType::from_string(w))
+            .collect();
+
         Ghost {
-            pos: enemy.pos,
-            stats: enemy.stats,
-            weapon_type: enemy.weapon.clone(),
-            entity_type: enemy.entity_type,
-            energy_drain_per_sec: enemy.entity_type.get_energy_cost(entities_config) * 0.1,
+            pos: spawn_pos,
+            stats: entity_type.get_stats(&config.entities),
+            weapon_type: if weapons.is_empty() {
+                vec![WeaponType::Bullet] // Fallback only if config invalid
+            } else {
+                weapons // ✅ Uses entity's configured weapons!
+            },
+            entity_type,
+            energy_drain_per_sec: entity_type.get_energy_cost(&config.entities) * 0.1,
         }
     }
 }
@@ -247,7 +271,13 @@ impl GameState {
                     max_health: config.player.max_health,
                     damage: 20.0,
                 },
-                weapon: vec![WeaponType::Bullet, WeaponType::Laser, WeaponType::Missile],
+                weapon: vec![
+                    WeaponType::Bullet,
+                    WeaponType::Laser,
+                    WeaponType::Missile,
+                    WeaponType::Plasma,
+                    WeaponType::Bombs,
+                ],
                 energy: config.player.starting_energy,
                 max_energy: config.player.max_energy,
                 available_ghosts: Vec::new(),
