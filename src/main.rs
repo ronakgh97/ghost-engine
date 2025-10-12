@@ -14,7 +14,7 @@ use rendering::{render_game, render_ui};
 /// Window configuration
 fn window_conf() -> Conf {
     Conf {
-        window_title: "Ghost Ally Shooter".to_owned(),
+        window_title: "Ghost Engine".to_owned(),
         window_width: 800,
         window_height: 600,
         window_resizable: false,
