@@ -37,7 +37,13 @@ fn default_player() -> PlayerConfig {
         starting_energy: 100.0,
         max_energy: 100.0,
         movement_speed: 200.0,
-        starting_weapons: vec!["Bullet".to_string(), "Laser".to_string(), "Missile".to_string(), "Plasma".to_string(), "Bombs".to_string()],
+        starting_weapons: vec![
+            "Bullet".to_string(),
+            "Laser".to_string(),
+            "Missile".to_string(),
+            "Plasma".to_string(),
+            "Bombs".to_string(),
+        ],
     }
 }
 
@@ -69,7 +75,7 @@ fn default_entities() -> EntitiesConfig {
             damage: 15.0,
             energy_cost: 40.0,
             fire_interval: 1.5,
-            weapons: vec!["Bullet".to_string(), "Missile".to_string()], // Mix
+            weapons: vec!["Missile".to_string(), "Plasma".to_string()], // Tank: Homing + Spread
         },
         boss: EntityStats {
             health: 500.0,
@@ -79,8 +85,9 @@ fn default_entities() -> EntitiesConfig {
             weapons: vec![
                 "Laser".to_string(),
                 "Missile".to_string(),
-                "Bullet".to_string(),
-            ], // Arsenal
+                "Bombs".to_string(),
+                "Plasma".to_string(),
+            ], // Boss arsenal: ALL advanced weapons!
         },
     }
 }

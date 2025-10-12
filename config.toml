@@ -30,21 +30,21 @@ health = 30.0
 damage = 25.0
 energy_cost = 25.0
 fire_interval = 3.0
-weapons = ["Laser"]  # Piercing beam - dangerous!
+weapons = ["Laser"]  # Piercing beam
 
 [entities.tank]
 health = 150.0
 damage = 15.0
 energy_cost = 40.0
 fire_interval = 1.5
-weapons = ["Bullet", "Missile"]  # Mix: 50% bullets, 50% homing
+weapons = ["Missile", "Plasma"]  # Tank: Homing missiles + spread plasma
 
 [entities.boss]
 health = 500.0
 damage = 50.0
 energy_cost = 80.0
 fire_interval = 0.8
-weapons = ["Laser", "Missile", "Bullet"]  # Boss arsenal: laser + homing + bullets
+weapons = ["Laser", "Missile", "Bombs", "Plasma"]  # Boss arsenal: ALL advanced weapons!
 
 # WEAPONS CONFIGURATION
 

@@ -156,12 +156,12 @@ impl GameConfig {
         // Try to load from file
         match Self::try_load_from_file() {
             Ok(config) => {
-                println!("✅ Loaded config from config.toml");
+                println!("✓ Loaded config from config.toml");
                 config
             }
             Err(e) => {
-                println!("⚠️  Could not load config.toml: {}", e);
-                println!("✅ Using compiled-in defaults");
+                println!("✗  Could not load config.toml: {}", e);
+                println!("✓ Using compiled-in defaults");
                 default_config()
             }
         }
@@ -181,7 +181,7 @@ impl GameConfig {
         let toml_string = toml::to_string_pretty(&default).expect("Failed to serialize config");
 
         fs::write("config.toml", toml_string)?;
-        println!("✅ Created config.toml template");
+        println!("✓ Created config.toml template");
         Ok(())
     }
 
