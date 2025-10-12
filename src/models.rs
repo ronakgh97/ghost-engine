@@ -1,5 +1,4 @@
 use crate::config::GameConfig;
-use macroquad::logging::warn;
 
 #[derive(Clone, Copy)]
 pub struct Position {
@@ -169,30 +168,27 @@ pub struct Ghost {
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum GhostFormation {
-    VShape,    // Classic V formation (good for spread coverage)
-    Line,      // Horizontal line (maximum firepower forward)
-    Circle,    // Circle around player (defensive)
-    Scattered, // Random positions (chaotic but cool)
+    VShape, // Classic V formation (good for spread coverage)
+    Line,   // Horizontal line (maximum firepower forward)
+    Circle, // Circle around player (defensive)
 }
 
 impl GhostFormation {
     /// Get minimum ghost count required for this formation
     pub fn min_ghost_count(&self) -> usize {
         match self {
-            GhostFormation::VShape => 2,    // At least 2 to make a V
-            GhostFormation::Line => 3,      // At least 3 for a line
-            GhostFormation::Circle => 4,    // At least 4 for circular shape
-            GhostFormation::Scattered => 3, // Can scatter even 1 ghost
+            GhostFormation::VShape => 2, // At least 2 to make a V
+            GhostFormation::Line => 3,   // At least 3 for a line
+            GhostFormation::Circle => 4, // At least 4 for circular shape
         }
     }
 
     /// Get optimal ghost count for this formation
     pub fn optimal_ghost_count(&self) -> usize {
         match self {
-            GhostFormation::VShape => 6,    // 3 on each side
-            GhostFormation::Line => 5,      // Nice spread
-            GhostFormation::Circle => 8,    // Perfect circle
-            GhostFormation::Scattered => 6, // Not too chaotic
+            GhostFormation::VShape => 6, // 3 on each side
+            GhostFormation::Line => 5,   // Nice spread
+            GhostFormation::Circle => 8, // Perfect circle
         }
     }
 
@@ -289,7 +285,7 @@ impl GameState {
             enemy_fire_timers: Vec::new(),
             ghost_fire_timers: Vec::new(),
             spawn_timer: 0.0,
-            ghost_formation: GhostFormation::Scattered,
+            ghost_formation: GhostFormation::Line,
         }
     }
     pub fn apply_config(&mut self, config: &GameConfig) {
