@@ -1,3 +1,4 @@
+use crate::game::screen_shake::shake_on_parry;
 use crate::models::*;
 use macroquad::prelude::*;
 
@@ -84,6 +85,7 @@ pub fn check_parry_projectiles(state: &mut GameState) {
         println!("✔ PARRY SUCCESS! ({} projectiles deflected)", parried_count);
         state.player.parry_active = false;
         state.player.parry_cooldown = state.config.player.parry_cooldown;
-        // TODO: Screen shake, particle effect, sound
+        shake_on_parry(state); // Screen shake on successful parry!
+        // TODO: Particle effect, sound
     }
 }
