@@ -54,6 +54,16 @@ pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
 
     // Ghost spawning
     spawn_ghost_from_queue(game_state);
+
+    // Parry system
+    if is_key_pressed(KeyCode::X) {
+        crate::game::parry::attempt_parry(game_state);
+    }
+
+    // Cancel summon
+    if is_key_pressed(KeyCode::C) {
+        crate::game::cancel_summon::cancel_summon(game_state);
+    }
 }
 
 /// Spawn single ghost when F-keys pressed
