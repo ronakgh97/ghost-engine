@@ -1,3 +1,4 @@
+use crate::game::screen_shake::shake_on_enemy_death;
 use crate::game::utils::circle_collision;
 use crate::models::*;
 
@@ -20,7 +21,8 @@ pub fn cleanup_dead_entities(state: &mut GameState) {
             let enemy_type = state.enemies[i].entity_type;
             state.player.available_ghosts.push(enemy_type);
             state.enemies.remove(i);
-            // TODO: Spawn death particle effect
+            shake_on_enemy_death(state); // Screen shake on death!
+        // TODO: Spawn death particle effect
         } else {
             i += 1;
         }

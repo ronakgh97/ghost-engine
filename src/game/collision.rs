@@ -1,3 +1,4 @@
+use crate::game::screen_shake::{shake_on_player_hit, shake_on_weapon_hit};
 use crate::game::utils::circle_collision;
 use crate::models::*;
 
@@ -5,6 +6,8 @@ use crate::models::*;
 pub fn check_projectile_collisions(state: &mut GameState) {
     let mut projectiles_to_remove = Vec::new();
     let collision_cfg = &state.config.collision;
+    let mut player_was_hit = false; // Track if player took damage
+    let mut weapon_hits: Vec<WeaponType> = Vec::new(); // Track weapon types that hit
 
     for (proj_idx, projectile) in state.projectiles.iter().enumerate() {
         match projectile.owner {
@@ -27,6 +30,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
 
                     // Bomb explodes if it hits ANY enemy (AOE damage applied to all in radius)
                     if hit_any_enemy {
+                        weapon_hits.push(projectile.weapon_type); // Track bomb hit for shake
                         projectiles_to_remove.push(proj_idx);
                     }
                 } else {
@@ -39,6 +43,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                             collision_cfg.enemy_radius,
                         ) {
                             enemy.stats.health -= projectile.damage;
+                            weapon_hits.push(projectile.weapon_type); // Track weapon hit for shake
 
                             // Only mark for removal if NOT piercing (lasers pierce through)
                             if !projectile.piercing {
@@ -63,6 +68,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
 
                     if distance_to_player <= projectile.explosion_radius {
                         state.player.stats.health -= projectile.damage;
+                        player_was_hit = true; // Mark for shake trigger
                         hit_player_or_ghost = true;
                     }
 
@@ -91,6 +97,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                         collision_cfg.player_radius,
                     ) {
                         state.player.stats.health -= projectile.damage;
+                        player_was_hit = true; // Mark for shake trigger
                         // Enemy projectiles never pierce
                         projectiles_to_remove.push(proj_idx);
                     }
@@ -120,5 +127,24 @@ pub fn check_projectile_collisions(state: &mut GameState) {
         if idx < state.projectiles.len() {
             state.projectiles.remove(idx);
         }
+    }
+
+    // Trigger screen shake if player was hit
+    if player_was_hit {
+        shake_on_player_hit(state);
+    }
+    
+    // Trigger weapon-specific shake for each hit (strongest weapon wins if multiple)
+    if let Some(&strongest_weapon) = weapon_hits.iter().max_by_key(|w| {
+        // Priority order: Bombs > Missile > Laser > Plasma > Bullet
+        match w {
+            WeaponType::Bombs => 5,
+            WeaponType::Missile => 4,
+            WeaponType::Laser => 3,
+            WeaponType::Plasma => 2,
+            WeaponType::Bullet => 1,
+        }
+    }) {
+        shake_on_weapon_hit(state, strongest_weapon);
     }
 }
