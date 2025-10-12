@@ -25,7 +25,6 @@ pub fn attempt_parry(state: &mut GameState) {
     state.player.energy -= parry_cost;
 
     // TODO: Play parry animation/sound
-
 }
 
 /// Update parry timers

@@ -14,9 +14,6 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             EntityType::BasicFighter,
             EntityType::BasicFighter,
             EntityType::Sniper,
-            EntityType::Sniper,
-            EntityType::Tank,
-            EntityType::Tank,
             EntityType::Tank,
         ];
 

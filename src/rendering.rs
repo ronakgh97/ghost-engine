@@ -172,13 +172,7 @@ fn draw_player(player: &Player, state: &GameState) {
             RED, // Bright blue
         );
         // Inner glow
-        draw_circle_lines(
-            player.pos.x,
-            player.pos.y,
-            parry_radius - 5.0,
-            2.0,
-            ORANGE,
-        );
+        draw_circle_lines(player.pos.x, player.pos.y, parry_radius - 5.0, 2.0, ORANGE);
     }
 
     // Draw health bar above player
