@@ -54,8 +54,8 @@ pub fn render_ui(state: &GameState) {
         &format!("Ghosts Available: {:?}", state.player.available_ghosts),
         10.0,
         screen_height() - 25.0,
-        15.0,
-        GRAY,
+        18.0,
+        GREEN,
     );
 
     // Active ghosts count
@@ -204,15 +204,13 @@ fn draw_projectiles(projectiles: &[Projectile]) {
     for proj in projectiles {
         // Determine color/size based on weapon type and owner
         let (color, size, glow) = match proj.owner {
-            ProjectileOwner::Player | ProjectileOwner::Ghost => {
-                match proj.weapon_type {
-                    WeaponType::Bullet => (YELLOW, 4.0, false),
-                    WeaponType::Laser => (GREEN, 6.0, true), // Green, larger
-                    WeaponType::Missile => (ORANGE, 5.0, true), // Orange glow for homing
-                    WeaponType::Plasma => (PURPLE, 5.0, true),
-                    WeaponType::Bombs => (RED, 8.0, true),
-                }
-            }
+            ProjectileOwner::Player | ProjectileOwner::Ghost => match proj.weapon_type {
+                WeaponType::Bullet => (YELLOW, 4.0, false),
+                WeaponType::Laser => (GREEN, 6.0, true),
+                WeaponType::Missile => (ORANGE, 5.0, true),
+                WeaponType::Plasma => (PURPLE, 5.0, true),
+                WeaponType::Bombs => (RED, 8.0, true),
+            },
             ProjectileOwner::Enemy => (RED, 5.0, false),
         };
 
@@ -221,7 +219,7 @@ fn draw_projectiles(projectiles: &[Projectile]) {
             draw_circle(
                 proj.pos.x,
                 proj.pos.y,
-                size + 3.0,
+                size + 4.0,
                 Color::new(color.r, color.g, color.b, 0.3),
             );
         }
@@ -252,13 +250,13 @@ fn get_enemy_color(entity_type: EntityType) -> Color {
     }
 }
 
-/// Get color based on ghost type (semi-transparent)
+/// Get color based on ghost type
 fn get_ghost_color(entity_type: EntityType) -> Color {
     match entity_type {
-        EntityType::BasicFighter => Color::new(0.5, 1.0, 0.5, 0.6),
-        EntityType::Sniper => Color::new(1.0, 0.7, 0.3, 0.6),
-        EntityType::Tank => Color::new(0.7, 0.5, 1.0, 0.6),
-        EntityType::Boss => Color::new(1.0, 1.0, 0.5, 0.6),
+        EntityType::BasicFighter => RED,
+        EntityType::Sniper => BLUE,
+        EntityType::Tank => GREEN,
+        EntityType::Boss => GOLD,
     }
 }
 
