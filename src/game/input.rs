@@ -80,12 +80,10 @@ fn change_formation(state: &mut GameState) {
 
     let current_ghost_count = state.player.available_ghosts.len();
     let new_formation = if is_key_pressed(KeyCode::Key1) {
-        Some(GhostFormation::Scattered)
-    } else if is_key_pressed(KeyCode::Key2) {
         Some(GhostFormation::Line)
-    } else if is_key_pressed(KeyCode::Key3) {
+    } else if is_key_pressed(KeyCode::Key2) {
         Some(GhostFormation::Circle)
-    } else if is_key_pressed(KeyCode::Key4) {
+    } else if is_key_pressed(KeyCode::Key3) {
         Some(GhostFormation::VShape)
     } else {
         None
@@ -106,7 +104,6 @@ fn change_formation(state: &mut GameState) {
 }
 
 /// Attempt to spawn a single ghost of specific type
-/// Single spawns use simple side offset (NOT formation-based)
 fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
     // Find this ghost type in queue
     if let Some(index) = state
@@ -123,8 +120,14 @@ fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
             return;
         }
 
-        // Calculate simple spawn position (alternating left/right of player)
-        let spawn_pos = calculate_single_spawn_position(state);
+        // Calculate spawn position using current formation
+        let spawn_pos = calculate_formation_position(
+            state.player.pos,
+            state.ghosts.len(),
+            state.ghosts.len() + 1,
+            state.ghost_formation,
+            &state.config.formation_spacing,
+        );
 
         // Create ghost directly from EntityType (no temp Enemy!)
         let ghost = Ghost::from_entity_type(desired_type, spawn_pos, &state.config);
@@ -134,25 +137,6 @@ fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
         state.ghost_fire_timers.push(0.0); // Add timer for new ghost
         state.player.available_ghosts.remove(index);
         state.player.energy -= energy_cost;
-    }
-}
-
-/// Calculate spawn position for single ghost spawns (F-keys)
-/// Uses simple alternating left/right pattern instead of formation
-fn calculate_single_spawn_position(state: &GameState) -> crate::models::Position {
-    use crate::models::Position;
-
-    let ghost_count = state.ghosts.len();
-    let horizontal_spacing = 40.0; // Spacing between ghosts
-    let vertical_offset = -30.0; // Spawn slightly above player
-
-    // Alternate: even indices go left, odd go right
-    let side = if ghost_count % 2 == 0 { -1.0 } else { 1.0 };
-    let distance = ((ghost_count + 1) / 2) as f32 * horizontal_spacing;
-
-    Position {
-        x: state.player.pos.x + (side * distance),
-        y: state.player.pos.y + vertical_offset,
     }
 }
 
