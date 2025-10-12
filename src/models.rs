@@ -251,6 +251,10 @@ pub struct GameState {
     pub ghost_fire_timers: Vec<f32>,
     pub spawn_timer: f32,
     pub ghost_formation: GhostFormation,
+
+    // Screen shake
+    pub screen_shake_duration: f32,
+    pub screen_shake_intensity: f32,
 }
 
 impl GameState {
@@ -296,6 +300,10 @@ impl GameState {
             ghost_fire_timers: Vec::new(),
             spawn_timer: 0.0,
             ghost_formation: GhostFormation::Line,
+
+            // Screen shake
+            screen_shake_duration: 0.0,
+            screen_shake_intensity: 0.0,
         }
     }
     pub fn apply_config(&mut self, config: &GameConfig) {
