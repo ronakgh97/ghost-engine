@@ -45,7 +45,7 @@ pub enum ProjectileOwner {
 }
 
 #[allow(dead_code)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum WeaponType {
     Bullet,
     Laser,
@@ -146,6 +146,11 @@ pub struct Player {
     pub max_energy: f32,
     pub weapon: Vec<WeaponType>,
     pub available_ghosts: Vec<EntityType>,
+
+    // Parry system
+    pub parry_cooldown: f32, // Time until parry available again
+    pub parry_window: f32,   // How long parry is active (0.2 seconds)
+    pub parry_active: bool,  // Currently in parry stance
 }
 
 // Enemy
@@ -226,7 +231,7 @@ impl Ghost {
             weapon_type: if weapons.is_empty() {
                 vec![WeaponType::Bullet] // Fallback only if config invalid
             } else {
-                weapons // ✅ Uses entity's configured weapons!
+                weapons // Uses entity's configured weapons!
             },
             entity_type,
             energy_drain_per_sec: entity_type.get_energy_cost(&config.entities) * 0.1,
@@ -277,6 +282,11 @@ impl GameState {
                 energy: config.player.starting_energy,
                 max_energy: config.player.max_energy,
                 available_ghosts: Vec::new(),
+
+                // Parry system initialized
+                parry_cooldown: 0.0,
+                parry_window: 0.0,
+                parry_active: false,
             },
             enemies: Vec::new(),
             ghosts: Vec::new(),

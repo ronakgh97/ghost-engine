@@ -3,7 +3,7 @@ use macroquad::prelude::*;
 
 /// Render all game entities
 pub fn render_game(state: &GameState) {
-    draw_player(&state.player);
+    draw_player(&state.player, state);
     draw_enemies(&state.enemies);
     draw_ghosts(&state.ghosts);
     draw_projectiles(&state.projectiles);
@@ -129,18 +129,57 @@ pub fn render_ui(state: &GameState) {
         );
     }
 
+    // Parry status
+    let parry_color = if state.player.parry_cooldown > 0.0 {
+        RED // On cooldown
+    } else {
+        GREEN // Ready
+    };
+
+    let parry_status = if state.player.parry_active {
+        "PARRY ACTIVE!".to_string()
+    } else if state.player.parry_cooldown > 0.0 {
+        format!("Parry: {:.1}s", state.player.parry_cooldown)
+    } else {
+        "Parry: READY".to_string()
+    };
+
+    draw_text(&parry_status, 10.0, 175.0, 18.0, parry_color);
+
     // Controls hint
-    draw_text("SPACE - Deploy Formation", 10.0, 175.0, 16.0, GRAY);
-    draw_text("F1-F4 - Spawn Single Ghost", 10.0, 195.0, 16.0, GRAY);
-    draw_text("1-3 - Change Formation", 10.0, 215.0, 16.0, GRAY);
+    draw_text("SPACE - Deploy Formation", 10.0, 195.0, 16.0, GRAY);
+    draw_text("F1-F4 - Spawn Single Ghost", 10.0, 215.0, 16.0, GRAY);
+    draw_text("1-3 - Change Formation", 10.0, 235.0, 16.0, GRAY);
+    draw_text("X - Parry Missiles", 10.0, 255.0, 16.0, GRAY);
+    draw_text("C - Cancel Summon", 10.0, 275.0, 16.0, GRAY);
 
     // Controls hint
     draw_controls_hint();
 }
 
 /// Draw player entity
-fn draw_player(player: &Player) {
+fn draw_player(player: &Player, state: &GameState) {
     draw_circle(player.pos.x, player.pos.y, 15.0, BLUE);
+
+    // Draw parry shield if active
+    if player.parry_active {
+        let parry_radius = state.config.collision.player_radius + 20.0;
+        draw_circle_lines(
+            player.pos.x,
+            player.pos.y,
+            parry_radius,
+            3.0,
+            RED, // Bright blue
+        );
+        // Inner glow
+        draw_circle_lines(
+            player.pos.x,
+            player.pos.y,
+            parry_radius - 5.0,
+            2.0,
+            ORANGE,
+        );
+    }
 
     // Draw health bar above player
     let health_ratio = player.stats.health / player.stats.max_health;
