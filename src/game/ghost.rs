@@ -18,7 +18,7 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
     // Update each ghost
     let total_ghosts = state.ghosts.len();
     for (idx, ghost) in state.ghosts.iter_mut().enumerate() {
-        // Formation following - calculate target position based on current formation
+        // Calculate target position using current formation
         let target_pos = calculate_formation_position(
             state.player.pos,
             idx,
@@ -35,7 +35,7 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
         // Only move if far enough from target (prevents jitter/oscillation)
         if distance > 2.0 {
             // Smoothly interpolate to formation position (feels more natural than instant)
-            let follow_speed = 1.0; // Reduced from 5.0 for smoother movement
+            let follow_speed = 3.0; // Smooth movement
             ghost.pos.x += dx * follow_speed * delta;
             ghost.pos.y += dy * follow_speed * delta;
         }
@@ -99,112 +99,119 @@ fn fire_ghost_weapon(
     projectile_speed: f32,
     weapons_config: &crate::config::WeaponsConfig,
 ) {
-    if let Some(&weapon) = ghost.weapon_type.first() {
-        let weapon_stats = weapon.get_weapon_stats(weapons_config);
+    // ✅ FIX: Pick random weapon from arsenal (just like enemies do!)
+    if ghost.weapon_type.is_empty() {
+        return; // No weapons available
+    }
 
-        match weapon {
-            WeaponType::Bullet => {
-                let velocity = calculate_velocity(ghost.pos, target, projectile_speed);
+    use macroquad::rand;
+    let random_idx = rand::gen_range(0, ghost.weapon_type.len());
+    let weapon = ghost.weapon_type[random_idx];
 
-                projectiles.push(Projectile {
-                    pos: ghost.pos,
-                    velocity,
-                    damage: weapon_stats.damage,
-                    weapon_type: weapon,
-                    owner: ProjectileOwner::Ghost,
-                    piercing: false,
-                    homing: false,
-                    explosion_radius: 0.0,
-                    locked_target_index: None,
-                    lifetime: 0.0,
-                });
-            }
-            WeaponType::Laser => {
-                let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
+    let weapon_stats = weapon.get_weapon_stats(weapons_config);
 
-                projectiles.push(Projectile {
-                    pos: ghost.pos,
-                    velocity,
-                    damage: weapon_stats.damage,
-                    weapon_type: weapon,
-                    owner: ProjectileOwner::Ghost,
-                    piercing: true, // Ghost lasers also pierce
-                    homing: false,
-                    explosion_radius: 0.0,
-                    locked_target_index: None,
-                    lifetime: 0.0,
-                });
-            }
-            WeaponType::Missile => {
-                // Ghost missiles ARE homing (exact copy of enemy behavior!)
-                // Find nearest enemy to lock onto
-                let nearest_idx = find_nearest_enemy_index(ghost.pos, enemies);
-                let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
+    match weapon {
+        WeaponType::Bullet => {
+            let velocity = calculate_velocity(ghost.pos, target, projectile_speed);
 
-                projectiles.push(Projectile {
-                    pos: ghost.pos,
-                    velocity,
-                    damage: weapon_stats.damage,
-                    weapon_type: weapon,
-                    owner: ProjectileOwner::Ghost,
-                    piercing: false,
-                    homing: true, // ✅ Ghosts use homing missiles (just like enemies)
-                    explosion_radius: 0.0,
-                    locked_target_index: nearest_idx, // Lock onto nearest enemy
-                    lifetime: 0.0,
-                });
-            }
-            WeaponType::Plasma => {
-                // Ghost plasma: 3-projectile spread toward target
-                let spread_angle = 15.0_f32.to_radians();
-                let angles = [-spread_angle, 0.0, spread_angle];
+            projectiles.push(Projectile {
+                pos: ghost.pos,
+                velocity,
+                damage: weapon_stats.damage,
+                weapon_type: weapon,
+                owner: ProjectileOwner::Ghost,
+                piercing: false,
+                homing: false,
+                explosion_radius: 0.0,
+                locked_target_index: None,
+                lifetime: 0.0,
+            });
+        }
+        WeaponType::Laser => {
+            let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
 
-                for &angle in &angles {
-                    let base_dir_x = target.x - ghost.pos.x;
-                    let base_dir_y = target.y - ghost.pos.y;
-                    let base_distance = (base_dir_x * base_dir_x + base_dir_y * base_dir_y).sqrt();
+            projectiles.push(Projectile {
+                pos: ghost.pos,
+                velocity,
+                damage: weapon_stats.damage,
+                weapon_type: weapon,
+                owner: ProjectileOwner::Ghost,
+                piercing: true, // Ghost lasers also pierce
+                homing: false,
+                explosion_radius: 0.0,
+                locked_target_index: None,
+                lifetime: 0.0,
+            });
+        }
+        WeaponType::Missile => {
+            // Ghost missiles ARE homing (exact copy of enemy behavior!)
+            // Find nearest enemy to lock onto
+            let nearest_idx = find_nearest_enemy_index(ghost.pos, enemies);
+            let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
 
-                    if base_distance > 0.1 {
-                        let norm_x = base_dir_x / base_distance;
-                        let norm_y = base_dir_y / base_distance;
+            projectiles.push(Projectile {
+                pos: ghost.pos,
+                velocity,
+                damage: weapon_stats.damage,
+                weapon_type: weapon,
+                owner: ProjectileOwner::Ghost,
+                piercing: false,
+                homing: true, // ✅ Ghosts use homing missiles (just like enemies)
+                explosion_radius: 0.0,
+                locked_target_index: nearest_idx, // Lock onto nearest enemy
+                lifetime: 0.0,
+            });
+        }
+        WeaponType::Plasma => {
+            // Ghost plasma: 3-projectile spread toward target
+            let spread_angle = 15.0_f32.to_radians();
+            let angles = [-spread_angle, 0.0, spread_angle];
 
-                        let rotated_x = norm_x * angle.cos() - norm_y * angle.sin();
-                        let rotated_y = norm_x * angle.sin() + norm_y * angle.cos();
+            for &angle in &angles {
+                let base_dir_x = target.x - ghost.pos.x;
+                let base_dir_y = target.y - ghost.pos.y;
+                let base_distance = (base_dir_x * base_dir_x + base_dir_y * base_dir_y).sqrt();
 
-                        projectiles.push(Projectile {
-                            pos: ghost.pos,
-                            velocity: Position {
-                                x: rotated_x * weapon_stats.projectile_speed,
-                                y: rotated_y * weapon_stats.projectile_speed,
-                            },
-                            damage: weapon_stats.damage,
-                            weapon_type: weapon,
-                            owner: ProjectileOwner::Ghost,
-                            piercing: false,
-                            homing: false,
-                            explosion_radius: 0.0,
-                            locked_target_index: None,
-                            lifetime: 0.0,
-                        });
-                    }
+                if base_distance > 0.1 {
+                    let norm_x = base_dir_x / base_distance;
+                    let norm_y = base_dir_y / base_distance;
+
+                    let rotated_x = norm_x * angle.cos() - norm_y * angle.sin();
+                    let rotated_y = norm_x * angle.sin() + norm_y * angle.cos();
+
+                    projectiles.push(Projectile {
+                        pos: ghost.pos,
+                        velocity: Position {
+                            x: rotated_x * weapon_stats.projectile_speed,
+                            y: rotated_y * weapon_stats.projectile_speed,
+                        },
+                        damage: weapon_stats.damage,
+                        weapon_type: weapon,
+                        owner: ProjectileOwner::Ghost,
+                        piercing: false,
+                        homing: false,
+                        explosion_radius: 0.0,
+                        locked_target_index: None,
+                        lifetime: 0.0,
+                    });
                 }
             }
-            WeaponType::Bombs => {
-                let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
+        }
+        WeaponType::Bombs => {
+            let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
 
-                projectiles.push(Projectile {
-                    pos: ghost.pos,
-                    velocity,
-                    damage: weapon_stats.damage,
-                    weapon_type: weapon,
-                    owner: ProjectileOwner::Ghost,
-                    piercing: false,
-                    homing: false,
-                    explosion_radius: 70.0, // Ghost bomb AOE
-                    locked_target_index: None,
-                    lifetime: 0.0,
-                });
-            }
+            projectiles.push(Projectile {
+                pos: ghost.pos,
+                velocity,
+                damage: weapon_stats.damage,
+                weapon_type: weapon,
+                owner: ProjectileOwner::Ghost,
+                piercing: false,
+                homing: false,
+                explosion_radius: 70.0, // Ghost bomb AOE
+                locked_target_index: None,
+                lifetime: 0.0,
+            });
         }
     }
 }
