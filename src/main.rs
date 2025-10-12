@@ -24,9 +24,21 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let space_texture: Texture2D = load_texture("assets/background/space_1.png").await.unwrap();
     let mut game_state = GameState::new();
 
     loop {
+        draw_texture_ex(
+            &space_texture,
+            0.0,
+            0.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
+
         let delta = get_frame_time();
 
         // Hot-reload config with R key (development only)
@@ -46,7 +58,7 @@ async fn main() {
         update_all_systems(&mut game_state, delta);
 
         // Render everything
-        clear_background(Color::from_rgba(10, 10, 30, 255));
+        //clear_background(Color::from_rgba(10, 10, 30, 255));
         render_game(&game_state);
         render_ui(&game_state);
 
