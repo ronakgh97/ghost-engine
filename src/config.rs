@@ -17,6 +17,7 @@ pub struct GameConfig {
     pub enemy_behavior: EnemyBehaviorConfig,
     pub formation_spacing: FormationSpacingConfig,
     pub projectile_bounds: ProjectileBoundsConfig,
+    pub screen_shake: ScreenShakeConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -146,6 +147,25 @@ pub struct FormationSpacingConfig {
 pub struct ProjectileBoundsConfig {
     pub off_screen_padding: f32,
     pub player_projectile_speed_y: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScreenShakeConfig {
+    // Weapon-specific hit shake (when player/ghost hits enemy)
+    pub bullet_hit_intensity: f32,
+    pub laser_hit_intensity: f32,
+    pub missile_hit_intensity: f32,
+    pub plasma_hit_intensity: f32,
+    pub bomb_hit_intensity: f32,
+    pub weapon_hit_duration: f32, // Duration for all weapon hits
+    
+    // Event-specific shake
+    pub enemy_death_duration: f32,
+    pub enemy_death_intensity: f32,
+    pub parry_duration: f32,
+    pub parry_intensity: f32,
+    pub player_hit_duration: f32,
+    pub player_hit_intensity: f32,
 }
 
 impl GameConfig {

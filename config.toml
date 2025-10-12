@@ -9,7 +9,7 @@ target_fps = 60
 [player]
 starting_health = 100.0
 max_health = 1000.0
-starting_energy = 150.0
+starting_energy = 200.0
 max_energy = 1000.0
 movement_speed = 200.0
 starting_weapons = ["Bullet", "Laser", "Missile", "Plasma", "Bombs"]
@@ -146,3 +146,21 @@ screen_edge_padding = 30.0
 [projectile_bounds]
 off_screen_padding = 50.0
 player_projectile_speed_y = -400.0
+
+# Screen Shake (Juice!)
+[screen_shake]
+# Weapon-specific shake (intensity scales with weapon damage/power)
+bullet_hit_intensity = 0.8      # Light tap - rapid fire feel
+laser_hit_intensity = 4.0       # Medium - piercing beam power
+missile_hit_intensity = 2.5     # Strong - explosive impact
+plasma_hit_intensity = 1.5      # Medium - energy burst (x3 projectiles!)
+bomb_hit_intensity = 5.0        # HUGE - massive AOE explosion!
+weapon_hit_duration = 0.1      # Quick shake for weapon hits
+
+# Event-specific shake
+enemy_death_duration = 1.0      # Duration of shake on enemy death (seconds)
+enemy_death_intensity = 1.5     # Intensity/magnitude of shake
+parry_duration = 0.25           # Duration of shake on parry success
+parry_intensity = 5.0           # Strong shake for skill reward
+player_hit_duration = 0.3       # Duration when player takes damage
+player_hit_intensity = 5.0      # Strongest shake for critical feedback
