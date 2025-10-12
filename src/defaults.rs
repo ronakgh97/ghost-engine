@@ -34,7 +34,7 @@ fn default_player() -> PlayerConfig {
     PlayerConfig {
         starting_health: 100.0,
         max_health: 100.0,
-        starting_energy: 100.0,
+        starting_energy: 150.0,
         max_energy: 100.0,
         movement_speed: 200.0,
         starting_weapons: vec![
@@ -50,7 +50,7 @@ fn default_player() -> PlayerConfig {
 fn default_energy() -> EnergyConfig {
     EnergyConfig {
         regen_rate_idle: 30.0,
-        regen_rate_active: 10.0,
+        regen_rate_active: 5.0,
     }
 }
 
@@ -61,13 +61,13 @@ fn default_entities() -> EntitiesConfig {
             damage: 10.0,
             energy_cost: 15.0,
             fire_interval: 2.0,
-            weapons: vec!["Bullet".to_string()], // Simple shots
+            weapons: vec!["Bullet".to_string()], // Simple straight shots
         },
         sniper: EntityStats {
             health: 30.0,
             damage: 25.0,
             energy_cost: 25.0,
-            fire_interval: 3.0,
+            fire_interval: 4.0,
             weapons: vec!["Laser".to_string()], // Piercing beam
         },
         tank: EntityStats {
@@ -104,7 +104,7 @@ fn default_weapons() -> WeaponsConfig {
         // LASER: Piercing beam, high damage, slow fire rate
         laser: WeaponStats {
             damage: 60.0,
-            fire_rate: 1.0,          // Slow fire rate
+            fire_rate: 1.5,          // Slow fire rate
             projectile_speed: 800.0, // Very fast
             ammo: 100.0,
         },
@@ -134,7 +134,7 @@ fn default_weapons() -> WeaponsConfig {
 
 fn default_spawning() -> SpawningConfig {
     SpawningConfig {
-        enemy_spawn_interval: 2.0,
+        enemy_spawn_interval: 1.5,
         initial_delay: 3.0,
     }
 }

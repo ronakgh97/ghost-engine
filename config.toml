@@ -8,15 +8,15 @@ target_fps = 60
 
 [player]
 starting_health = 100.0
-max_health = 100.0
-starting_energy = 1000.0
-max_energy = 2000.0
+max_health = 1000.0
+starting_energy = 150.0
+max_energy = 1000.0
 movement_speed = 200.0
 starting_weapons = ["Bullet", "Laser", "Missile", "Plasma", "Bombs"]
 
 [energy]
 regen_rate_idle = 30.0
-regen_rate_active = 10.0
+regen_rate_active = 5.0
 
 [entities.basic_fighter]
 health = 50.0
@@ -29,7 +29,7 @@ weapons = ["Bullet"]  # Simple straight shots
 health = 30.0
 damage = 25.0
 energy_cost = 25.0
-fire_interval = 3.0
+fire_interval = 4.0
 weapons = ["Laser"]  # Piercing beam
 
 [entities.tank]
@@ -58,7 +58,7 @@ ammo = 100.0
 [weapons.laser]
 # Piercing beam, high damage, slow fire rate
 damage = 60.0
-fire_rate = 1.0
+fire_rate = 1.5
 projectile_speed = 800.0
 ammo = 100.0
 
@@ -84,7 +84,7 @@ projectile_speed = 200.0
 ammo = 100.0
 
 [spawning]
-enemy_spawn_interval = 2.0
+enemy_spawn_interval = 1.5
 initial_delay = 3.0
 
 [formations]
@@ -94,8 +94,6 @@ line_min = 3
 line_optimal = 5
 circle_min = 4
 circle_optimal = 8
-scattered_min = 1
-scattered_optimal = 4
 
 [debug]
 show_hitboxes = false
