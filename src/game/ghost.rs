@@ -95,11 +95,11 @@ fn fire_ghost_weapon(
     ghost: &Ghost,
     target: Position,
     projectiles: &mut Vec<Projectile>,
-    enemies: &[Enemy], // ✅ NEW: Need enemies for missile targeting
+    enemies: &[Enemy], // Need enemies for missile targeting
     projectile_speed: f32,
     weapons_config: &crate::config::WeaponsConfig,
 ) {
-    // ✅ FIX: Pick random weapon from arsenal (just like enemies do!)
+    // Pick random weapon from arsenal
     if ghost.weapon_type.is_empty() {
         return; // No weapons available
     }
@@ -117,7 +117,7 @@ fn fire_ghost_weapon(
             projectiles.push(Projectile {
                 pos: ghost.pos,
                 velocity,
-                damage: weapon_stats.damage,
+                damage: weapon_stats.damage * 0.5, // Ghost bullets do 50% damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Ghost,
                 piercing: false,
@@ -133,7 +133,7 @@ fn fire_ghost_weapon(
             projectiles.push(Projectile {
                 pos: ghost.pos,
                 velocity,
-                damage: weapon_stats.damage,
+                damage: weapon_stats.damage * 0.5, // Ghost lasers do 50% damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Ghost,
                 piercing: true, // Ghost lasers also pierce
@@ -152,11 +152,11 @@ fn fire_ghost_weapon(
             projectiles.push(Projectile {
                 pos: ghost.pos,
                 velocity,
-                damage: weapon_stats.damage,
+                damage: weapon_stats.damage * 0.5, // Ghost missiles do 50% damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Ghost,
                 piercing: false,
-                homing: true, // ✅ Ghosts use homing missiles (just like enemies)
+                homing: true,
                 explosion_radius: 0.0,
                 locked_target_index: nearest_idx, // Lock onto nearest enemy
                 lifetime: 0.0,
@@ -185,7 +185,7 @@ fn fire_ghost_weapon(
                             x: rotated_x * weapon_stats.projectile_speed,
                             y: rotated_y * weapon_stats.projectile_speed,
                         },
-                        damage: weapon_stats.damage,
+                        damage: weapon_stats.damage * 0.5, // Ghost plasma does 50% damage
                         weapon_type: weapon,
                         owner: ProjectileOwner::Ghost,
                         piercing: false,
@@ -203,7 +203,7 @@ fn fire_ghost_weapon(
             projectiles.push(Projectile {
                 pos: ghost.pos,
                 velocity,
-                damage: weapon_stats.damage,
+                damage: weapon_stats.damage * 0.5, // Ghost bombs do 50% damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Ghost,
                 piercing: false,

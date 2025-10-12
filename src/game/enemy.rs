@@ -84,7 +84,7 @@ fn fire_enemy_weapon(
             projectiles.push(Projectile {
                 pos: enemy.pos,
                 velocity, // Straight if Basic Fighter or Tank and aim toward player if Sniper and Boss
-                damage: weapon_stats.damage * 0.5, // Enemies deal half damage
+                damage: weapon_stats.damage * 0.75, // Enemies deal half damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
                 piercing: false,
@@ -101,7 +101,7 @@ fn fire_enemy_weapon(
             projectiles.push(Projectile {
                 pos: enemy.pos,
                 velocity,
-                damage: weapon_stats.damage * 0.5,
+                damage: weapon_stats.damage * 0.75,
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
                 piercing: true, // Enemy lasers also pierce
@@ -118,7 +118,7 @@ fn fire_enemy_weapon(
             projectiles.push(Projectile {
                 pos: enemy.pos,
                 velocity,
-                damage: weapon_stats.damage * 0.5,
+                damage: weapon_stats.damage * 0.75,
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
                 piercing: false,
@@ -154,7 +154,7 @@ fn fire_enemy_weapon(
                             x: rotated_x * weapon_stats.projectile_speed,
                             y: rotated_y * weapon_stats.projectile_speed,
                         },
-                        damage: weapon_stats.damage * 0.5,
+                        damage: weapon_stats.damage * 0.75,
                         weapon_type: weapon,
                         owner: ProjectileOwner::Enemy,
                         piercing: false,
@@ -173,7 +173,7 @@ fn fire_enemy_weapon(
             projectiles.push(Projectile {
                 pos: enemy.pos,
                 velocity,
-                damage: weapon_stats.damage * 0.5,
+                damage: weapon_stats.damage * 0.75,
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
                 piercing: false,
