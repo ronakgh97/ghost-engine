@@ -44,13 +44,18 @@ fn default_player() -> PlayerConfig {
             "Plasma".to_string(),
             "Bombs".to_string(),
         ],
+
+        // Parry system
+        parry_cooldown: 1.5,     // 2 second cooldown
+        parry_window: 0.2,       // 0.2 second window for success
+        parry_energy_cost: 10.0, // 10 energy per parry attempt
     }
 }
 
 fn default_energy() -> EnergyConfig {
     EnergyConfig {
         regen_rate_idle: 30.0,
-        regen_rate_active: 5.0,
+        regen_rate_active: 1.0,
     }
 }
 

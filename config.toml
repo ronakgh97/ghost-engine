@@ -14,9 +14,14 @@ max_energy = 1000.0
 movement_speed = 200.0
 starting_weapons = ["Bullet", "Laser", "Missile", "Plasma", "Bombs"]
 
+# Parry system
+parry_cooldown = 1.5       # Cooldown between parries (seconds)
+parry_window = 0.2         # Window for successful parry (seconds)
+parry_energy_cost = 10.0   # Energy cost per parry attempt
+
 [energy]
 regen_rate_idle = 30.0
-regen_rate_active = 5.0
+regen_rate_active = 1.0
 
 [entities.basic_fighter]
 health = 50.0

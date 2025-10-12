@@ -35,6 +35,11 @@ pub struct PlayerConfig {
     pub max_energy: f32,
     pub movement_speed: f32,
     pub starting_weapons: Vec<String>,
+
+    // Parry system
+    pub parry_cooldown: f32,
+    pub parry_window: f32,
+    pub parry_energy_cost: f32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
