@@ -1,6 +1,6 @@
 use crate::game::utils::calculate_formation_position;
 use crate::game::weapons;
-use crate::models::{Enemy, EntityType, GameState, Ghost, WeaponType};
+use crate::models::{EntityType, GameState, Ghost};
 use macroquad::input::*;
 
 /// Handle all player input
@@ -106,6 +106,7 @@ fn change_formation(state: &mut GameState) {
 }
 
 /// Attempt to spawn a single ghost of specific type
+/// Single spawns use simple side offset (NOT formation-based)
 fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
     // Find this ghost type in queue
     if let Some(index) = state
@@ -122,29 +123,36 @@ fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
             return;
         }
 
-        // Calculate spawn position
-        let spawn_pos = calculate_formation_position(
-            state.player.pos,
-            state.ghosts.len(),
-            state.ghosts.len() + 1,
-            state.ghost_formation,
-            &state.config.formation_spacing,
-        );
+        // Calculate simple spawn position (alternating left/right of player)
+        let spawn_pos = calculate_single_spawn_position(state);
 
-        // Create ghost
-        let template_enemy = Enemy {
-            pos: spawn_pos,
-            stats: desired_type.get_stats(&state.config.entities),
-            entity_type: desired_type,
-            weapon: vec![WeaponType::Bullet],
-        };
-
-        let ghost = Ghost::from_enemy(&template_enemy, &state.config.entities);
+        // Create ghost directly from EntityType (no temp Enemy!)
+        let ghost = Ghost::from_entity_type(desired_type, spawn_pos, &state.config);
 
         // All checks passed - spawn and deduct
         state.ghosts.push(ghost);
+        state.ghost_fire_timers.push(0.0); // Add timer for new ghost
         state.player.available_ghosts.remove(index);
         state.player.energy -= energy_cost;
+    }
+}
+
+/// Calculate spawn position for single ghost spawns (F-keys)
+/// Uses simple alternating left/right pattern instead of formation
+fn calculate_single_spawn_position(state: &GameState) -> crate::models::Position {
+    use crate::models::Position;
+
+    let ghost_count = state.ghosts.len();
+    let horizontal_spacing = 40.0; // Spacing between ghosts
+    let vertical_offset = -30.0; // Spawn slightly above player
+
+    // Alternate: even indices go left, odd go right
+    let side = if ghost_count % 2 == 0 { -1.0 } else { 1.0 };
+    let distance = ((ghost_count + 1) / 2) as f32 * horizontal_spacing;
+
+    Position {
+        x: state.player.pos.x + (side * distance),
+        y: state.player.pos.y + vertical_offset,
     }
 }
 
@@ -193,15 +201,8 @@ fn spawn_formation(state: &mut GameState) {
             &state.config.formation_spacing,
         );
 
-        // Create ghost
-        let template_enemy = Enemy {
-            pos: spawn_pos,
-            stats: ghost_type.get_stats(&state.config.entities),
-            entity_type: ghost_type,
-            weapon: vec![WeaponType::Bullet],
-        };
-
-        let ghost = Ghost::from_enemy(&template_enemy, &state.config.entities);
+        // Create ghost directly from EntityType (inherits weapons from config!)
+        let ghost = Ghost::from_entity_type(ghost_type, spawn_pos, &state.config);
         state.ghosts.push(ghost);
     }
 

@@ -16,12 +16,28 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
     }
 
     // Update each ghost
+    let total_ghosts = state.ghosts.len();
     for (idx, ghost) in state.ghosts.iter_mut().enumerate() {
-        // Movement logic - ghosts rise upward
-        if ghost.pos.y > ghost_cfg.movement_threshold_y {
-            ghost.pos.y -= ghost_cfg.fast_ascent_speed * delta;
-        } else {
-            ghost.pos.y -= ghost_cfg.slow_hover_speed * delta;
+        // Formation following - calculate target position based on current formation
+        let target_pos = calculate_formation_position(
+            state.player.pos,
+            idx,
+            total_ghosts,
+            state.ghost_formation,
+            &state.config.formation_spacing,
+        );
+
+        // Calculate distance to target
+        let dx = target_pos.x - ghost.pos.x;
+        let dy = target_pos.y - ghost.pos.y;
+        let distance = (dx * dx + dy * dy).sqrt();
+
+        // Only move if far enough from target (prevents jitter/oscillation)
+        if distance > 2.0 {
+            // Smoothly interpolate to formation position (feels more natural than instant)
+            let follow_speed = 1.0; // Reduced from 5.0 for smoother movement
+            ghost.pos.x += dx * follow_speed * delta;
+            ghost.pos.y += dy * follow_speed * delta;
         }
 
         // Auto-fire at nearest enemy
@@ -34,6 +50,7 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
                     ghost,
                     target,
                     &mut state.projectiles,
+                    &state.enemies, // Pass enemies for missile targeting
                     ghost_cfg.projectile_speed,
                     &state.config.weapons,
                 );
@@ -42,10 +59,10 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
         }
     }
 
-    // Remove off-screen ghosts
+    // Remove off-screen ghosts (safety cleanup, shouldn't happen with formation following)
     state
         .ghosts
-        .retain(|g| g.pos.y > ghost_cfg.screen_boundary_top);
+        .retain(|g| g.pos.y > ghost_cfg.screen_boundary_top && g.pos.y < 1000.0);
 
     // Clean up excess timers
     state.ghost_fire_timers.truncate(state.ghosts.len());
@@ -60,11 +77,25 @@ fn find_nearest_enemy(ghost_pos: Position, enemies: &[Enemy]) -> Option<Position
     })
 }
 
+/// Find the index of the nearest enemy for missile locking
+fn find_nearest_enemy_index(ghost_pos: Position, enemies: &[Enemy]) -> Option<usize> {
+    enemies
+        .iter()
+        .enumerate()
+        .min_by(|(_, a), (_, b)| {
+            let dist_a = distance_sq(ghost_pos, a.pos);
+            let dist_b = distance_sq(ghost_pos, b.pos);
+            dist_a.partial_cmp(&dist_b).unwrap()
+        })
+        .map(|(idx, _)| idx)
+}
+
 /// Fire ghost weapon at target
 fn fire_ghost_weapon(
     ghost: &Ghost,
     target: Position,
     projectiles: &mut Vec<Projectile>,
+    enemies: &[Enemy], // ✅ NEW: Need enemies for missile targeting
     projectile_speed: f32,
     weapons_config: &crate::config::WeaponsConfig,
 ) {
@@ -105,7 +136,9 @@ fn fire_ghost_weapon(
                 });
             }
             WeaponType::Missile => {
-                // Ghosts don't use homing (too powerful with formations)
+                // Ghost missiles ARE homing (exact copy of enemy behavior!)
+                // Find nearest enemy to lock onto
+                let nearest_idx = find_nearest_enemy_index(ghost.pos, enemies);
                 let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
 
                 projectiles.push(Projectile {
@@ -115,9 +148,9 @@ fn fire_ghost_weapon(
                     weapon_type: weapon,
                     owner: ProjectileOwner::Ghost,
                     piercing: false,
-                    homing: false, // Aimed shot, not homing
+                    homing: true, // ✅ Ghosts use homing missiles (just like enemies)
                     explosion_radius: 0.0,
-                    locked_target_index: None,
+                    locked_target_index: nearest_idx, // Lock onto nearest enemy
                     lifetime: 0.0,
                 });
             }
