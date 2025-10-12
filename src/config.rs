@@ -1,7 +1,6 @@
 use crate::defaults::default_config;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::thread::AccessError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameConfig {
@@ -92,8 +91,6 @@ pub struct FormationsConfig {
     pub line_optimal: usize,
     pub circle_min: usize,
     pub circle_optimal: usize,
-    pub scattered_min: usize,
-    pub scattered_optimal: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -137,10 +134,6 @@ pub struct FormationSpacingConfig {
     pub line_spacing: f32,
     pub line_height_offset: f32,
     pub circle_radius: f32,
-    pub scattered_x_min: f32,
-    pub scattered_x_max: f32,
-    pub scattered_y_min: f32,
-    pub scattered_y_max: f32,
     pub screen_edge_padding: f32,
 }
 
@@ -151,7 +144,7 @@ pub struct ProjectileBoundsConfig {
 }
 
 impl GameConfig {
-    /// Load config with smart fallback strategy (ONLY use for hot-reload on R key)
+    /// Load config with smart fallback strategy (Hot-reload on R key)
     pub fn load() -> Self {
         // Try to load from file
         match Self::try_load_from_file() {
@@ -175,7 +168,7 @@ impl GameConfig {
         Ok(config)
     }
 
-    /// Create default config file for modders/testers
+    /// Create default config file for mods/testers
     pub fn create_template() -> std::io::Result<()> {
         let default = default_config();
         let toml_string = toml::to_string_pretty(&default).expect("Failed to serialize config");

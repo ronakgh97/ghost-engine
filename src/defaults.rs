@@ -147,8 +147,6 @@ fn default_formations() -> FormationsConfig {
         line_optimal: 5,
         circle_min: 4,
         circle_optimal: 8,
-        scattered_min: 1,
-        scattered_optimal: 4,
     }
 }
 
@@ -197,10 +195,6 @@ fn default_formation_spacing() -> FormationSpacingConfig {
         line_spacing: 50.0,
         line_height_offset: 80.0,
         circle_radius: 70.0,
-        scattered_x_min: -80.0,
-        scattered_x_max: 80.0,
-        scattered_y_min: -100.0,
-        scattered_y_max: -40.0,
         screen_edge_padding: 30.0,
     }
 }
