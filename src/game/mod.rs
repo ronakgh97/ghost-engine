@@ -7,6 +7,7 @@ mod ghost;
 mod input;
 mod parry;
 mod player;
+mod screen_shake;
 mod spawn;
 mod utils;
 mod weapons;
@@ -20,6 +21,7 @@ pub use ghost::*;
 pub use input::*;
 pub use parry::*;
 pub use player::*;
+pub use screen_shake::*;
 pub use spawn::*;
 pub use weapons::*;
 
@@ -52,4 +54,7 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
 
     // Spawn new enemies
     spawn_enemies(state, delta);
+
+    // Update screen shake
+    update_shake(state, delta);
 }
