@@ -42,10 +42,10 @@ pub fn calculate_formation_position(
     formation: GhostFormation,
     config: &crate::config::FormationSpacingConfig,
 ) -> Position {
-    // If formation is invalid for the number of ghosts, default to scattered
-    if !formation.is_valid_for_count(total_ghosts) {
-        return calculate_scattered_formation(player_pos, config);
-    }
+    // If formation is invalid for the number of ghosts, default to scattered (REMOVED)
+    //if !formation.is_valid_for_count(total_ghosts) {
+    //    return calculate_scattered_formation(player_pos, config);
+    //}
 
     match formation {
         GhostFormation::VShape => {
@@ -57,7 +57,6 @@ pub fn calculate_formation_position(
         GhostFormation::Circle => {
             calculate_circle_formation(player_pos, ghost_index, total_ghosts, config)
         }
-        GhostFormation::Scattered => calculate_scattered_formation(player_pos, config),
     }
 }
 
@@ -110,18 +109,5 @@ fn calculate_circle_formation(
     Position {
         x: player_pos.x + angle.cos() * radius,
         y: player_pos.y + angle.sin() * radius,
-    }
-}
-
-/// Scattered formation (random but aesthetic)
-fn calculate_scattered_formation(
-    player_pos: Position,
-    config: &crate::config::FormationSpacingConfig,
-) -> Position {
-    use macroquad::rand::gen_range;
-
-    Position {
-        x: player_pos.x + gen_range(config.scattered_x_min, config.scattered_x_max),
-        y: player_pos.y + gen_range(config.scattered_y_min, config.scattered_y_max),
     }
 }
