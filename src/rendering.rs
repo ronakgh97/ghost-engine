@@ -211,30 +211,26 @@ pub fn render_ui(state: &GameState) {
 
     // BasicFighter
     let count = ghost_counts.get(&EntityType::BasicFighter);
-        draw_circle(25.0, line_y - 5.0, 6.0, RED);
-        draw_text(&format!("Fighter: {:?}", count), 40.0, line_y, 16.0, WHITE);
-        line_y += 22.0;
-
+    draw_circle(25.0, line_y - 5.0, 6.0, RED);
+    draw_text(&format!("Fighter: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    line_y += 22.0;
 
     // Sniper
     let count = ghost_counts.get(&EntityType::Sniper);
-        draw_circle(25.0, line_y - 5.0, 6.0, BLUE);
-        draw_text(&format!("Sniper: {:?}", count), 40.0, line_y, 16.0, WHITE);
-        line_y += 22.0;
-
+    draw_circle(25.0, line_y - 5.0, 6.0, BLUE);
+    draw_text(&format!("Sniper: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    line_y += 22.0;
 
     // Tank
     let count = ghost_counts.get(&EntityType::Tank);
-        draw_circle(25.0, line_y - 5.0, 6.0, GREEN);
-        draw_text(&format!("Tank: {:?}", count), 40.0, line_y, 16.0, WHITE);
-        line_y += 22.0;
-
+    draw_circle(25.0, line_y - 5.0, 6.0, GREEN);
+    draw_text(&format!("Tank: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    line_y += 22.0;
 
     // Boss
     let count = ghost_counts.get(&EntityType::Boss);
-        draw_circle(25.0, line_y - 5.0, 6.0, GOLD);
-        draw_text(&format!("Boss: {:?}", count), 40.0, line_y, 16.0, WHITE);
-
+    draw_circle(25.0, line_y - 5.0, 6.0, GOLD);
+    draw_text(&format!("Boss: {:?}", count), 40.0, line_y, 16.0, WHITE);
 }
 
 /// Draw modern panel with shadow
