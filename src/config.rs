@@ -158,7 +158,7 @@ pub struct ScreenShakeConfig {
     pub plasma_hit_intensity: f32,
     pub bomb_hit_intensity: f32,
     pub weapon_hit_duration: f32, // Duration for all weapon hits
-    
+
     // Event-specific shake
     pub enemy_death_duration: f32,
     pub enemy_death_intensity: f32,

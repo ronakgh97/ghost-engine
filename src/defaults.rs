@@ -215,19 +215,19 @@ fn default_projectile_bounds() -> ProjectileBoundsConfig {
 fn default_screen_shake() -> ScreenShakeConfig {
     ScreenShakeConfig {
         // Weapon-specific shake (intensity scales with weapon power)
-        bullet_hit_intensity: 0.8,   // Light tap - rapid fire feel
-        laser_hit_intensity: 4.0,    // Medium - piercing beam power
-        missile_hit_intensity: 2.5,  // Strong - explosive impact
-        plasma_hit_intensity: 1.5,   // Medium - energy burst (3 projectiles!)
-        bomb_hit_intensity: 5.0,     // HUGE - massive explosion!
+        bullet_hit_intensity: 0.8,  // Light tap - rapid fire feel
+        laser_hit_intensity: 4.0,   // Medium - piercing beam power
+        missile_hit_intensity: 2.5, // Strong - explosive impact
+        plasma_hit_intensity: 1.5,  // Medium - energy burst (3 projectiles!)
+        bomb_hit_intensity: 5.0,    // HUGE - massive explosion!
         weapon_hit_duration: 0.5,   // Quick shake for hits (not too long)
-        
+
         // Event-specific shake
-        enemy_death_duration: 1.0,   // Quick shake on enemy death
-        enemy_death_intensity: 1.5,  // Subtle shake
-        parry_duration: 0.25,        // Longer shake for parry success
-        parry_intensity: 5.0,        // Strong shake for skill reward
-        player_hit_duration: 0.3,    // Longest shake when hit
-        player_hit_intensity: 5.0,   // Strongest shake for feedback
+        enemy_death_duration: 1.0,  // Quick shake on enemy death
+        enemy_death_intensity: 1.5, // Subtle shake
+        parry_duration: 0.25,       // Longer shake for parry success
+        parry_intensity: 5.0,       // Strong shake for skill reward
+        player_hit_duration: 0.3,   // Longest shake when hit
+        player_hit_intensity: 5.0,  // Strongest shake for feedback
     }
 }
