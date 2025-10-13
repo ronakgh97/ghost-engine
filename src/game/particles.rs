@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 /// Spawn explosion particles at position
 pub fn spawn_explosion(state: &mut GameState, pos: Position, count: usize, color: Color) {
     let cfg = &state.config.particles;
-    
+
     for _ in 0..count {
         let angle = rand::gen_range(0.0, std::f32::consts::PI * 2.0);
         let speed = rand::gen_range(cfg.explosion_speed_min, cfg.explosion_speed_max);
@@ -30,7 +30,7 @@ pub fn spawn_explosion(state: &mut GameState, pos: Position, count: usize, color
 /// Spawn hit sparks at position (directional)
 pub fn spawn_hit_sparks(state: &mut GameState, pos: Position, direction: Position) {
     let cfg = &state.config.particles;
-    
+
     for _ in 0..cfg.spark_count {
         // Particles fly in reverse direction from impact
         let angle_offset = rand::gen_range(-0.5, 0.5);
@@ -59,14 +59,14 @@ pub fn spawn_hit_sparks(state: &mut GameState, pos: Position, direction: Positio
 /// Spawn weapon-specific particles
 pub fn spawn_weapon_particles(state: &mut GameState, pos: Position, weapon_type: WeaponType) {
     let cfg = &state.config.particles;
-    
+
     // Extract config values before calling spawn functions (borrow checker)
     let laser_count = cfg.laser_particle_count;
     let missile_count = cfg.missile_particle_count;
     let plasma_count = cfg.plasma_particle_count;
     let bomb_red_count = cfg.bomb_red_particle_count;
     let bomb_orange_count = cfg.bomb_orange_particle_count;
-    
+
     match weapon_type {
         WeaponType::Bullet => {
             // Small yellow sparks
@@ -95,12 +95,12 @@ pub fn spawn_weapon_particles(state: &mut GameState, pos: Position, weapon_type:
 /// Spawn enemy death explosion
 pub fn spawn_death_explosion(state: &mut GameState, pos: Position) {
     let cfg = &state.config.particles;
-    
+
     // Extract config values (borrow checker)
     let red_count = cfg.death_red_count;
     let orange_count = cfg.death_orange_count;
     let yellow_count = cfg.death_yellow_count;
-    
+
     // Red/orange/yellow explosion
     spawn_explosion(state, pos, red_count, RED);
     spawn_explosion(state, pos, orange_count, ORANGE);
@@ -110,11 +110,11 @@ pub fn spawn_death_explosion(state: &mut GameState, pos: Position) {
 /// Spawn parry deflection effect
 pub fn spawn_parry_effect(state: &mut GameState, pos: Position) {
     let cfg = &state.config.particles;
-    
+
     // Extract config values (borrow checker)
     let blue_count = cfg.parry_blue_count;
     let white_count = cfg.parry_white_count;
-    
+
     // Blue/white energy burst
     spawn_explosion(state, pos, blue_count, SKYBLUE);
     spawn_explosion(state, pos, white_count, WHITE);
@@ -123,7 +123,7 @@ pub fn spawn_parry_effect(state: &mut GameState, pos: Position) {
 /// Update all particles (movement, lifetime, cleanup)
 pub fn update_particles(state: &mut GameState, delta: f32) {
     let friction = state.config.particles.friction;
-    
+
     // Update particles
     for particle in &mut state.particles {
         particle.pos.x += particle.velocity.x * delta;

@@ -244,7 +244,7 @@ fn default_particles() -> ParticleConfig {
         explosion_size_max: 6.0,
         explosion_speed_min: 50.0,
         explosion_speed_max: 150.0,
-        
+
         // Hit sparks (directional)
         spark_count: 3,
         spark_lifetime_min: 0.15,
@@ -253,7 +253,7 @@ fn default_particles() -> ParticleConfig {
         spark_size_max: 4.0,
         spark_speed_min: 80.0,
         spark_speed_max: 200.0,
-        
+
         // Weapon-specific particle counts
         bullet_particle_count: 3,       // Small sparks
         laser_particle_count: 8,        // Energy burst
@@ -261,18 +261,18 @@ fn default_particles() -> ParticleConfig {
         plasma_particle_count: 6,       // Energy
         bomb_red_particle_count: 20,    // HUGE explosion
         bomb_orange_particle_count: 15, // Secondary burst
-        
+
         // Death explosion counts
         death_red_count: 15,
         death_orange_count: 10,
         death_yellow_count: 5,
-        
+
         // Parry effect counts
         parry_blue_count: 12,
         parry_white_count: 8,
-        
+
         // Physics
-        friction: 0.95,      // 5% slowdown per frame
-        size_decay: 8.0,     // Shrinks 8 pixels/sec
+        friction: 0.95,  // 5% slowdown per frame
+        size_decay: 8.0, // Shrinks 8 pixels/sec
     }
 }
