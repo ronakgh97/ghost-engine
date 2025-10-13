@@ -9,7 +9,7 @@ pub fn cancel_summon(state: &mut GameState) {
 
     let ghost_count = state.ghosts.len();
 
-    // Return ghosts to available queue (so player doesn't lose them permanently)
+    // Return ghosts to available queue
     for ghost in &state.ghosts {
         state.player.available_ghosts.push(ghost.entity_type);
     }

@@ -1,3 +1,4 @@
+use crate::game::particles::spawn_weapon_particles;
 use crate::game::screen_shake::{shake_on_player_hit, shake_on_weapon_hit};
 use crate::game::utils::circle_collision;
 use crate::models::*;
@@ -7,7 +8,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
     let mut projectiles_to_remove = Vec::new();
     let collision_cfg = &state.config.collision;
     let mut player_was_hit = false; // Track if player took damage
-    let mut weapon_hits: Vec<WeaponType> = Vec::new(); // Track weapon types that hit
+    let mut weapon_hits: Vec<(WeaponType, Position)> = Vec::new(); // Track weapon hits with positions
 
     for (proj_idx, projectile) in state.projectiles.iter().enumerate() {
         match projectile.owner {
@@ -30,7 +31,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
 
                     // Bomb explodes if it hits ANY enemy (AOE damage applied to all in radius)
                     if hit_any_enemy {
-                        weapon_hits.push(projectile.weapon_type); // Track bomb hit for shake
+                        weapon_hits.push((projectile.weapon_type, projectile.pos)); // Track bomb hit
                         projectiles_to_remove.push(proj_idx);
                     }
                 } else {
@@ -43,7 +44,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                             collision_cfg.enemy_radius,
                         ) {
                             enemy.stats.health -= projectile.damage;
-                            weapon_hits.push(projectile.weapon_type); // Track weapon hit for shake
+                            weapon_hits.push((projectile.weapon_type, projectile.pos)); // Track weapon hit
 
                             // Only mark for removal if NOT piercing (lasers pierce through)
                             if !projectile.piercing {
@@ -133,9 +134,9 @@ pub fn check_projectile_collisions(state: &mut GameState) {
     if player_was_hit {
         shake_on_player_hit(state);
     }
-    
-    // Trigger weapon-specific shake for each hit (strongest weapon wins if multiple)
-    if let Some(&strongest_weapon) = weapon_hits.iter().max_by_key(|w| {
+
+    // Trigger weapon-specific shake and particles for each hit
+    if let Some(&(strongest_weapon, hit_pos)) = weapon_hits.iter().max_by_key(|(w, _)| {
         // Priority order: Bombs > Missile > Laser > Plasma > Bullet
         match w {
             WeaponType::Bombs => 5,
@@ -146,5 +147,6 @@ pub fn check_projectile_collisions(state: &mut GameState) {
         }
     }) {
         shake_on_weapon_hit(state, strongest_weapon);
+        spawn_weapon_particles(state, hit_pos, strongest_weapon);
     }
 }
