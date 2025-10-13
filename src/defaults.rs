@@ -38,13 +38,12 @@ fn default_player() -> PlayerConfig {
         max_health: 100.0,
         starting_energy: 150.0,
         max_energy: 100.0,
-        movement_speed: 200.0,
+        movement_speed: 250.0,
         starting_weapons: vec![
             "Bullet".to_string(),
             "Laser".to_string(),
             "Missile".to_string(),
             "Plasma".to_string(),
-            "Bombs".to_string(),
         ],
 
         // Parry system
@@ -92,7 +91,6 @@ fn default_entities() -> EntitiesConfig {
             weapons: vec![
                 "Laser".to_string(),
                 "Missile".to_string(),
-                "Bombs".to_string(),
                 "Plasma".to_string(),
             ], // Boss arsenal: ALL advanced weapons!
         },
@@ -106,43 +104,40 @@ fn default_weapons() -> WeaponsConfig {
             damage: 10.0,
             fire_rate: 0.1, // Fast fire rate
             projectile_speed: 500.0,
-            ammo: 100.0,
         },
         // LASER: Piercing beam, high damage, slow fire rate
         laser: WeaponStats {
             damage: 60.0,
             fire_rate: 1.5,          // Slow fire rate
             projectile_speed: 800.0, // Very fast
-            ammo: 100.0,
         },
         // MISSILE: Homing, medium damage/fire rate
         missile: WeaponStats {
             damage: 30.0,
             fire_rate: 0.5,
             projectile_speed: 250.0, // Slow but tracks
-            ammo: 100.0,
         },
-        // PLASMA: Spread shot (TODO: implement 3-projectile cone)
+        // PLASMA: Spread shot (3-projectile cone)
         plasma: WeaponStats {
             damage: 25.0,
             fire_rate: 0.4,
             projectile_speed: 500.0,
-            ammo: 100.0,
         },
-        // BOMBS: AOE explosion (TODO: implement explosion radius)
+        // BOMBS: AOE explosion
         bombs: WeaponStats {
             damage: 80.0,
             fire_rate: 2.0,          // Very slow
             projectile_speed: 200.0, // Slow drop
-            ammo: 100.0,
         },
     }
 }
 
 fn default_spawning() -> SpawningConfig {
     SpawningConfig {
-        enemy_spawn_interval: 1.5,
-        initial_delay: 3.0,
+        wave_mode: true,           // Enable Lua wave system by default
+        wave_count: 5,             // 5 waves total
+        enemy_spawn_interval: 2.2, // Random spawn timer (for classic mode)
+        initial_delay: 3.0,        // Initial delay before spawning
     }
 }
 

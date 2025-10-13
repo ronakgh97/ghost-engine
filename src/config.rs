@@ -81,13 +81,14 @@ pub struct WeaponStats {
     pub damage: f32,           // Base damage per projectile
     pub fire_rate: f32,        // Cooldown between shots (in seconds)
     pub projectile_speed: f32, // How fast projectiles travel (pixels/sec)
-    pub ammo: f32,             // Magazine capacity (TODO: implement reload system)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpawningConfig {
-    pub enemy_spawn_interval: f32,
-    pub initial_delay: f32,
+    pub wave_mode: bool,   // true = Lua wave system, false = classic random spawning
+    pub wave_count: usize, // Number of waves (if wave_mode = true)
+    pub enemy_spawn_interval: f32, // Random spawn timer (if wave_mode = false)
+    pub initial_delay: f32, // Delay before first spawn (random mode)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -214,6 +215,7 @@ pub struct ParticleConfig {
 
 impl GameConfig {
     /// Load config with smart fallback strategy (Hot-reload on R key)
+    #[allow(dead_code)] // Reserved for future config loading strategies
     pub fn load() -> Self {
         // Try to load from file
         match Self::try_load_from_file() {
@@ -238,6 +240,7 @@ impl GameConfig {
     }
 
     /// Create default config file for mods/testers
+    #[allow(dead_code)] // Utility for generating config.toml template
     pub fn create_template() -> std::io::Result<()> {
         let default = default_config();
         let toml_string = toml::to_string_pretty(&default).expect("Failed to serialize config");
@@ -248,6 +251,7 @@ impl GameConfig {
     }
 
     /// Reload config (hot-reload for development)
+    #[allow(dead_code)] // Alternative reload method (main.rs uses try_load_from_file)
     pub fn reload(&mut self) {
         *self = Self::load();
     }

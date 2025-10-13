@@ -11,8 +11,8 @@ starting_health = 100.0
 max_health = 1000.0
 starting_energy = 200.0
 max_energy = 1000.0
-movement_speed = 200.0
-starting_weapons = ["Bullet", "Laser", "Missile", "Plasma", "Bombs"]
+movement_speed = 250.0
+starting_weapons = ["Bullet", "Laser", "Missile", "Plasma"]
 
 # Parry system
 parry_cooldown = 1.5       # Cooldown between parries (seconds)
@@ -49,7 +49,7 @@ health = 500.0
 damage = 50.0
 energy_cost = 80.0
 fire_interval = 0.8
-weapons = ["Laser", "Missile", "Bombs", "Plasma"]  # Boss arsenal: ALL advanced weapons!
+weapons = ["Laser", "Missile", "Plasma"]  # Boss arsenal: ALL advanced weapons!
 
 # WEAPONS CONFIGURATION
 
@@ -58,39 +58,36 @@ weapons = ["Laser", "Missile", "Bombs", "Plasma"]  # Boss arsenal: ALL advanced 
 damage = 10.0
 fire_rate = 0.1
 projectile_speed = 500.0
-ammo = 100.0
 
 [weapons.laser]
 # Piercing beam, high damage, slow fire rate
 damage = 60.0
 fire_rate = 1.5
 projectile_speed = 800.0
-ammo = 100.0
 
 [weapons.missile]
 # Homing, medium damage/fire rate
 damage = 30.0
 fire_rate = 0.5
 projectile_speed = 250.0
-ammo = 100.0
 
 [weapons.plasma]
-# Spread shot (TODO: implement 3-projectile cone)
+# Spread shot (3-projectile cone)
 damage = 25.0
 fire_rate = 0.4
 projectile_speed = 500.0
-ammo = 100.0
 
 [weapons.bombs]
-# AOE explosion (TODO: implement explosion radius damage)
+# AOE explosion
 damage = 80.0
 fire_rate = 2.0
 projectile_speed = 200.0
-ammo = 100.0
 
 [spawning]
-enemy_spawn_interval = 1.5
-initial_delay = 3.0
+wave_mode = false             # true = Lua wave system, false = classic random spawning
+wave_count = 5               # Number of waves (if wave_mode = true)
+enemy_spawn_interval = 2.0   # Random spawn timer (if wave_mode = false)
+initial_delay = 3.0          # Delay before first spawn (random mode)
 
 [formations]
 v_shape_min = 2
