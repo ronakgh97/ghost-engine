@@ -164,3 +164,45 @@ parry_duration = 0.25           # Duration of shake on parry success
 parry_intensity = 5.0           # Strong shake for skill reward
 player_hit_duration = 0.3       # Duration when player takes damage
 player_hit_intensity = 5.0      # Strongest shake for critical feedback
+
+# Particle System (Visual Effects!)
+[particles]
+# Explosion particles (radial burst)
+explosion_count_min = 10        # Minimum particles per explosion
+explosion_count_max = 20        # Maximum particles per explosion
+explosion_lifetime_min = 0.3    # Minimum lifetime (seconds)
+explosion_lifetime_max = 0.6    # Maximum lifetime (seconds)
+explosion_size_min = 3.0        # Minimum size (pixels)
+explosion_size_max = 6.0        # Maximum size (pixels)
+explosion_speed_min = 50.0      # Minimum speed (pixels/sec)
+explosion_speed_max = 150.0     # Maximum speed (pixels/sec)
+
+# Hit sparks (directional)
+spark_count = 3                 # Number of sparks per hit
+spark_lifetime_min = 0.15       # Fast-fading sparks
+spark_lifetime_max = 0.3
+spark_size_min = 2.0            # Small particles
+spark_size_max = 4.0
+spark_speed_min = 80.0
+spark_speed_max = 200.0
+
+# Weapon-specific particle counts
+bullet_particle_count = 3       # Bullet: small yellow sparks
+laser_particle_count = 8        # Laser: cyan energy burst
+missile_particle_count = 12     # Missile: orange explosion
+plasma_particle_count = 6       # Plasma: purple energy
+bomb_red_particle_count = 20    # Bombs: HUGE red explosion
+bomb_orange_particle_count = 15 # Bombs: secondary orange burst
+
+# Death explosion counts
+death_red_count = 15            # Enemy death: red particles
+death_orange_count = 10         # Enemy death: orange particles
+death_yellow_count = 5          # Enemy death: yellow center
+
+# Parry effect counts
+parry_blue_count = 12           # Parry: blue energy
+parry_white_count = 8           # Parry: white flash
+
+# Physics
+friction = 0.95                 # Velocity decay per frame (0.95 = 5% slowdown)
+size_decay = 8.0                # Shrink rate (pixels per second)

@@ -19,6 +19,7 @@ pub fn default_config() -> GameConfig {
         formation_spacing: default_formation_spacing(),
         projectile_bounds: default_projectile_bounds(),
         screen_shake: default_screen_shake(),
+        particles: default_particles(),
     }
 }
 
@@ -229,5 +230,49 @@ fn default_screen_shake() -> ScreenShakeConfig {
         parry_intensity: 5.0,       // Strong shake for skill reward
         player_hit_duration: 0.3,   // Longest shake when hit
         player_hit_intensity: 5.0,  // Strongest shake for feedback
+    }
+}
+
+fn default_particles() -> ParticleConfig {
+    ParticleConfig {
+        // Explosion particles (radial burst)
+        explosion_count_min: 10,
+        explosion_count_max: 20,
+        explosion_lifetime_min: 0.3,
+        explosion_lifetime_max: 0.6,
+        explosion_size_min: 3.0,
+        explosion_size_max: 6.0,
+        explosion_speed_min: 50.0,
+        explosion_speed_max: 150.0,
+        
+        // Hit sparks (directional)
+        spark_count: 3,
+        spark_lifetime_min: 0.15,
+        spark_lifetime_max: 0.3,
+        spark_size_min: 2.0,
+        spark_size_max: 4.0,
+        spark_speed_min: 80.0,
+        spark_speed_max: 200.0,
+        
+        // Weapon-specific particle counts
+        bullet_particle_count: 3,       // Small sparks
+        laser_particle_count: 8,        // Energy burst
+        missile_particle_count: 12,     // Explosion
+        plasma_particle_count: 6,       // Energy
+        bomb_red_particle_count: 20,    // HUGE explosion
+        bomb_orange_particle_count: 15, // Secondary burst
+        
+        // Death explosion counts
+        death_red_count: 15,
+        death_orange_count: 10,
+        death_yellow_count: 5,
+        
+        // Parry effect counts
+        parry_blue_count: 12,
+        parry_white_count: 8,
+        
+        // Physics
+        friction: 0.95,      // 5% slowdown per frame
+        size_decay: 8.0,     // Shrinks 8 pixels/sec
     }
 }

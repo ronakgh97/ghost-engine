@@ -18,6 +18,7 @@ pub struct GameConfig {
     pub formation_spacing: FormationSpacingConfig,
     pub projectile_bounds: ProjectileBoundsConfig,
     pub screen_shake: ScreenShakeConfig,
+    pub particles: ParticleConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -166,6 +167,49 @@ pub struct ScreenShakeConfig {
     pub parry_intensity: f32,
     pub player_hit_duration: f32,
     pub player_hit_intensity: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ParticleConfig {
+    // Explosion particles (radial burst)
+    pub explosion_count_min: usize,
+    pub explosion_count_max: usize,
+    pub explosion_lifetime_min: f32,
+    pub explosion_lifetime_max: f32,
+    pub explosion_size_min: f32,
+    pub explosion_size_max: f32,
+    pub explosion_speed_min: f32,
+    pub explosion_speed_max: f32,
+    
+    // Hit sparks (directional)
+    pub spark_count: usize,
+    pub spark_lifetime_min: f32,
+    pub spark_lifetime_max: f32,
+    pub spark_size_min: f32,
+    pub spark_size_max: f32,
+    pub spark_speed_min: f32,
+    pub spark_speed_max: f32,
+    
+    // Weapon-specific particle counts
+    pub bullet_particle_count: usize,
+    pub laser_particle_count: usize,
+    pub missile_particle_count: usize,
+    pub plasma_particle_count: usize,
+    pub bomb_red_particle_count: usize,
+    pub bomb_orange_particle_count: usize,
+    
+    // Death explosion counts
+    pub death_red_count: usize,
+    pub death_orange_count: usize,
+    pub death_yellow_count: usize,
+    
+    // Parry effect counts
+    pub parry_blue_count: usize,
+    pub parry_white_count: usize,
+    
+    // Physics
+    pub friction: f32,        // Velocity multiplier per frame (0.95 = 5% slowdown)
+    pub size_decay: f32,      // Pixels per second
 }
 
 impl GameConfig {
