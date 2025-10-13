@@ -11,9 +11,11 @@ mod player;
 mod screen_shake;
 mod spawn;
 mod utils;
+pub mod wave; // Public module for WaveManager
 mod weapons;
 
-pub use cancel_summon::*;
+// Exports (some unused until features implemented)
+// pub use cancel_summon::*; // TODO: Enable when cancel summon UI added
 pub use collision::*;
 pub use combat::*;
 pub use enemy::*;
@@ -25,6 +27,7 @@ pub use particles::*;
 pub use player::*;
 pub use screen_shake::*;
 pub use spawn::*;
+// pub use wave::*; // WaveManager accessed via game::wave::WaveManager
 pub use weapons::*;
 
 use crate::models::*;
@@ -54,10 +57,49 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
     manage_energy(state, delta);
     cleanup_dead_entities(state);
 
-    // Spawn new enemies
-    spawn_enemies(state, delta);
+    // Wave-based spawning (replaces spawn_enemies)
+    update_wave_system(state, delta);
 
     // Update visual effects
     update_particles(state, delta);
     update_shake(state, delta);
+}
+
+/// Update wave system (replaces random spawning)
+fn update_wave_system(state: &mut GameState, delta: f32) {
+    if state.config.spawning.wave_mode {
+        // ===== WAVE MODE: Lua-based wave progression =====
+        use crate::models::WaveState;
+        use std::mem;
+
+        // Temporarily take wave_manager out of state to avoid borrow issues
+        let mut wave_manager = mem::replace(
+            &mut state.wave_manager,
+            crate::game::wave::WaveManager::new_dummy(),
+        );
+
+        // Check if we need to start the next wave
+        if wave_manager.state == WaveState::Ready {
+            let config = state.config.clone();
+            wave_manager.start_next_wave(&config);
+        }
+
+        // Update wave state
+        let enemies_alive = state.enemies.len();
+        wave_manager.update_state(
+            enemies_alive,
+            &mut state.player.energy,
+            state.player.max_energy,
+            delta,
+        );
+
+        // Spawn enemies for active wave
+        wave_manager.spawn_for_wave(state, delta);
+
+        // Put wave_manager back
+        state.wave_manager = wave_manager;
+    } else {
+        // Random enemy spawning for testing
+        spawn_enemies(state, delta);
+    }
 }

@@ -17,7 +17,6 @@ pub struct WeaponStats {
     pub damage: f32,           // Base damage per projectile
     pub fire_rate: f32,        // Cooldown between shots (in seconds)
     pub projectile_speed: f32, // How fast projectiles travel (pixels/sec)
-    pub ammo: f32,             // Magazine capacity (TODO: implement reload system)
 }
 
 pub struct Projectile {
@@ -92,7 +91,6 @@ impl WeaponType {
             damage: weapon_cfg.damage,
             fire_rate: weapon_cfg.fire_rate,
             projectile_speed: weapon_cfg.projectile_speed,
-            ammo: weapon_cfg.ammo,
         }
     }
 
@@ -105,7 +103,7 @@ impl WeaponType {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum EntityType {
     BasicFighter,
     Sniper,
@@ -250,6 +248,92 @@ impl Ghost {
     }
 }
 
+// ===== WAVE SYSTEM =====
+
+/// Wave state machine
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum WaveState {
+    Ready,      // Wave loaded, waiting for prep countdown
+    Preparing,  // Countdown active
+    Active,     // Enemies spawning
+    Complete,   // All enemies defeated
+    Transition, // Brief pause before next wave
+}
+
+/// Individual spawn group within a wave
+#[derive(Debug, Clone)]
+pub struct WaveSpawn {
+    pub enemy_type: EntityType,
+    pub count: usize,
+    pub interval: f32, // Seconds between each enemy spawn
+    #[allow(dead_code)] // Used in from_lua() initialization
+    pub delay: f32, // Delay before starting this spawn group (copied to timer)
+    pub spawned: usize, // How many have been spawned so far
+    pub timer: f32,    // Time until next spawn (initialized from delay)
+}
+
+/// Wave definition (converted from Lua)
+pub struct WaveDefinition {
+    pub wave_number: usize,
+    pub name: String,
+    pub prep_time: f32,
+    pub spawns: Vec<WaveSpawn>,
+}
+
+impl WaveDefinition {
+    /// Convert from Lua wave definition
+    pub fn from_lua(
+        lua_wave: crate::scripting::LuaWaveDefinition,
+        _config: &crate::config::GameConfig, // Reserved for future difficulty scaling
+    ) -> Option<Self> {
+        let mut spawns = Vec::new();
+
+        for lua_spawn in lua_wave.spawns {
+            // Parse entity type from string
+            let entity_type = match lua_spawn.enemy_type.as_str() {
+                "BasicFighter" => EntityType::BasicFighter,
+                "Sniper" => EntityType::Sniper,
+                "Tank" => EntityType::Tank,
+                "Boss" => EntityType::Boss,
+                unknown => {
+                    println!(
+                        "✗ Unknown enemy type in wave {}: {}",
+                        lua_wave.wave_number, unknown
+                    );
+                    continue; // Skip invalid enemy types
+                }
+            };
+
+            spawns.push(WaveSpawn {
+                enemy_type: entity_type,
+                count: lua_spawn.count,
+                interval: lua_spawn.interval,
+                delay: lua_spawn.delay,
+                spawned: 0,
+                timer: lua_spawn.delay, // Start with delay
+            });
+        }
+
+        if spawns.is_empty() {
+            println!("✗ Wave {} has no valid spawns!", lua_wave.wave_number);
+            return None;
+        }
+
+        Some(WaveDefinition {
+            wave_number: lua_wave.wave_number,
+            name: lua_wave.name,
+            prep_time: lua_wave.prep_time,
+            spawns,
+        })
+    }
+
+    /// Total enemies in this wave (used by wave UI)
+    #[allow(dead_code)] // UI Helper
+    pub fn total_enemy_count(&self) -> usize {
+        self.spawns.iter().map(|s| s.count).sum()
+    }
+}
+
 // GameState
 pub struct GameState {
     pub config: crate::config::GameConfig,
@@ -267,6 +351,12 @@ pub struct GameState {
     // Screen shake
     pub screen_shake_duration: f32,
     pub screen_shake_intensity: f32,
+
+    // Background scroll
+    pub bg_scroll_offset: f32,
+
+    // Wave system
+    pub wave_manager: crate::game::wave::WaveManager,
 }
 
 impl GameState {
@@ -317,6 +407,23 @@ impl GameState {
             // Screen shake
             screen_shake_duration: 0.0,
             screen_shake_intensity: 0.0,
+
+            // Starts at bottom of texture
+            bg_scroll_offset: 0.0,
+
+            // Wave system - initialized based on config
+            wave_manager: {
+                let cfg = crate::defaults::default_config();
+                if cfg.spawning.wave_mode {
+                    println!(
+                        "✓ Initializing Lua wave system ({} waves)",
+                        cfg.spawning.wave_count
+                    );
+                } else {
+                    println!("✓ Wave system ready (classic random mode)");
+                }
+                crate::game::wave::WaveManager::new(cfg.spawning.wave_count)
+            },
         }
     }
     pub fn apply_config(&mut self, config: &GameConfig) {
