@@ -1,12 +1,31 @@
+use crate::game::get_shake_offset;
 use crate::models::*;
 use macroquad::prelude::*;
 
 /// Render all game entities
 pub fn render_game(state: &GameState) {
+    // Apply screen shake offset to camera
+    let (shake_x, shake_y) = get_shake_offset(state);
+
+    // Push camera with shake offset
+    gl_use_default_material();
+    set_camera(&Camera2D {
+        zoom: vec2(1.0 / screen_width() * 2.0, 1.0 / screen_height() * 2.0),
+        target: vec2(
+            screen_width() / 2.0 + shake_x,
+            screen_height() / 2.0 + shake_y,
+        ),
+        ..Default::default()
+    });
+
     draw_player(&state.player, state);
     draw_enemies(&state.enemies);
     draw_ghosts(&state.ghosts);
     draw_projectiles(&state.projectiles);
+    draw_particles(&state.particles);
+
+    // Reset camera for UI
+    set_default_camera();
 }
 
 /// Render UI overlay (health, energy, stats)
@@ -159,7 +178,7 @@ pub fn render_ui(state: &GameState) {
 
 /// Draw player entity
 fn draw_player(player: &Player, state: &GameState) {
-    draw_circle(player.pos.x, player.pos.y, 15.0, BLUE);
+    draw_circle(player.pos.x, player.pos.y, 15.0, WHITE);
 
     // Draw parry shield if active
     if player.parry_active {
@@ -169,10 +188,10 @@ fn draw_player(player: &Player, state: &GameState) {
             player.pos.y,
             parry_radius,
             3.0,
-            RED, // Bright blue
+            BLUE, // Bright blue
         );
         // Inner glow
-        draw_circle_lines(player.pos.x, player.pos.y, parry_radius - 5.0, 2.0, ORANGE);
+        draw_circle_lines(player.pos.x, player.pos.y, parry_radius - 5.0, 2.0, SKYBLUE);
     }
 
     // Draw health bar above player
@@ -264,7 +283,7 @@ fn draw_projectiles(projectiles: &[Projectile]) {
                 proj.pos.x,
                 proj.pos.y,
                 proj.pos.x,
-                proj.pos.y + 30.0, // Beam trail
+                proj.pos.y + 0.0, // Beam trail
                 2.0,
                 Color::new(color.r, color.g, color.b, 0.5),
             );
@@ -307,5 +326,32 @@ fn draw_controls_hint() {
             16.0,
             GRAY,
         );
+    }
+}
+
+/// Draw particles
+fn draw_particles(particles: &[Particle]) {
+    for particle in particles {
+        // Calculate alpha based on lifetime (fade out)
+        let alpha = (particle.lifetime / particle.max_lifetime).clamp(0.0, 1.0);
+        let color = Color::new(
+            particle.color.r,
+            particle.color.g,
+            particle.color.b,
+            alpha,
+        );
+        
+        // Draw particle as circle with current size
+        draw_circle(particle.pos.x, particle.pos.y, particle.size, color);
+        
+        // Add glow effect for larger particles
+        if particle.size > 3.0 {
+            draw_circle(
+                particle.pos.x,
+                particle.pos.y,
+                particle.size + 2.0,
+                Color::new(color.r, color.g, color.b, alpha * 0.3),
+            );
+        }
     }
 }
