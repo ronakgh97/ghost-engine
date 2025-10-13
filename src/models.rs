@@ -37,6 +37,17 @@ pub struct Projectile {
     pub lifetime: f32,                      // How long projectile has existed (for cleanup)
 }
 
+#[derive(Clone, Copy)]
+pub struct Particle {
+    pub pos: Position,
+    pub velocity: Position,
+    pub lifetime: f32,     // Time until particle disappears
+    pub max_lifetime: f32, // For fade-out calculation
+    pub color: macroquad::prelude::Color,
+    pub size: f32,       // Initial size
+    pub size_decay: f32, // How much size shrinks per second
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ProjectileOwner {
     Player,
@@ -55,7 +66,7 @@ pub enum WeaponType {
 }
 
 impl WeaponType {
-    /// Parse weapon type from string (for config loading)
+    /// Parse weapon type from string
     pub fn from_string(s: &str) -> Option<Self> {
         match s {
             "Bullet" => Some(WeaponType::Bullet),
@@ -67,7 +78,7 @@ impl WeaponType {
         }
     }
 
-    /// Get weapon stats from config (no more hardcoded values!)
+    /// Get weapon stats from config
     pub fn get_weapon_stats(&self, config: &crate::config::WeaponsConfig) -> WeaponStats {
         let weapon_cfg = match self {
             WeaponType::Bullet => &config.bullet,
@@ -103,7 +114,7 @@ pub enum EntityType {
 }
 
 impl EntityType {
-    /// Get stats from config (no more hardcoded values!)
+    /// Get stats from config
     pub fn get_stats(&self, config: &crate::config::EntitiesConfig) -> Stats {
         let entity_stats = match self {
             EntityType::BasicFighter => &config.basic_fighter,
@@ -204,7 +215,7 @@ impl GhostFormation {
 }
 
 impl Ghost {
-    /// Create ghost directly from EntityType (no temp Enemy allocation)
+    /// Create ghost directly from EntityType
     pub fn from_entity_type(
         entity_type: EntityType,
         spawn_pos: Position,
@@ -246,6 +257,7 @@ pub struct GameState {
     pub enemies: Vec<Enemy>,
     pub ghosts: Vec<Ghost>,
     pub projectiles: Vec<Projectile>,
+    pub particles: Vec<Particle>,
     pub player_fire_timer: f32,
     pub enemy_fire_timers: Vec<f32>,
     pub ghost_fire_timers: Vec<f32>,
@@ -295,6 +307,7 @@ impl GameState {
             enemies: Vec::new(),
             ghosts: Vec::new(),
             projectiles: Vec::new(),
+            particles: Vec::new(),
             player_fire_timer: 0.0,
             enemy_fire_timers: Vec::new(),
             ghost_fire_timers: Vec::new(),
