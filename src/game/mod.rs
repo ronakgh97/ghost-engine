@@ -6,6 +6,7 @@ mod energy;
 mod ghost;
 mod input;
 mod parry;
+mod particles;
 mod player;
 mod screen_shake;
 mod spawn;
@@ -20,6 +21,7 @@ pub use energy::*;
 pub use ghost::*;
 pub use input::*;
 pub use parry::*;
+pub use particles::*;
 pub use player::*;
 pub use screen_shake::*;
 pub use spawn::*;
@@ -55,6 +57,7 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
     // Spawn new enemies
     spawn_enemies(state, delta);
 
-    // Update screen shake
+    // Update visual effects
+    update_particles(state, delta);
     update_shake(state, delta);
 }

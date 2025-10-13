@@ -52,7 +52,7 @@ pub fn shake_on_player_hit(state: &mut GameState) {
 /// Trigger weapon-specific shake on hit (when player/ghost hits enemy)
 pub fn shake_on_weapon_hit(state: &mut GameState, weapon_type: WeaponType) {
     let cfg = &state.config.screen_shake;
-    
+
     let intensity = match weapon_type {
         WeaponType::Bullet => cfg.bullet_hit_intensity,
         WeaponType::Laser => cfg.laser_hit_intensity,
@@ -60,6 +60,6 @@ pub fn shake_on_weapon_hit(state: &mut GameState, weapon_type: WeaponType) {
         WeaponType::Plasma => cfg.plasma_hit_intensity,
         WeaponType::Bombs => cfg.bomb_hit_intensity,
     };
-    
+
     trigger_shake(state, cfg.weapon_hit_duration, intensity);
 }

@@ -95,7 +95,7 @@ fn fire_enemy_weapon(
             });
         }
         WeaponType::Laser => {
-            // Lasers always aim at player (high-threat weapon)
+            // Lasers always aim at player
             let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
 
             projectiles.push(Projectile {
@@ -178,7 +178,7 @@ fn fire_enemy_weapon(
                 owner: ProjectileOwner::Enemy,
                 piercing: false,
                 homing: false,
-                explosion_radius: 60.0, // Enemy bomb AOE (smaller than player's)
+                explosion_radius: 60.0, // Enemy bomb AOE
                 locked_target_index: None,
                 lifetime: 0.0,
             });

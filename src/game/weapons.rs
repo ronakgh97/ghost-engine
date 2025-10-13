@@ -141,7 +141,7 @@ fn fire_bombs(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
         owner: ProjectileOwner::Player,
         piercing: false,
         homing: false,
-        explosion_radius: 80.0, // AOE damage radius (configurable)
+        explosion_radius: 80.0, // AOE damage radius
         locked_target_index: None,
         lifetime: 0.0,
     };
@@ -201,8 +201,8 @@ fn update_projectiles(state: &mut GameState, delta: f32) {
     }
 
     // Remove projectiles that are:
-    // 1. Off-screen
-    // 2. Exceeded max lifetime (5 seconds - prevents stuck missiles)
+    // Off-screen
+    // Exceeded max lifetime (5 seconds - prevents stuck missiles)
     let padding = state.config.projectile_bounds.off_screen_padding;
     let max_lifetime = 5.0;
 
@@ -230,7 +230,7 @@ fn homing_behavior(projectile: &mut Projectile, target: Position, delta: f32) {
     }
 
     // Desired velocity (pointing at target)
-    let desired_speed = 300.0; // Constant homing speed (could be from config)
+    let desired_speed = 300.0; // Constant homing speed (CONFIG HERE)
     let desired_vel_x = (dx / distance) * desired_speed;
     let desired_vel_y = (dy / distance) * desired_speed;
 
@@ -245,8 +245,8 @@ fn homing_behavior(projectile: &mut Projectile, target: Position, delta: f32) {
         + projectile.velocity.y * projectile.velocity.y)
         .sqrt();
 
-    if current_speed > desired_speed * 1.2 {
-        let scale = (desired_speed * 1.2) / current_speed;
+    if current_speed > desired_speed * 1.5 {
+        let scale = (desired_speed * 1.5) / current_speed;
         projectile.velocity.x *= scale;
         projectile.velocity.y *= scale;
     }
@@ -269,7 +269,7 @@ fn find_nearest_enemy_index(pos: Position, enemies: &[crate::models::Enemy]) -> 
         .map(|(idx, _)| idx)
 }
 
-/// Find the nearest enemy to a given position (for legacy compatibility)
+/// Find the nearest enemy to a given position (for backward compatibility)
 fn find_nearest_enemy(pos: Position, enemies: &[crate::models::Enemy]) -> Option<Position> {
     find_nearest_enemy_index(pos, enemies).map(|idx| enemies[idx].pos)
 }
