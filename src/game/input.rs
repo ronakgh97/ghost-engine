@@ -1,6 +1,7 @@
 use crate::game::utils::calculate_formation_position;
 use crate::game::weapons;
 use crate::models::{EntityType, GameState, Ghost};
+use gamepads::Gamepads;
 use macroquad::input::*;
 
 /// Handle all player input
@@ -41,9 +42,9 @@ pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
         weapons::player_fire_weapon(game_state, 3);
     }
     // Fire Bombs
-    if is_key_down(KeyCode::Semicolon) {
-        weapons::player_fire_weapon(game_state, 4);
-    }
+    //if is_key_down(KeyCode::Semicolon) {
+    //    weapons::player_fire_weapon(game_state, 4);
+    //}
 
     // Formation switching
     change_formation(game_state);
@@ -75,6 +76,8 @@ fn spawn_ghost_from_queue(state: &mut GameState) {
     } else if is_key_pressed(KeyCode::F3) {
         Some(EntityType::Tank)
     } else if is_key_pressed(KeyCode::F4) {
+        Some(EntityType::Healer)
+    } else if is_key_pressed(KeyCode::F5) {
         Some(EntityType::Boss)
     } else {
         None

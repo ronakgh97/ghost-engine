@@ -198,16 +198,16 @@ impl WaveManager {
                 // Get entity stats from config
                 let entity_stats = spawn.enemy_type.get_stats(&game_state.config.entities);
 
-                // Parse weapons from config
-                let entity_config = match spawn.enemy_type {
-                    EntityType::BasicFighter => &game_state.config.entities.basic_fighter,
-                    EntityType::Sniper => &game_state.config.entities.sniper,
-                    EntityType::Tank => &game_state.config.entities.tank,
-                    EntityType::Boss => &game_state.config.entities.boss,
+                // Get weapons list (handle healer's special struct)
+                let weapons_list = match spawn.enemy_type {
+                    EntityType::BasicFighter => &game_state.config.entities.basic_fighter.weapons,
+                    EntityType::Sniper => &game_state.config.entities.sniper.weapons,
+                    EntityType::Tank => &game_state.config.entities.tank.weapons,
+                    EntityType::Boss => &game_state.config.entities.boss.weapons,
+                    EntityType::Healer => &game_state.config.entities.healer.weapons,
                 };
 
-                let weapons: Vec<WeaponType> = entity_config
-                    .weapons
+                let weapons: Vec<WeaponType> = weapons_list
                     .iter()
                     .filter_map(|w| WeaponType::from_string(w))
                     .collect();
