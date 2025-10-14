@@ -57,7 +57,8 @@ pub struct EntitiesConfig {
     pub sniper: EntityStats,
     pub tank: EntityStats,
     pub boss: EntityStats,
-    pub healer: HealerStats, // Special stats for healer enemy
+    pub healer: HealerStats,     // Special stats for healer enemy
+    pub splitter: SplitterStats, // Special stats for splitter enemy
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,6 +80,19 @@ pub struct HealerStats {
     // Healer-specific fields
     pub heal_rate: f32,   // HP healed per second
     pub heal_radius: f32, // Range of healing field (pixels)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SplitterStats {
+    pub health: f32,
+    pub damage: f32,
+    pub energy_cost: f32,
+    pub fire_interval: f32,
+    pub weapons: Vec<String>,
+    // Splitter-specific fields
+    pub split_count: usize,          // How many splits to spawn (2-3)
+    pub split_health_ratio: f32,     // HP ratio for each split (0.3 = 30%)
+    pub split_speed_multiplier: f32, // Speed boost for splits (1.5 = 50% faster)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

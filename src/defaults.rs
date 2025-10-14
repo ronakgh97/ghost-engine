@@ -48,9 +48,9 @@ fn default_player() -> PlayerConfig {
         ],
 
         // Parry system
-        parry_cooldown: 1.5,     // 2 second cooldown
-        parry_window: 0.2,       // 0.2 second window for success
-        parry_energy_cost: 10.0, // 10 energy per parry attempt
+        parry_cooldown: 1.5,
+        parry_window: 0.3,
+        parry_energy_cost: 5.0,
     }
 }
 
@@ -82,7 +82,7 @@ fn default_entities() -> EntitiesConfig {
             damage: 15.0,
             energy_cost: 40.0,
             fire_interval: 1.5,
-            weapons: vec!["Missile".to_string(), "Plasma".to_string()], // Tank: Homing + Spread
+            weapons: vec!["Missile".to_string(), "Plasma".to_string()], // Homing + Spread
         },
         boss: EntityStats {
             health: 500.0,
@@ -93,7 +93,7 @@ fn default_entities() -> EntitiesConfig {
                 "Laser".to_string(),
                 "Missile".to_string(),
                 "Plasma".to_string(),
-            ], // Boss arsenal: ALL advanced weapons!
+            ],
         },
         healer: HealerStats {
             health: 60.0,
@@ -105,40 +105,47 @@ fn default_entities() -> EntitiesConfig {
             heal_rate: 15.0,    // Heals 15 HP/sec to allies in range
             heal_radius: 150.0, // 150 pixel radius healing field
         },
+        splitter: SplitterStats {
+            health: 80.0,
+            damage: 12.0,
+            energy_cost: 25.0,
+            fire_interval: 2.0,
+            weapons: vec!["Bullet".to_string()],
+            // Splitting stats
+            split_count: 3,
+            split_health_ratio: 0.3,
+            split_speed_multiplier: 2.0,
+        },
     }
 }
 
+// Weapon config with balanced stats
 fn default_weapons() -> WeaponsConfig {
     WeaponsConfig {
-        // BULLET: Rapid fire, low damage, general purpose
         bullet: WeaponStats {
             damage: 10.0,
-            fire_rate: 0.1, // Fast fire rate
+            fire_rate: 0.1,
             projectile_speed: 500.0,
         },
-        // LASER: Piercing beam, high damage, slow fire rate
         laser: WeaponStats {
             damage: 60.0,
-            fire_rate: 1.5,          // Slow fire rate
-            projectile_speed: 800.0, // Very fast
+            fire_rate: 1.5,
+            projectile_speed: 800.0,
         },
-        // MISSILE: Homing, medium damage/fire rate
         missile: WeaponStats {
             damage: 30.0,
             fire_rate: 0.5,
-            projectile_speed: 250.0, // Slow but tracks
+            projectile_speed: 250.0,
         },
-        // PLASMA: Spread shot (3-projectile cone)
         plasma: WeaponStats {
             damage: 25.0,
             fire_rate: 0.4,
             projectile_speed: 500.0,
         },
-        // BOMBS: AOE explosion
         bombs: WeaponStats {
             damage: 80.0,
-            fire_rate: 2.0,          // Very slow
-            projectile_speed: 200.0, // Slow drop
+            fire_rate: 2.0,
+            projectile_speed: 200.0,
         },
     }
 }
@@ -147,7 +154,7 @@ fn default_spawning() -> SpawningConfig {
     SpawningConfig {
         wave_mode: false,          // Enable Lua wave system by default
         wave_count: 5,             // 5 waves total
-        enemy_spawn_interval: 2.2, // Random spawn timer (for classic mode)
+        enemy_spawn_interval: 2.2, // Random spawn timer
         initial_delay: 3.0,        // Initial delay before spawning
     }
 }
@@ -221,21 +228,20 @@ fn default_projectile_bounds() -> ProjectileBoundsConfig {
 
 fn default_screen_shake() -> ScreenShakeConfig {
     ScreenShakeConfig {
-        // Weapon-specific shake (intensity scales with weapon power)
-        bullet_hit_intensity: 0.8,  // Light tap - rapid fire feel
-        laser_hit_intensity: 4.0,   // Medium - piercing beam power
-        missile_hit_intensity: 2.5, // Strong - explosive impact
-        plasma_hit_intensity: 1.5,  // Medium - energy burst (3 projectiles!)
-        bomb_hit_intensity: 5.0,    // HUGE - massive explosion!
-        weapon_hit_duration: 0.5,   // Quick shake for hits (not too long)
+        bullet_hit_intensity: 0.8,
+        laser_hit_intensity: 4.0,
+        missile_hit_intensity: 2.5,
+        plasma_hit_intensity: 1.5,
+        bomb_hit_intensity: 5.0,
+        weapon_hit_duration: 0.5,
 
         // Event-specific shake
-        enemy_death_duration: 1.0,  // Quick shake on enemy death
-        enemy_death_intensity: 1.5, // Subtle shake
-        parry_duration: 0.25,       // Longer shake for parry success
-        parry_intensity: 5.0,       // Strong shake for skill reward
-        player_hit_duration: 0.3,   // Longest shake when hit
-        player_hit_intensity: 5.0,  // Strongest shake for feedback
+        enemy_death_duration: 1.0,
+        enemy_death_intensity: 1.5,
+        parry_duration: 0.25,
+        parry_intensity: 5.0,
+        player_hit_duration: 0.3,
+        player_hit_intensity: 5.0,
     }
 }
 
@@ -282,10 +288,10 @@ fn default_particles() -> ParticleConfig {
         size_decay: 8.0, // Shrinks 8 pixels/sec
 
         // Projectile trails
-        trails_enabled: true,         // Trails enabled by default
+        trails_enabled: true,        // Trails enabled by default
         trail_spawn_interval: 0.005, // Spawn rate
-        trail_lifetime: 0.3,          // Trail fades in 0.5 seconds
-        trail_size: 3.5,              // Small trail particles
+        trail_lifetime: 0.3,         // Trail fades in 0.5 seconds
+        trail_size: 3.5,             // Small trail particles
     }
 }
 

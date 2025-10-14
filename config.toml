@@ -15,9 +15,9 @@ movement_speed = 250.0
 starting_weapons = ["Bullet", "Laser", "Missile", "Plasma"]
 
 # Parry system
-parry_cooldown = 1.5       # Cooldown between parries (seconds)
-parry_window = 0.2         # Window for successful parry (seconds)
-parry_energy_cost = 10.0   # Energy cost per parry attempt
+parry_cooldown = 1.5
+parry_window = 0.3
+parry_energy_cost = 5.0
 
 [energy]
 regen_rate_idle = 30.0
@@ -60,33 +60,38 @@ weapons = ["Bullet"]
 heal_rate = 15.0      # Heals 15 HP per second to allies in range
 heal_radius = 150.0   # 150 pixel radius healing field
 
+[entities.splitter]
+health = 80.0
+damage = 12.0
+energy_cost = 25.0
+fire_interval = 2.0
+weapons = ["Bullet"]
+split_count = 3                  
+split_health_ratio = 0.3         
+split_speed_multiplier = 2.5    
+
 # WEAPONS CONFIGURATION
 [weapons.bullet]
-# Rapid fire, low damage, general purpose
 damage = 10.0
 fire_rate = 0.1
 projectile_speed = 500.0
 
 [weapons.laser]
-# Piercing beam, high damage, slow fire rate
 damage = 60.0
 fire_rate = 1.5
 projectile_speed = 800.0
 
 [weapons.missile]
-# Homing, medium damage/fire rate
 damage = 30.0
 fire_rate = 0.5
 projectile_speed = 250.0
 
 [weapons.plasma]
-# Spread shot (3-projectile cone)
 damage = 25.0
 fire_rate = 0.4
 projectile_speed = 500.0
 
 [weapons.bombs]
-# AOE explosion
 damage = 80.0
 fire_rate = 2.0
 projectile_speed = 200.0
@@ -155,32 +160,31 @@ player_projectile_speed_y = -400.0
 # Screen Shake (Juice!)
 [screen_shake]
 # Weapon-specific shake (intensity scales with weapon damage/power)
-bullet_hit_intensity = 0.8      # Light tap - rapid fire feel
-laser_hit_intensity = 4.0       # Medium - piercing beam power
-missile_hit_intensity = 2.5     # Strong - explosive impact
-plasma_hit_intensity = 1.5      # Medium - energy burst (x3 projectiles!)
-bomb_hit_intensity = 5.0        # HUGE - massive AOE explosion!
-weapon_hit_duration = 0.1      # Quick shake for weapon hits
+bullet_hit_intensity = 0.8
+laser_hit_intensity = 4.0
+missile_hit_intensity = 2.5
+plasma_hit_intensity = 1.5
+bomb_hit_intensity = 5.0
+weapon_hit_duration = 0.1
 
 # Event-specific shake
-enemy_death_duration = 1.0      # Duration of shake on enemy death (seconds)
-enemy_death_intensity = 1.5     # Intensity/magnitude of shake
-parry_duration = 0.25           # Duration of shake on parry success
-parry_intensity = 5.0           # Strong shake for skill reward
-player_hit_duration = 0.3       # Duration when player takes damage
-player_hit_intensity = 5.0      # Strongest shake for critical feedback
+enemy_death_duration = 1.0
+enemy_death_intensity = 1.5
+parry_duration = 0.25
+parry_intensity = 5.0
+player_hit_duration = 0.3
+player_hit_intensity = 5.0
 
-# Particle System (Visual Effects!)
+# Particle System
 [particles]
-# Explosion particles (radial burst)
-explosion_count_min = 10        # Minimum particles per explosion
-explosion_count_max = 20        # Maximum particles per explosion
-explosion_lifetime_min = 0.3    # Minimum lifetime (seconds)
-explosion_lifetime_max = 0.6    # Maximum lifetime (seconds)
-explosion_size_min = 3.0        # Minimum size (pixels)
-explosion_size_max = 6.0        # Maximum size (pixels)
-explosion_speed_min = 50.0      # Minimum speed (pixels/sec)
-explosion_speed_max = 150.0     # Maximum speed (pixels/sec)
+explosion_count_min = 10
+explosion_count_max = 20
+explosion_lifetime_min = 0.3
+explosion_lifetime_max = 0.6
+explosion_size_min = 3.0
+explosion_size_max = 6.0
+explosion_speed_min = 50.0
+explosion_speed_max = 150.0
 
 # Hit sparks (directional)
 spark_count = 3                 # Number of sparks per hit
