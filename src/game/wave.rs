@@ -198,13 +198,14 @@ impl WaveManager {
                 // Get entity stats from config
                 let entity_stats = spawn.enemy_type.get_stats(&game_state.config.entities);
 
-                // Get weapons list (handle healer's special struct)
+                // Get weapons list
                 let weapons_list = match spawn.enemy_type {
                     EntityType::BasicFighter => &game_state.config.entities.basic_fighter.weapons,
                     EntityType::Sniper => &game_state.config.entities.sniper.weapons,
                     EntityType::Tank => &game_state.config.entities.tank.weapons,
                     EntityType::Boss => &game_state.config.entities.boss.weapons,
                     EntityType::Healer => &game_state.config.entities.healer.weapons,
+                    EntityType::Splitter => &game_state.config.entities.splitter.weapons,
                 };
 
                 let weapons: Vec<WeaponType> = weapons_list
@@ -257,7 +258,7 @@ impl WaveManager {
     }
 
     /// Get prep countdown (for UI)
-    #[allow(dead_code)] // Will be used in Task 7: Wave UI
+    #[allow(dead_code)] // Will be used in Wave UI
     pub fn get_prep_countdown(&self) -> Option<f32> {
         if self.state == WaveState::Preparing {
             Some(self.prep_timer)
@@ -267,7 +268,7 @@ impl WaveManager {
     }
 
     /// Check if all waves complete
-    #[allow(dead_code)] // Will be used in Task 7: Wave UI
+    #[allow(dead_code)] // Will be used in Wave UI
     pub fn is_game_complete(&self) -> bool {
         self.current_wave_number >= self.total_waves && self.state == WaveState::Transition
     }

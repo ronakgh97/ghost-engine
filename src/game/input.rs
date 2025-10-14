@@ -1,7 +1,6 @@
 use crate::game::utils::calculate_formation_position;
 use crate::game::weapons;
 use crate::models::{EntityType, GameState, Ghost};
-use gamepads::Gamepads;
 use macroquad::input::*;
 
 /// Handle all player input
@@ -78,6 +77,8 @@ fn spawn_ghost_from_queue(state: &mut GameState) {
     } else if is_key_pressed(KeyCode::F4) {
         Some(EntityType::Healer)
     } else if is_key_pressed(KeyCode::F5) {
+        Some(EntityType::Splitter)
+    } else if is_key_pressed(KeyCode::F6) {
         Some(EntityType::Boss)
     } else {
         None
