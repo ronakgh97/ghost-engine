@@ -52,6 +52,7 @@ fn fire_bullet(state: &mut GameState, weapon_stats: crate::models::WeaponStats) 
         explosion_radius: 0.0,
         locked_target_index: None,
         lifetime: 0.0,
+        trail_timer: 0.0,
     };
 
     state.projectiles.push(projectile);
@@ -73,6 +74,7 @@ fn fire_laser(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
         explosion_radius: 0.0,
         locked_target_index: None,
         lifetime: 0.0,
+        trail_timer: 0.0,
     };
 
     state.projectiles.push(projectile);
@@ -97,6 +99,7 @@ fn fire_missile(state: &mut GameState, weapon_stats: crate::models::WeaponStats)
         explosion_radius: 0.0,
         locked_target_index: nearest_idx, // Lock onto target at spawn
         lifetime: 0.0,
+        trail_timer: 0.0,
     };
 
     state.projectiles.push(projectile);
@@ -122,6 +125,7 @@ fn fire_plasma(state: &mut GameState, weapon_stats: crate::models::WeaponStats) 
             explosion_radius: 0.0,
             locked_target_index: None,
             lifetime: 0.0,
+            trail_timer: 0.0,
         };
 
         state.projectiles.push(projectile);
@@ -144,6 +148,7 @@ fn fire_bombs(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
         explosion_radius: 80.0, // AOE damage radius
         locked_target_index: None,
         lifetime: 0.0,
+        trail_timer: 0.0,
     };
 
     state.projectiles.push(projectile);
@@ -151,9 +156,15 @@ fn fire_bombs(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
 
 /// Update all projectile positions and remove off-screen ones
 fn update_projectiles(state: &mut GameState, delta: f32) {
-    // Update lifetimes first
+    // Update lifetimes and trail timers
     for projectile in &mut state.projectiles {
         projectile.lifetime += delta;
+        projectile.trail_timer += delta;
+    }
+
+    // Spawn trail particles if enabled
+    if state.config.particles.trails_enabled {
+        spawn_projectile_trails(state, delta);
     }
 
     // Update homing missiles with proper target tracking
@@ -216,6 +227,58 @@ fn update_projectiles(state: &mut GameState, delta: f32) {
 
         in_bounds && alive
     });
+}
+
+/// Spawn trail particles behind moving projectiles
+fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
+    use macroquad::prelude::*;
+
+    let cfg = &state.config.particles;
+    let interval = cfg.trail_spawn_interval;
+
+    // Collect trail spawn data (avoid borrow checker issues)
+    let mut trails_to_spawn = Vec::new();
+
+    for projectile in &mut state.projectiles {
+        // Check if it's time to spawn a trail particle
+        if projectile.trail_timer >= interval {
+            projectile.trail_timer = 0.0; // Reset timer
+
+            // Get trail color based on weapon type and owner
+            let trail_color = match projectile.weapon_type {
+                WeaponType::Missile => match projectile.owner {
+                    ProjectileOwner::Player | ProjectileOwner::Ghost => {
+                        Color::new(1.0, 0.6, 0.2, 0.8)
+                    } // Orange smoke
+                    ProjectileOwner::Enemy => Color::new(0.9, 0.2, 0.2, 0.8), // Red smoke
+                },
+                WeaponType::Laser => Color::new(0.2, 0.8, 1.0, 0.9), // Cyan glow
+                WeaponType::Plasma => Color::new(0.8, 0.2, 1.0, 0.8), // Purple energy
+                WeaponType::Bombs => Color::new(1.0, 0.3, 0.0, 0.7), // Fiery red-orange
+                WeaponType::Bullet => Color::new(1.0, 1.0, 0.6, 0.6), // Faint yellow
+            };
+
+            trails_to_spawn.push((projectile.pos, trail_color));
+        }
+    }
+
+    // Spawn trail particles
+    for (pos, color) in trails_to_spawn {
+        let particle = Particle {
+            pos,
+            velocity: Position {
+                x: rand::gen_range(-10.0, 10.0), // Slight random drift
+                y: rand::gen_range(-10.0, 10.0),
+            },
+            lifetime: cfg.trail_lifetime,
+            max_lifetime: cfg.trail_lifetime,
+            color,
+            size: cfg.trail_size,
+            size_decay: cfg.size_decay * 0.5, // Slower decay for trails
+        };
+
+        state.particles.push(particle);
+    }
 }
 
 /// Homing behavior: Smoothly steer projectile towards target

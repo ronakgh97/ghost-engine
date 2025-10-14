@@ -92,6 +92,7 @@ fn fire_enemy_weapon(
                 explosion_radius: 0.0,
                 locked_target_index: None,
                 lifetime: 0.0,
+                trail_timer: 0.0,
             });
         }
         WeaponType::Laser => {
@@ -109,6 +110,7 @@ fn fire_enemy_weapon(
                 explosion_radius: 0.0,
                 locked_target_index: None,
                 lifetime: 0.0,
+                trail_timer: 0.0,
             });
         }
         WeaponType::Missile => {
@@ -126,6 +128,7 @@ fn fire_enemy_weapon(
                 explosion_radius: 0.0,
                 locked_target_index: Some(0), // Lock onto player (index 0 for enemy projectiles)
                 lifetime: 0.0,
+                trail_timer: 0.0,
             });
         }
         WeaponType::Plasma => {
@@ -162,6 +165,7 @@ fn fire_enemy_weapon(
                         explosion_radius: 0.0,
                         locked_target_index: None,
                         lifetime: 0.0,
+                        trail_timer: 0.0,
                     });
                 }
             }
@@ -181,6 +185,7 @@ fn fire_enemy_weapon(
                 explosion_radius: 60.0, // Enemy bomb AOE
                 locked_target_index: None,
                 lifetime: 0.0,
+                trail_timer: 0.0,
             });
         }
     }
