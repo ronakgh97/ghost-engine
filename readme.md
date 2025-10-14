@@ -11,4 +11,4 @@
 - Parry Missiles: X (short window, costs energy)
 - Cancel Summon: C (returns all ghosts to available queue)
 - Change Formation: 1-3 for Line, Circle, V-shape (Needs Optimal Ghosts in queue)
-- Single Summon: F keys, F1-F4 for specific ghost types (Basic, Sniper, Tank, Boss)
+- Single Summon: F keys, F1-F6 for specific ghost types (Basic, Sniper, Tank, Elite, Healer, Splitter)
