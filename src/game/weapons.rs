@@ -270,6 +270,7 @@ fn find_nearest_enemy_index(pos: Position, enemies: &[crate::models::Enemy]) -> 
 }
 
 /// Find the nearest enemy to a given position (for backward compatibility)
+#[allow(dead_code)] // May be used for future weapon targeting improvements
 fn find_nearest_enemy(pos: Position, enemies: &[crate::models::Enemy]) -> Option<Position> {
     find_nearest_enemy_index(pos, enemies).map(|idx| enemies[idx].pos)
 }

@@ -5,12 +5,13 @@ use macroquad::prelude::*;
 pub fn spawn_enemies(state: &mut GameState, delta: f32) {
     state.spawn_timer += delta;
 
-    // Spawn enemy every 2 seconds
+    // Spawn enemy from config interval
     if state.spawn_timer >= state.config.spawning.enemy_spawn_interval {
         state.spawn_timer = 0.0;
 
         // Pick random enemy type
         let enemy_types = [
+            EntityType::BasicFighter,
             EntityType::BasicFighter,
             EntityType::BasicFighter,
             EntityType::Sniper,

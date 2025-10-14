@@ -19,7 +19,7 @@ impl LuaScripting {
             println!("✓ Loaded scripts/init.lua");
         } else {
             return Err(LuaError::RuntimeError(
-                "✘ scripts/init.lua not found! Required for Lua helper functions.".to_string()
+                "✘ scripts/init.lua not found! Required for Lua helper functions.".to_string(),
             ));
         }
 

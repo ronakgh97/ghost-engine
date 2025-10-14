@@ -99,7 +99,7 @@ impl WaveManager {
     pub fn update_state(
         &mut self,
         enemies_alive: usize,
-        _player_energy: &mut f32,     // TODO: Max-Energy increase based on enemies slayed
+        _player_energy: &mut f32, // TODO: Max-Energy increase based on enemies slayed
         _player_max_energy: f32,
         delta: f32,
     ) {
@@ -244,7 +244,7 @@ impl WaveManager {
     }
 
     // UI Helpers
-    
+
     /// Get current wave info for UI
     #[allow(dead_code)] // Will be used in Task 7: Wave UI
     pub fn get_wave_info(&self) -> Option<WaveInfo> {
