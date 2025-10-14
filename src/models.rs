@@ -34,6 +34,7 @@ pub struct Projectile {
     // Homing missile data
     pub locked_target_index: Option<usize>, // Which enemy index is locked (None = find new target)
     pub lifetime: f32,                      // How long projectile has existed (for cleanup)
+    pub trail_timer: f32,                   // Timer for spawning trail particles
 }
 
 #[derive(Clone, Copy)]
@@ -383,7 +384,6 @@ impl GameState {
                     WeaponType::Laser,
                     WeaponType::Missile,
                     WeaponType::Plasma,
-                    WeaponType::Bombs,
                 ],
                 energy: config.player.starting_energy,
                 max_energy: config.player.max_energy,

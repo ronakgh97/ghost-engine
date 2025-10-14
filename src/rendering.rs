@@ -3,10 +3,10 @@ use crate::models::*;
 use macroquad::prelude::*;
 use std::collections::HashMap;
 
-/// Render all game entities with static background
+/// Render all game entities with scrolling background
 pub fn render_game(state: &GameState, space_texture: &Option<Texture2D>) {
-    // Draw static background BEFORE camera setup
-    draw_static_background(space_texture);
+    // Draw scrolling background BEFORE camera setup
+    draw_scrolling_background(space_texture, state.bg_scroll_offset);
 
     // Apply screen shake offset to camera
     let (shake_x, shake_y) = get_shake_offset(state);
@@ -33,39 +33,31 @@ pub fn render_game(state: &GameState, space_texture: &Option<Texture2D>) {
     set_default_camera();
 }
 
-/// Draw STATIC background
-fn draw_static_background(space_texture: &Option<Texture2D>) {
+/// Draw SCROLLING background
+fn draw_scrolling_background(space_texture: &Option<Texture2D>, scroll_offset: f32) {
     if let Some(texture) = space_texture {
         let screen_w = screen_width();
         let screen_h = screen_height();
-
-        // Calculate texture aspect ratio
-        let tex_w = texture.width();
         let tex_h = texture.height();
-        let tex_aspect = tex_w / tex_h;
-        let screen_aspect = screen_w / screen_h;
 
-        // Scale to cover screen
-        let (dest_w, dest_h) = if screen_aspect > tex_aspect {
-            // Screen wider - fit width
-            (screen_w, screen_w / tex_aspect)
-        } else {
-            (screen_h * tex_aspect, screen_h)
-        };
+        // Start at bottom (max_scroll) and move toward 0
+        let max_scroll = (tex_h - screen_h).max(0.0);
+        let clamped_offset = max_scroll - (scroll_offset % max_scroll).max(0.0);
 
-        // Draw centered background
+        // Draw texture with vertical offset
         draw_texture_ex(
             texture,
-            (screen_w - dest_w) / 2.0,
-            (screen_h - dest_h) / 2.0,
+            0.0,
+            0.0,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(vec2(dest_w, dest_h)),
+                dest_size: Some(vec2(screen_w, screen_h)),
+                source: Some(Rect::new(0.0, clamped_offset, screen_w, screen_h)),
                 ..Default::default()
             },
         );
     } else {
-        // Fallback: solid gradient
+        // Fallback: solid gradient (if texture fails to load)
         for y in 0..screen_height() as i32 {
             let ratio = y as f32 / screen_height();
             let color = Color::new(
@@ -401,7 +393,7 @@ fn draw_projectiles(projectiles: &[Projectile]) {
                 proj.pos.x,
                 proj.pos.y,
                 proj.pos.x,
-                proj.pos.y + 12.0,
+                proj.pos.y + 0.0,
                 2.0,
                 Color::new(color.r, color.g, color.b, 0.5),
             );
@@ -421,18 +413,94 @@ fn draw_particles(particles: &[Particle]) {
         let alpha = (particle.lifetime / particle.max_lifetime).clamp(0.0, 1.0);
         let color = Color::new(particle.color.r, particle.color.g, particle.color.b, alpha);
 
-        draw_circle(particle.pos.x, particle.pos.y, particle.size, color);
+        // Determine particle shape based on position (pseudo-random but consistent)
+        let shape_variant = (particle.pos.x * 123.45 + particle.pos.y * 67.89) as i32 % 3;
 
-        // Glow for larger particles
-        if particle.size > 3.0 {
+        match shape_variant {
+            0 => {
+                // Circle (default) - brightest core
+                draw_circle(particle.pos.x, particle.pos.y, particle.size, color);
+            }
+            1 => {
+                // Star shape
+                draw_star(particle.pos.x, particle.pos.y, particle.size, color);
+            }
+            _ => {
+                // Rotated square
+                draw_rotated_square(particle.pos.x, particle.pos.y, particle.size, color);
+            }
+        }
+
+        // Enhanced glow with multiple layers (creates additive-like effect)
+        if particle.size > 2.0 {
+            let glow_alpha = alpha * 0.5;
+
+            // Outer glow
             draw_circle(
                 particle.pos.x,
                 particle.pos.y,
-                particle.size + 2.0,
-                Color::new(color.r, color.g, color.b, alpha * 0.3),
+                particle.size + 1.5,
+                Color::new(color.r, color.g, color.b, glow_alpha * 0.2),
+            );
+
+            // Mid glow
+            draw_circle(
+                particle.pos.x,
+                particle.pos.y,
+                particle.size + 1.0,
+                Color::new(color.r, color.g, color.b, glow_alpha * 0.4),
+            );
+
+            // Inner glow
+            draw_circle(
+                particle.pos.x,
+                particle.pos.y,
+                particle.size + 0.5,
+                Color::new(color.r, color.g, color.b, glow_alpha),
             );
         }
     }
+}
+
+/// Draw a 4-pointed star
+fn draw_star(x: f32, y: f32, size: f32, color: Color) {
+    let points = 4;
+    let inner_radius = size * 0.4;
+    let outer_radius = size;
+
+    for i in 0..points {
+        let angle1 =
+            (i as f32 * std::f32::consts::PI * 2.0 / points as f32) - std::f32::consts::PI / 2.0;
+        let angle2 = ((i as f32 + 0.5) * std::f32::consts::PI * 2.0 / points as f32)
+            - std::f32::consts::PI / 2.0;
+        let angle3 = ((i as f32 + 1.0) * std::f32::consts::PI * 2.0 / points as f32)
+            - std::f32::consts::PI / 2.0;
+
+        let x1 = x + angle1.cos() * outer_radius;
+        let y1 = y + angle1.sin() * outer_radius;
+        let x2 = x + angle2.cos() * inner_radius;
+        let y2 = y + angle2.sin() * inner_radius;
+        let x3 = x + angle3.cos() * outer_radius;
+        let y3 = y + angle3.sin() * outer_radius;
+
+        draw_triangle(vec2(x, y), vec2(x1, y1), vec2(x2, y2), color);
+        draw_triangle(vec2(x, y), vec2(x2, y2), vec2(x3, y3), color);
+    }
+}
+
+/// Draw a rotated square (diamond shape)
+fn draw_rotated_square(x: f32, y: f32, size: f32, color: Color) {
+    let half = size * 0.7; // Slightly smaller for visual balance
+    let points = [
+        vec2(x, y - half), // Top
+        vec2(x + half, y), // Right
+        vec2(x, y + half), // Bottom
+        vec2(x - half, y), // Left
+    ];
+
+    // Draw as two triangles
+    draw_triangle(points[0], points[1], points[2], color);
+    draw_triangle(points[0], points[2], points[3], color);
 }
 
 /// Get color based on enemy type

@@ -19,6 +19,7 @@ pub struct GameConfig {
     pub projectile_bounds: ProjectileBoundsConfig,
     pub screen_shake: ScreenShakeConfig,
     pub particles: ParticleConfig,
+    pub background: BackgroundConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -211,6 +212,17 @@ pub struct ParticleConfig {
     // Physics
     pub friction: f32,   // Velocity multiplier per frame (0.95 = 5% slowdown)
     pub size_decay: f32, // Pixels per second
+
+    // Projectile trails
+    pub trails_enabled: bool,      // Toggle trails on/off
+    pub trail_spawn_interval: f32, // Time between trail particle spawns (seconds)
+    pub trail_lifetime: f32,       // How long trail particles last
+    pub trail_size: f32,           // Size of trail particles
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BackgroundConfig {
+    pub scroll_speed: f32, // Pixels per second
 }
 
 impl GameConfig {
