@@ -24,7 +24,7 @@ return {
 			delay = 8.0
 		},
 		{
-			type = "BasicFighter",
+			type = "Elite",
 			count = 6,
 			interval = 1.0,
 			delay = 12.0

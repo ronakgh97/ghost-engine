@@ -1,29 +1,41 @@
 -- Wave 2: Sharpshooters
 return {
-    wave_number = 2,
-    name = "Sharpshooters",
-    prep_time = 3.0,
-    
-    spawns = {
-        {
-            type = "BasicFighter",
-            count = 10,
-            interval = 1.5,
-            delay = 0.0
-        },
-        {
-            type = "Sniper",
-            count = 5,
-            interval = 3.0,
-            delay = 3.0
-        },
-    },
-    
-    on_start = function()
-        print_wave_start(2, "Sharpshooters")
-    end,
-    
-    on_complete = function()
-        print_wave_complete(2)
-    end
+	wave_number = 2,
+	name = "Sharpshooters",
+	prep_time = 2.0,
+
+	spawns = {
+		{
+			type = "BasicFighter",
+			count = 5,
+			interval = 1,
+			delay = 0.0
+		},
+		{
+			type = "Sniper",
+			count = 5,
+			interval = 3.0,
+			delay = 5.0
+		},
+		{
+			type = "Healer",
+			count = 4,
+			interval = 1.0,
+			delay = 10.0
+		},
+		{
+			type = "Splitter",
+			count = 6,
+			interval = 2.0,
+			delay = 15.0
+		},
+	},
+
+	on_start = function()
+		print_wave_start(2, "Sharpshooters")
+	end,
+
+	on_complete = function()
+		print_wave_complete(2)
+	end
 }

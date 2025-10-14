@@ -12,6 +12,12 @@ return {
 			interval = 2.0,
 			delay = 0.0
 		},
+		{
+			type = "Splitter",
+			count = 5,
+			interval = 2.0,
+			delay = 5.0
+		}
 	},
 
 	on_start = function()
