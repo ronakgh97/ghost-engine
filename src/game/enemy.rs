@@ -72,7 +72,7 @@ fn fire_enemy_weapon(
         WeaponType::Bullet => {
             // Shoot straight down or aimed based on enemy type
             let velocity = match enemy.entity_type {
-                EntityType::BasicFighter | EntityType::Tank => Position {
+                EntityType::BasicFighter | EntityType::Tank | EntityType::Healer => Position {
                     x: 0.0,
                     y: basic_projectile_speed_y,
                 },
