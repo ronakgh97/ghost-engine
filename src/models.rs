@@ -111,6 +111,7 @@ pub enum EntityType {
     Tank,
     Boss,
     Healer,
+    Splitter, // Splits into 2-3 smaller versions when killed
 }
 
 impl EntityType {
@@ -142,6 +143,11 @@ impl EntityType {
                 max_health: config.healer.health,
                 damage: config.healer.damage,
             },
+            EntityType::Splitter => Stats {
+                health: config.splitter.health,
+                max_health: config.splitter.health,
+                damage: config.splitter.damage,
+            },
         }
     }
 
@@ -152,6 +158,7 @@ impl EntityType {
             EntityType::Tank => config.tank.energy_cost,
             EntityType::Boss => config.boss.energy_cost,
             EntityType::Healer => config.healer.energy_cost,
+            EntityType::Splitter => config.splitter.energy_cost,
         }
     }
 
@@ -162,6 +169,7 @@ impl EntityType {
             EntityType::Tank => config.tank.fire_interval,
             EntityType::Boss => config.boss.fire_interval,
             EntityType::Healer => config.healer.fire_interval,
+            EntityType::Splitter => config.splitter.fire_interval,
         }
     }
 }
@@ -173,7 +181,7 @@ pub struct Player {
     pub energy: f32,
     pub max_energy: f32,
     pub weapon: Vec<WeaponType>,
-    pub available_ghosts: Vec<EntityType>,
+    pub available_ghosts: Vec<EntityType>, // Queue of defeated enemies (can summon as ghosts)
 
     // Parry system
     pub parry_cooldown: f32, // Time until parry available again
@@ -182,6 +190,7 @@ pub struct Player {
 }
 
 // Enemy
+#[derive(Clone)] // Needed for splitter system
 pub struct Enemy {
     pub pos: Position,
     pub stats: Stats,
@@ -190,6 +199,7 @@ pub struct Enemy {
 }
 
 // Ghost
+#[derive(Clone)]
 pub struct Ghost {
     pub pos: Position,
     pub stats: Stats,
@@ -280,6 +290,14 @@ impl Ghost {
                     damage: config.entities.healer.damage,
                 },
             ),
+            EntityType::Splitter => (
+                &config.entities.splitter.weapons,
+                Stats {
+                    health: config.entities.splitter.health,
+                    max_health: config.entities.splitter.health,
+                    damage: config.entities.splitter.damage,
+                },
+            ),
         };
 
         // Parse weapons from config (inherit from entity type!)
@@ -348,6 +366,7 @@ impl WaveDefinition {
                 "Tank" => EntityType::Tank,
                 "Boss" => EntityType::Boss,
                 "Healer" => EntityType::Healer,
+                "Splitter" => EntityType::Splitter,
                 unknown => {
                     println!(
                         "✗ Unknown enemy type in wave {}: {}",
