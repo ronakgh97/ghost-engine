@@ -1,21 +1,23 @@
+use crate::game::utils::*;
 use crate::models::*;
 use macroquad::prelude::*;
 
-/// Spawn enemies at regular intervals
+/// Spawn random enemies (classic mode - not wave-based)
 pub fn spawn_enemies(state: &mut GameState, delta: f32) {
-    state.spawn_timer += delta;
+    state.spawn_timer -= delta;
 
-    // Spawn enemy from config interval
-    if state.spawn_timer >= state.config.spawning.enemy_spawn_interval {
-        state.spawn_timer = 0.0;
+    if state.spawn_timer <= 0.0 {
+        // Reset timer
+        state.spawn_timer = state.config.spawning.enemy_spawn_interval;
 
-        // Pick random enemy type
-        let enemy_types = [
-            EntityType::BasicFighter,
-            EntityType::BasicFighter,
+        //  Spawn pool
+        let enemy_types = vec![
             EntityType::BasicFighter,
             EntityType::Sniper,
             EntityType::Tank,
+            EntityType::Healer,
+            EntityType::Healer,
+            EntityType::Healer,
         ];
 
         let random_idx = rand::gen_range(0, enemy_types.len());
@@ -23,16 +25,18 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
 
         // Get entity stats from config
         let entity_stats = entity_type.get_stats(&state.config.entities);
-        let entity_config = match entity_type {
-            EntityType::BasicFighter => &state.config.entities.basic_fighter,
-            EntityType::Sniper => &state.config.entities.sniper,
-            EntityType::Tank => &state.config.entities.tank,
-            EntityType::Boss => &state.config.entities.boss,
+        
+        // Get weapons list
+        let weapons_list = match entity_type {
+            EntityType::BasicFighter => &state.config.entities.basic_fighter.weapons,
+            EntityType::Sniper => &state.config.entities.sniper.weapons,
+            EntityType::Tank => &state.config.entities.tank.weapons,
+            EntityType::Boss => &state.config.entities.boss.weapons,
+            EntityType::Healer => &state.config.entities.healer.weapons,
         };
 
         // Parse weapons from config
-        let weapons: Vec<WeaponType> = entity_config
-            .weapons
+        let weapons: Vec<WeaponType> = weapons_list
             .iter()
             .filter_map(|w| WeaponType::from_string(w))
             .collect();
@@ -47,7 +51,7 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
         // Create enemy at random X position
         let enemy = Enemy {
             pos: Position {
-                x: rand::gen_range(30.0, screen_width() - 30.0),
+                x: rand::gen_range(40.0, screen_width() - 40.0),
                 y: -30.0, // Above screen
             },
             stats: entity_stats,
