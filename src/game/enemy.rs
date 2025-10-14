@@ -72,18 +72,21 @@ fn fire_enemy_weapon(
         WeaponType::Bullet => {
             // Shoot straight down or aimed based on enemy type
             let velocity = match enemy.entity_type {
-                EntityType::BasicFighter | EntityType::Tank  => Position {
+                EntityType::BasicFighter | EntityType::Tank => Position {
                     x: 0.0,
                     y: basic_projectile_speed_y,
                 },
-                EntityType::Sniper | EntityType::Boss | EntityType::Healer => {
+                EntityType::Sniper
+                | EntityType::Boss
+                | EntityType::Healer
+                | EntityType::Splitter => {
                     calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
                 }
             };
 
             projectiles.push(Projectile {
                 pos: enemy.pos,
-                velocity, // Straight if Basic Fighter or Tank and aim toward player if Sniper and Boss
+                velocity,
                 damage: weapon_stats.damage * 0.75, // Enemies deal half damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
