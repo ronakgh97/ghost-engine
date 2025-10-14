@@ -4,6 +4,7 @@ mod combat;
 mod enemy;
 mod energy;
 mod ghost;
+mod healer; // NEW: Healing system for healer enemies/ghosts
 mod input;
 mod parry;
 mod particles;
@@ -45,6 +46,10 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
     update_player(state, delta);
     update_enemies(state, delta);
     update_ghosts(state, delta);
+
+    // Update healing (healers heal allies, healer ghosts heal player)
+    healer::update_healer_healing(state, delta);
+    healer::update_ghost_healer_healing(state, delta);
 
     // Update weapons & projectiles
     update_weapons(state, delta);

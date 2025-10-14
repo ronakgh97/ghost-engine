@@ -110,22 +110,38 @@ pub enum EntityType {
     Sniper,
     Tank,
     Boss,
+    Healer,
 }
 
 impl EntityType {
     /// Get stats from config
     pub fn get_stats(&self, config: &crate::config::EntitiesConfig) -> Stats {
-        let entity_stats = match self {
-            EntityType::BasicFighter => &config.basic_fighter,
-            EntityType::Sniper => &config.sniper,
-            EntityType::Tank => &config.tank,
-            EntityType::Boss => &config.boss,
-        };
-
-        Stats {
-            health: entity_stats.health,
-            max_health: entity_stats.health,
-            damage: entity_stats.damage,
+        match self {
+            EntityType::BasicFighter => Stats {
+                health: config.basic_fighter.health,
+                max_health: config.basic_fighter.health,
+                damage: config.basic_fighter.damage,
+            },
+            EntityType::Sniper => Stats {
+                health: config.sniper.health,
+                max_health: config.sniper.health,
+                damage: config.sniper.damage,
+            },
+            EntityType::Tank => Stats {
+                health: config.tank.health,
+                max_health: config.tank.health,
+                damage: config.tank.damage,
+            },
+            EntityType::Boss => Stats {
+                health: config.boss.health,
+                max_health: config.boss.health,
+                damage: config.boss.damage,
+            },
+            EntityType::Healer => Stats {
+                health: config.healer.health,
+                max_health: config.healer.health,
+                damage: config.healer.damage,
+            },
         }
     }
 
@@ -135,6 +151,7 @@ impl EntityType {
             EntityType::Sniper => config.sniper.energy_cost,
             EntityType::Tank => config.tank.energy_cost,
             EntityType::Boss => config.boss.energy_cost,
+            EntityType::Healer => config.healer.energy_cost,
         }
     }
 
@@ -144,6 +161,7 @@ impl EntityType {
             EntityType::Sniper => config.sniper.fire_interval,
             EntityType::Tank => config.tank.fire_interval,
             EntityType::Boss => config.boss.fire_interval,
+            EntityType::Healer => config.healer.fire_interval,
         }
     }
 }
@@ -220,24 +238,59 @@ impl Ghost {
         spawn_pos: Position,
         config: &crate::config::GameConfig,
     ) -> Self {
-        // Get entity config
-        let entity_config = match entity_type {
-            EntityType::BasicFighter => &config.entities.basic_fighter,
-            EntityType::Sniper => &config.entities.sniper,
-            EntityType::Tank => &config.entities.tank,
-            EntityType::Boss => &config.entities.boss,
+        // Get entity config (handle healer's special struct)
+        let (weapons_vec, base_stats) = match entity_type {
+            EntityType::BasicFighter => (
+                &config.entities.basic_fighter.weapons,
+                Stats {
+                    health: config.entities.basic_fighter.health,
+                    max_health: config.entities.basic_fighter.health,
+                    damage: config.entities.basic_fighter.damage,
+                },
+            ),
+            EntityType::Sniper => (
+                &config.entities.sniper.weapons,
+                Stats {
+                    health: config.entities.sniper.health,
+                    max_health: config.entities.sniper.health,
+                    damage: config.entities.sniper.damage,
+                },
+            ),
+            EntityType::Tank => (
+                &config.entities.tank.weapons,
+                Stats {
+                    health: config.entities.tank.health,
+                    max_health: config.entities.tank.health,
+                    damage: config.entities.tank.damage,
+                },
+            ),
+            EntityType::Boss => (
+                &config.entities.boss.weapons,
+                Stats {
+                    health: config.entities.boss.health,
+                    max_health: config.entities.boss.health,
+                    damage: config.entities.boss.damage,
+                },
+            ),
+            EntityType::Healer => (
+                &config.entities.healer.weapons,
+                Stats {
+                    health: config.entities.healer.health,
+                    max_health: config.entities.healer.health,
+                    damage: config.entities.healer.damage,
+                },
+            ),
         };
 
         // Parse weapons from config (inherit from entity type!)
-        let weapons: Vec<WeaponType> = entity_config
-            .weapons
+        let weapons: Vec<WeaponType> = weapons_vec
             .iter()
             .filter_map(|w| WeaponType::from_string(w))
             .collect();
 
         Ghost {
             pos: spawn_pos,
-            stats: entity_type.get_stats(&config.entities),
+            stats: base_stats,
             weapon_type: if weapons.is_empty() {
                 vec![WeaponType::Bullet] // Fallback only if config invalid
             } else {
@@ -248,8 +301,6 @@ impl Ghost {
         }
     }
 }
-
-// ===== WAVE SYSTEM =====
 
 /// Wave state machine
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -296,6 +347,7 @@ impl WaveDefinition {
                 "Sniper" => EntityType::Sniper,
                 "Tank" => EntityType::Tank,
                 "Boss" => EntityType::Boss,
+                "Healer" => EntityType::Healer,
                 unknown => {
                     println!(
                         "✗ Unknown enemy type in wave {}: {}",
