@@ -20,6 +20,7 @@ pub fn default_config() -> GameConfig {
         projectile_bounds: default_projectile_bounds(),
         screen_shake: default_screen_shake(),
         particles: default_particles(),
+        background: default_background(),
     }
 }
 
@@ -36,8 +37,8 @@ fn default_player() -> PlayerConfig {
     PlayerConfig {
         starting_health: 100.0,
         max_health: 100.0,
-        starting_energy: 150.0,
-        max_energy: 100.0,
+        starting_energy: 200.0,
+        max_energy: 500.0,
         movement_speed: 250.0,
         starting_weapons: vec![
             "Bullet".to_string(),
@@ -94,6 +95,16 @@ fn default_entities() -> EntitiesConfig {
                 "Plasma".to_string(),
             ], // Boss arsenal: ALL advanced weapons!
         },
+        healer: HealerStats {
+            health: 60.0,
+            damage: 5.0,
+            energy_cost: 20.0,
+            fire_interval: 3.0,
+            weapons: vec!["Bullet".to_string()],
+            // Healing stats
+            heal_rate: 15.0,    // Heals 15 HP/sec to allies in range
+            heal_radius: 150.0, // 150 pixel radius healing field
+        },
     }
 }
 
@@ -134,7 +145,7 @@ fn default_weapons() -> WeaponsConfig {
 
 fn default_spawning() -> SpawningConfig {
     SpawningConfig {
-        wave_mode: true,           // Enable Lua wave system by default
+        wave_mode: false,          // Enable Lua wave system by default
         wave_count: 5,             // 5 waves total
         enemy_spawn_interval: 2.2, // Random spawn timer (for classic mode)
         initial_delay: 3.0,        // Initial delay before spawning
@@ -251,7 +262,7 @@ fn default_particles() -> ParticleConfig {
 
         // Weapon-specific particle counts
         bullet_particle_count: 3,       // Small sparks
-        laser_particle_count: 8,        // Energy burst
+        laser_particle_count: 15,       // Energy burst
         missile_particle_count: 12,     // Explosion
         plasma_particle_count: 6,       // Energy
         bomb_red_particle_count: 20,    // HUGE explosion
@@ -269,5 +280,17 @@ fn default_particles() -> ParticleConfig {
         // Physics
         friction: 0.95,  // 5% slowdown per frame
         size_decay: 8.0, // Shrinks 8 pixels/sec
+
+        // Projectile trails
+        trails_enabled: true,         // Trails enabled by default
+        trail_spawn_interval: 0.005, // Spawn rate
+        trail_lifetime: 0.3,          // Trail fades in 0.5 seconds
+        trail_size: 3.5,              // Small trail particles
+    }
+}
+
+fn default_background() -> BackgroundConfig {
+    BackgroundConfig {
+        scroll_speed: 5.0, // Pixels per second
     }
 }

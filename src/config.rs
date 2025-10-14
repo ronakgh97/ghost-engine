@@ -57,6 +57,7 @@ pub struct EntitiesConfig {
     pub sniper: EntityStats,
     pub tank: EntityStats,
     pub boss: EntityStats,
+    pub healer: HealerStats, // Special stats for healer enemy
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -66,6 +67,18 @@ pub struct EntityStats {
     pub energy_cost: f32,
     pub fire_interval: f32,
     pub weapons: Vec<String>, // Weapon types this entity can use
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HealerStats {
+    pub health: f32,
+    pub damage: f32,
+    pub energy_cost: f32,
+    pub fire_interval: f32,
+    pub weapons: Vec<String>,
+    // Healer-specific fields
+    pub heal_rate: f32,   // HP healed per second
+    pub heal_radius: f32, // Range of healing field (pixels)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

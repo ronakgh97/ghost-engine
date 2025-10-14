@@ -49,10 +49,18 @@ health = 500.0
 damage = 50.0
 energy_cost = 80.0
 fire_interval = 0.8
-weapons = ["Laser", "Missile", "Plasma"]  # Boss arsenal: ALL advanced weapons!
+weapons = ["Laser", "Missile", "Plasma"]
+
+[entities.healer]
+health = 60.0
+damage = 5.0
+energy_cost = 20.0
+fire_interval = 3.0
+weapons = ["Bullet"]
+heal_rate = 15.0      # Heals 15 HP per second to allies in range
+heal_radius = 150.0   # 150 pixel radius healing field
 
 # WEAPONS CONFIGURATION
-
 [weapons.bullet]
 # Rapid fire, low damage, general purpose
 damage = 10.0
@@ -203,3 +211,13 @@ parry_white_count = 8           # Parry: white flash
 # Physics
 friction = 0.95                 # Velocity decay per frame (0.95 = 5% slowdown)
 size_decay = 8.0                # Shrink rate (pixels per second)
+
+# Projectile trails
+trails_enabled = true           # Enable projectile trails
+trail_spawn_interval = 0.03     # Time between trail spawns (seconds) - 0.03 = dense trail
+trail_lifetime = 0.5            # How long trail particles last (seconds)
+trail_size = 3.0                # Size of trail particles
+
+# === BACKGROUND SCROLLING ===
+[background]
+scroll_speed = 50.0             # Vertical scroll speed (pixels/second) - adjust for desired pace
