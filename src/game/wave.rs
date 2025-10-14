@@ -203,7 +203,7 @@ impl WaveManager {
                     EntityType::BasicFighter => &game_state.config.entities.basic_fighter.weapons,
                     EntityType::Sniper => &game_state.config.entities.sniper.weapons,
                     EntityType::Tank => &game_state.config.entities.tank.weapons,
-                    EntityType::Boss => &game_state.config.entities.boss.weapons,
+                    EntityType::Elite => &game_state.config.entities.elite.weapons,
                     EntityType::Healer => &game_state.config.entities.healer.weapons,
                     EntityType::Splitter => &game_state.config.entities.splitter.weapons,
                 };

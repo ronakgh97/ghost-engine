@@ -187,8 +187,8 @@ pub fn render_ui(state: &GameState) {
     draw_text(parry_text, 20.0, ui_y, 16.0, parry_color);
 
     // Available Ghosts (Bottom Left)
-    let ghost_panel_y = screen_height() - 140.0;
-    draw_panel(10.0, ghost_panel_y, 160.0, 130.0);
+    let ghost_panel_y = screen_height() - 180.0;
+    draw_panel(10.0, ghost_panel_y, 170.0, 170.0);
 
     draw_text("Available Ghosts:", 20.0, ghost_panel_y + 20.0, 18.0, WHITE);
 
@@ -219,10 +219,22 @@ pub fn render_ui(state: &GameState) {
     draw_text(&format!("Tank: {:?}", count), 40.0, line_y, 16.0, WHITE);
     line_y += 22.0;
 
-    // Boss
-    let count = ghost_counts.get(&EntityType::Boss);
+    // Healer
+    let count = ghost_counts.get(&EntityType::Healer);
+    draw_circle(25.0, line_y - 5.0, 6.0, LIME);
+    draw_text(&format!("Healer: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    line_y += 22.0;
+
+    // Splitter
+    let count = ghost_counts.get(&EntityType::Splitter);
+    draw_circle(25.0, line_y - 5.0, 6.0, ORANGE);
+    draw_text(&format!("Splitter: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    line_y += 22.0;
+
+    // Elite
+    let count = ghost_counts.get(&EntityType::Elite);
     draw_circle(25.0, line_y - 5.0, 6.0, GOLD);
-    draw_text(&format!("Boss: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Elite: {:?}", count), 40.0, line_y, 16.0, WHITE);
 }
 
 /// Draw modern panel with shadow
@@ -230,7 +242,7 @@ fn draw_panel(x: f32, y: f32, w: f32, h: f32) {
     // Shadow
     draw_rectangle(x + 4.0, y + 4.0, w, h, Color::from_rgba(0, 0, 0, 100));
     // Background
-    draw_rectangle(x, y, w, h, Color::from_rgba(0, 0, 0, 180));
+    draw_rectangle(x, y, w, h, Color::from_rgba(0, 0, 0, 50));
     // Border
     draw_rectangle_lines(x, y, w, h, 4.0, Color::from_rgba(100, 150, 200, 180));
 }
@@ -292,6 +304,30 @@ fn draw_player(player: &Player, state: &GameState) {
 /// Draw all enemies with enhanced visuals
 fn draw_enemies(enemies: &[Enemy]) {
     for enemy in enemies {
+        // Draw healing field for healers (pulsing green circle)
+        if enemy.entity_type == EntityType::Healer {
+            // Pulse effect using sine wave
+            let pulse = (macroquad::time::get_time() * 2.0).sin() as f32 * 0.1 + 0.9;
+            let heal_radius = 150.0 * pulse; // From config
+
+            // Draw healing radius (transparent green circle)
+            draw_circle_lines(
+                enemy.pos.x,
+                enemy.pos.y,
+                heal_radius,
+                2.0,
+                Color::new(0.2, 1.0, 0.2, 0.3),
+            );
+
+            // Inner healing glow
+            draw_circle(
+                enemy.pos.x,
+                enemy.pos.y,
+                heal_radius * 0.5,
+                Color::new(0.2, 1.0, 0.2, 0.05),
+            );
+        }
+
         let color = get_enemy_color(enemy.entity_type);
 
         // Glow effect
@@ -329,6 +365,30 @@ fn draw_enemies(enemies: &[Enemy]) {
 /// Draw all ghosts with transparency
 fn draw_ghosts(ghosts: &[Ghost]) {
     for ghost in ghosts {
+        // Draw healing field for healer ghosts (pulsing green circle)
+        if ghost.entity_type == EntityType::Healer {
+            // Pulse effect using sine wave
+            let pulse = (macroquad::time::get_time() * 2.0).sin() as f32 * 0.1 + 0.9;
+            let heal_radius = 150.0 * pulse;
+
+            // Draw healing radius (transparent green circle)
+            draw_circle_lines(
+                ghost.pos.x,
+                ghost.pos.y,
+                heal_radius,
+                2.0,
+                Color::new(0.2, 1.0, 0.2, 0.3),
+            );
+
+            // Inner healing glow
+            draw_circle(
+                ghost.pos.x,
+                ghost.pos.y,
+                heal_radius * 0.5,
+                Color::new(0.2, 1.0, 0.2, 0.05),
+            );
+        }
+
         let color = get_ghost_color(ghost.entity_type);
 
         // Ghost glow
@@ -339,7 +399,7 @@ fn draw_ghosts(ghosts: &[Ghost]) {
             Color::new(color.r, color.g, color.b, 0.3),
         );
 
-        // Ghost body (semi-transparent)
+        // Ghost body
         draw_circle(
             ghost.pos.x,
             ghost.pos.y,
@@ -392,8 +452,8 @@ fn draw_projectiles(projectiles: &[Projectile]) {
             draw_line(
                 proj.pos.x,
                 proj.pos.y,
-                proj.pos.x,
-                proj.pos.y + 0.0,
+                proj.pos.x + 5.0,
+                proj.pos.y + 5.0,
                 2.0,
                 Color::new(color.r, color.g, color.b, 0.5),
             );
@@ -401,7 +461,7 @@ fn draw_projectiles(projectiles: &[Projectile]) {
 
         // Missile fins
         if matches!(proj.weapon_type, WeaponType::Missile) {
-            draw_circle(proj.pos.x - 5.0, proj.pos.y + 5.0, 2.0, GRAY);
+            draw_circle(proj.pos.x + 5.0, proj.pos.y + 5.0, 2.0, GRAY);
             draw_circle(proj.pos.x + 5.0, proj.pos.y + 5.0, 2.0, GRAY);
         }
     }
@@ -509,7 +569,9 @@ fn get_enemy_color(entity_type: EntityType) -> Color {
         EntityType::BasicFighter => RED,
         EntityType::Sniper => BLUE,
         EntityType::Tank => GREEN,
-        EntityType::Boss => GOLD,
+        EntityType::Elite => GOLD,
+        EntityType::Healer => LIME,
+        EntityType::Splitter => BROWN,
     }
 }
 
@@ -519,6 +581,8 @@ fn get_ghost_color(entity_type: EntityType) -> Color {
         EntityType::BasicFighter => RED,
         EntityType::Sniper => BLUE,
         EntityType::Tank => GREEN,
-        EntityType::Boss => GOLD,
+        EntityType::Elite => GOLD,
+        EntityType::Healer => LIME,
+        EntityType::Splitter => BROWN,
     }
 }

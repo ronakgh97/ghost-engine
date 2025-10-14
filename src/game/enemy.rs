@@ -77,7 +77,7 @@ fn fire_enemy_weapon(
                     y: basic_projectile_speed_y,
                 },
                 EntityType::Sniper
-                | EntityType::Boss
+                | EntityType::Elite
                 | EntityType::Healer
                 | EntityType::Splitter => {
                     calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)

@@ -56,7 +56,7 @@ pub struct EntitiesConfig {
     pub basic_fighter: EntityStats,
     pub sniper: EntityStats,
     pub tank: EntityStats,
-    pub boss: EntityStats,
+    pub elite: EntityStats,
     pub healer: HealerStats,     // Special stats for healer enemy
     pub splitter: SplitterStats, // Special stats for splitter enemy
 }

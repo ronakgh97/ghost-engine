@@ -11,6 +11,7 @@ mod particles;
 mod player;
 mod screen_shake;
 mod spawn;
+mod splitter; // NEW: Splitting system for splitter enemies/ghosts
 mod utils;
 pub mod wave; // Public module for WaveManager
 mod weapons;

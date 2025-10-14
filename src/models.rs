@@ -109,7 +109,7 @@ pub enum EntityType {
     BasicFighter,
     Sniper,
     Tank,
-    Boss,
+    Elite,
     Healer,
     Splitter, // Splits into 2-3 smaller versions when killed
 }
@@ -133,10 +133,10 @@ impl EntityType {
                 max_health: config.tank.health,
                 damage: config.tank.damage,
             },
-            EntityType::Boss => Stats {
-                health: config.boss.health,
-                max_health: config.boss.health,
-                damage: config.boss.damage,
+            EntityType::Elite => Stats {
+                health: config.elite.health,
+                max_health: config.elite.health,
+                damage: config.elite.damage,
             },
             EntityType::Healer => Stats {
                 health: config.healer.health,
@@ -156,7 +156,7 @@ impl EntityType {
             EntityType::BasicFighter => config.basic_fighter.energy_cost,
             EntityType::Sniper => config.sniper.energy_cost,
             EntityType::Tank => config.tank.energy_cost,
-            EntityType::Boss => config.boss.energy_cost,
+            EntityType::Elite => config.elite.energy_cost,
             EntityType::Healer => config.healer.energy_cost,
             EntityType::Splitter => config.splitter.energy_cost,
         }
@@ -167,7 +167,7 @@ impl EntityType {
             EntityType::BasicFighter => config.basic_fighter.fire_interval,
             EntityType::Sniper => config.sniper.fire_interval,
             EntityType::Tank => config.tank.fire_interval,
-            EntityType::Boss => config.boss.fire_interval,
+            EntityType::Elite => config.elite.fire_interval,
             EntityType::Healer => config.healer.fire_interval,
             EntityType::Splitter => config.splitter.fire_interval,
         }
@@ -274,12 +274,12 @@ impl Ghost {
                     damage: config.entities.tank.damage,
                 },
             ),
-            EntityType::Boss => (
-                &config.entities.boss.weapons,
+            EntityType::Elite => (
+                &config.entities.elite.weapons,
                 Stats {
-                    health: config.entities.boss.health,
-                    max_health: config.entities.boss.health,
-                    damage: config.entities.boss.damage,
+                    health: config.entities.elite.health,
+                    max_health: config.entities.elite.health,
+                    damage: config.entities.elite.damage,
                 },
             ),
             EntityType::Healer => (
@@ -364,7 +364,7 @@ impl WaveDefinition {
                 "BasicFighter" => EntityType::BasicFighter,
                 "Sniper" => EntityType::Sniper,
                 "Tank" => EntityType::Tank,
-                "Boss" => EntityType::Boss,
+                "Elite" => EntityType::Elite,
                 "Healer" => EntityType::Healer,
                 "Splitter" => EntityType::Splitter,
                 unknown => {

@@ -44,7 +44,7 @@ energy_cost = 40.0
 fire_interval = 1.5
 weapons = ["Missile", "Plasma"]  # Tank: Homing missiles + spread plasma
 
-[entities.boss]
+[entities.elite]
 health = 500.0
 damage = 50.0
 energy_cost = 80.0
@@ -66,9 +66,9 @@ damage = 12.0
 energy_cost = 25.0
 fire_interval = 2.0
 weapons = ["Bullet"]
-split_count = 3                  
-split_health_ratio = 0.3         
-split_speed_multiplier = 2.5    
+split_count = 3
+split_health_ratio = 0.3
+split_speed_multiplier = 2.5
 
 # WEAPONS CONFIGURATION
 [weapons.bullet]
@@ -146,10 +146,6 @@ v_shape_vertical_factor = 0.8
 line_spacing = 50.0
 line_height_offset = 80.0
 circle_radius = 70.0
-scattered_x_min = -80.0
-scattered_x_max = 80.0
-scattered_y_min = -100.0
-scattered_y_max = -40.0
 screen_edge_padding = 30.0
 
 # Projectile boundaries
@@ -177,31 +173,31 @@ player_hit_intensity = 5.0
 
 # Particle System
 [particles]
-explosion_count_min = 10
-explosion_count_max = 20
-explosion_lifetime_min = 0.3
-explosion_lifetime_max = 0.6
+explosion_count_min = 25
+explosion_count_max = 50
+explosion_lifetime_min = 0.5
+explosion_lifetime_max = 1.0
 explosion_size_min = 3.0
 explosion_size_max = 6.0
 explosion_speed_min = 50.0
 explosion_speed_max = 150.0
 
 # Hit sparks (directional)
-spark_count = 3                 # Number of sparks per hit
+spark_count = 10                 # Number of sparks per hit
 spark_lifetime_min = 0.15       # Fast-fading sparks
 spark_lifetime_max = 0.3
-spark_size_min = 2.0            # Small particles
+spark_size_min = 2.0           
 spark_size_max = 4.0
 spark_speed_min = 80.0
 spark_speed_max = 200.0
 
 # Weapon-specific particle counts
-bullet_particle_count = 3       # Bullet: small yellow sparks
-laser_particle_count = 8        # Laser: cyan energy burst
-missile_particle_count = 12     # Missile: orange explosion
-plasma_particle_count = 6       # Plasma: purple energy
-bomb_red_particle_count = 20    # Bombs: HUGE red explosion
-bomb_orange_particle_count = 15 # Bombs: secondary orange burst
+bullet_particle_count = 10      
+laser_particle_count = 18        
+missile_particle_count = 12     
+plasma_particle_count = 6       
+bomb_red_particle_count = 20  
+bomb_orange_particle_count = 15
 
 # Death explosion counts
 death_red_count = 15            # Enemy death: red particles

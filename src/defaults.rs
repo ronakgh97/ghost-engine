@@ -84,7 +84,7 @@ fn default_entities() -> EntitiesConfig {
             fire_interval: 1.5,
             weapons: vec!["Missile".to_string(), "Plasma".to_string()], // Homing + Spread
         },
-        boss: EntityStats {
+        elite: EntityStats {
             health: 500.0,
             damage: 50.0,
             energy_cost: 80.0,
@@ -248,17 +248,17 @@ fn default_screen_shake() -> ScreenShakeConfig {
 fn default_particles() -> ParticleConfig {
     ParticleConfig {
         // Explosion particles (radial burst)
-        explosion_count_min: 10,
-        explosion_count_max: 20,
-        explosion_lifetime_min: 0.3,
-        explosion_lifetime_max: 0.6,
+        explosion_count_min: 20,
+        explosion_count_max: 50,
+        explosion_lifetime_min: 0.4,
+        explosion_lifetime_max: 0.8,
         explosion_size_min: 3.0,
         explosion_size_max: 6.0,
         explosion_speed_min: 50.0,
         explosion_speed_max: 150.0,
 
         // Hit sparks (directional)
-        spark_count: 3,
+        spark_count: 10,
         spark_lifetime_min: 0.15,
         spark_lifetime_max: 0.3,
         spark_size_min: 2.0,
@@ -267,12 +267,12 @@ fn default_particles() -> ParticleConfig {
         spark_speed_max: 200.0,
 
         // Weapon-specific particle counts
-        bullet_particle_count: 3,       // Small sparks
-        laser_particle_count: 15,       // Energy burst
-        missile_particle_count: 12,     // Explosion
-        plasma_particle_count: 6,       // Energy
-        bomb_red_particle_count: 20,    // HUGE explosion
-        bomb_orange_particle_count: 15, // Secondary burst
+        bullet_particle_count: 10,
+        laser_particle_count: 18,
+        missile_particle_count: 22,
+        plasma_particle_count: 16,
+        bomb_red_particle_count: 30,
+        bomb_orange_particle_count: 25,
 
         // Death explosion counts
         death_red_count: 15,
@@ -280,8 +280,8 @@ fn default_particles() -> ParticleConfig {
         death_yellow_count: 5,
 
         // Parry effect counts
-        parry_blue_count: 12,
-        parry_white_count: 8,
+        parry_blue_count: 22,
+        parry_white_count: 18,
 
         // Physics
         friction: 0.95,  // 5% slowdown per frame
@@ -297,6 +297,6 @@ fn default_particles() -> ParticleConfig {
 
 fn default_background() -> BackgroundConfig {
     BackgroundConfig {
-        scroll_speed: 5.0, // Pixels per second
+        scroll_speed: 10.0, // Pixels per second
     }
 }

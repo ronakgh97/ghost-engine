@@ -5,6 +5,7 @@ mod defaults;
 mod game;
 mod models;
 mod rendering;
+mod scripting;
 
 use crate::config::GameConfig;
 use game::update_all_systems;
@@ -24,7 +25,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let space_texture = match load_texture("assets/background/space_1.png").await {
+    let space_texture = match load_texture("assets/background/space_2.png").await {
         Ok(tex) => {
             println!("✓ Space background loaded successfully!");
             Some(tex)
@@ -53,10 +54,12 @@ async fn main() {
             }
         }
 
+        // Update background scroll offset
+        game_state.bg_scroll_offset += game_state.config.background.scroll_speed * delta;
+
         // Update game logic
         update_all_systems(&mut game_state, delta);
 
-        // Render everything with parallax
         render_game(&game_state, &space_texture);
         render_ui(&game_state);
 

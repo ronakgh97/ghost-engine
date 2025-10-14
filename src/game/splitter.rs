@@ -197,7 +197,7 @@ pub fn handle_ghost_splits(
                     damage: ghost.stats.damage, // Same damage as parent
                 },
                 weapon_type: ghost.weapon_type.clone(), // Inherit weapons
-                entity_type: EntityType::BasicFighter, // Splits become basic fighters
+                entity_type: EntityType::BasicFighter,  // Splits become basic fighters
                 energy_drain_per_sec: ghost.energy_drain_per_sec, // Same energy drain
             };
 

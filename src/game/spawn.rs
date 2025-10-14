@@ -1,7 +1,7 @@
 use crate::models::*;
 use macroquad::prelude::*;
 
-/// Spawn random enemies (classic mode - not wave-based)
+/// Spawn random enemies
 pub fn spawn_enemies(state: &mut GameState, delta: f32) {
     state.spawn_timer -= delta;
 
@@ -18,7 +18,7 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             EntityType::Healer,
             EntityType::Sniper,
             EntityType::Tank,
-            EntityType::Boss,
+            EntityType::Elite,
         ];
 
         let random_idx = rand::gen_range(0, enemy_types.len());
@@ -32,7 +32,7 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             EntityType::BasicFighter => &state.config.entities.basic_fighter.weapons,
             EntityType::Sniper => &state.config.entities.sniper.weapons,
             EntityType::Tank => &state.config.entities.tank.weapons,
-            EntityType::Boss => &state.config.entities.boss.weapons,
+            EntityType::Elite => &state.config.entities.elite.weapons,
             EntityType::Healer => &state.config.entities.healer.weapons,
             EntityType::Splitter => &state.config.entities.splitter.weapons,
         };

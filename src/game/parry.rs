@@ -67,7 +67,7 @@ pub fn check_parry_projectiles(state: &mut GameState) {
             let distance = (dx * dx + dy * dy).sqrt();
 
             if distance < parry_radius {
-                // PARRY SUCCESS! Reflect missile back to enemies
+                // PARRY SUCCESS
                 projectile.owner = ProjectileOwner::Player; // Now damages enemies!
                 projectile.velocity.x *= -1.5; // Reverse and boost speed
                 projectile.velocity.y *= -1.5;
@@ -83,7 +83,7 @@ pub fn check_parry_projectiles(state: &mut GameState) {
 
     // If successful parry, deactivate and set cooldown
     if parried_count > 0 {
-        println!("✔ PARRY SUCCESS! ({} projectiles deflected)", parried_count);
+        println!("✔ Parry ({} projectiles deflected)", parried_count);
         state.player.parry_active = false;
         state.player.parry_cooldown = state.config.player.parry_cooldown;
         shake_on_parry(state);

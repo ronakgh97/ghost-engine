@@ -79,7 +79,7 @@ fn spawn_ghost_from_queue(state: &mut GameState) {
     } else if is_key_pressed(KeyCode::F5) {
         Some(EntityType::Splitter)
     } else if is_key_pressed(KeyCode::F6) {
-        Some(EntityType::Boss)
+        Some(EntityType::Elite)
     } else {
         None
     };
