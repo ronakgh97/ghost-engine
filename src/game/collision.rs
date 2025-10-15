@@ -25,6 +25,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
 
                         if distance <= projectile.explosion_radius {
                             enemy.stats.health -= projectile.damage;
+                            enemy.anim.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on hit!
                             hit_any_enemy = true;
                         }
                     }
@@ -44,6 +45,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                             collision_cfg.enemy_radius,
                         ) {
                             enemy.stats.health -= projectile.damage;
+                            enemy.anim.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on hit!
                             weapon_hits.push((projectile.weapon_type, projectile.pos)); // Track weapon hit
 
                             // Only mark for removal if NOT piercing (lasers pierce through)
@@ -81,6 +83,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
 
                         if distance <= projectile.explosion_radius {
                             ghost.stats.health -= projectile.damage;
+                            ghost.anim.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on hit!
                             hit_player_or_ghost = true;
                         }
                     }
@@ -112,6 +115,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                             collision_cfg.ghost_radius,
                         ) {
                             ghost.stats.health -= projectile.damage;
+                            ghost.anim.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on hit!
                             projectiles_to_remove.push(proj_idx);
                             break;
                         }

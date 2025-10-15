@@ -304,6 +304,9 @@ fn draw_player(player: &Player, state: &GameState) {
 /// Draw all enemies with enhanced visuals
 fn draw_enemies(enemies: &[Enemy]) {
     for enemy in enemies {
+        // Apply animation state
+        let anim = &enemy.anim;
+        
         // Draw healing field for healers (pulsing green circle)
         if enemy.entity_type == EntityType::Healer {
             // Pulse effect using sine wave
@@ -328,9 +331,18 @@ fn draw_enemies(enemies: &[Enemy]) {
             );
         }
 
-        let color = get_enemy_color(enemy.entity_type);
+        let base_color = get_enemy_color(enemy.entity_type);
+        
+        // Apply hit flash (lerp toward white when hit)
+        let flash_intensity = anim.hit_flash_timer / 0.15; // Normalize (assumes 0.15s duration)
+        let color = Color::new(
+            base_color.r + (1.0 - base_color.r) * flash_intensity * 0.8, // Lerp R to white
+            base_color.g + (1.0 - base_color.g) * flash_intensity * 0.8, // Lerp G to white
+            base_color.b + (1.0 - base_color.b) * flash_intensity * 0.8, // Lerp B to white
+            base_color.a,
+        );
 
-        // Glow effect
+        // Glow effect (with hit flash)
         draw_circle(
             enemy.pos.x,
             enemy.pos.y,
@@ -338,10 +350,10 @@ fn draw_enemies(enemies: &[Enemy]) {
             Color::new(color.r, color.g, color.b, 0.2),
         );
 
-        // Main body
+        // Main body (with hit flash)
         draw_circle(enemy.pos.x, enemy.pos.y, 15.0, color);
 
-        // Inner detail
+        // Inner detail (darker, with hit flash)
         draw_circle(
             enemy.pos.x,
             enemy.pos.y,
@@ -398,9 +410,18 @@ fn draw_ghosts(ghosts: &[Ghost]) {
             );
         }
 
-        let color = get_ghost_color(ghost.entity_type);
+        let base_color = get_ghost_color(ghost.entity_type);
+        
+        // Apply hit flash (lerp toward white when hit)
+        let flash_intensity = anim.hit_flash_timer / 0.15; // Normalize (assumes 0.15s duration)
+        let color = Color::new(
+            base_color.r + (1.0 - base_color.r) * flash_intensity * 0.8, // Lerp R to white
+            base_color.g + (1.0 - base_color.g) * flash_intensity * 0.8, // Lerp G to white
+            base_color.b + (1.0 - base_color.b) * flash_intensity * 0.8, // Lerp B to white
+            base_color.a,
+        );
 
-        // Ghost glow (with animation alpha)
+        // Ghost glow (with animation alpha and hit flash)
         draw_circle(
             ghost.pos.x,
             ghost.pos.y,
@@ -408,7 +429,7 @@ fn draw_ghosts(ghosts: &[Ghost]) {
             Color::new(color.r, color.g, color.b, 0.3 * anim.alpha),
         );
 
-        // Ghost body (with animation scale and alpha)
+        // Ghost body (with animation scale, alpha, and hit flash)
         draw_circle(
             ghost.pos.x,
             ghost.pos.y,

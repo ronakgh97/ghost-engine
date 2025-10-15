@@ -18,6 +18,13 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
 
     // Update each enemy
     for (idx, enemy) in state.enemies.iter_mut().enumerate() {
+        // Update hit flash animation
+        crate::game::animation::update_hit_flash(
+            &mut enemy.anim.hit_flash_timer, 
+            delta, 
+            state.config.animations.hit_flash_duration
+        );
+        
         // Movement logic
         if enemy.pos.y < enemy_cfg.movement_threshold_y {
             enemy.pos.y += enemy_cfg.fast_descent_speed * delta;

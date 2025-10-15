@@ -196,6 +196,7 @@ pub struct Enemy {
     pub stats: Stats,
     pub weapon: Vec<WeaponType>,
     pub entity_type: EntityType,
+    pub anim: EntityAnimState, // Animation state (hit flash, spawn, despawn)
 }
 
 // Animation state for entities (ghosts, enemies, etc.)
@@ -211,6 +212,9 @@ pub struct EntityAnimState {
     pub scale: f32,           // Size multiplier (1.0 = normal)
     pub rotation: f32,        // Rotation in radians
     pub alpha: f32,           // Opacity (0.0 - 1.0)
+    
+    // Hit feedback
+    pub hit_flash_timer: f32, // White flash when taking damage (counts down from duration)
 }
 
 impl Default for EntityAnimState {
@@ -223,6 +227,7 @@ impl Default for EntityAnimState {
             scale: 1.0,
             rotation: 0.0,
             alpha: 1.0,
+            hit_flash_timer: 0.0,
         }
     }
 }
@@ -238,6 +243,7 @@ impl EntityAnimState {
             scale: 0.3,     // Start small
             rotation: 0.0,
             alpha: 0.0,     // Start invisible
+            hit_flash_timer: 0.0,
         }
     }
     
