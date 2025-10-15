@@ -8,6 +8,10 @@ release:
 lint:
   cargo clippy --all-targets --all-features
 
+re-run:
+  cargo clean
+  cargo run --release
+
 check-deadcode:
     rg '#\[allow\(dead_code\)\]'
 
