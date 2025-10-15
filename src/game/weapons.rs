@@ -69,7 +69,7 @@ fn fire_laser(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
         damage: weapon_stats.damage,
         weapon_type: WeaponType::Laser,
         owner: ProjectileOwner::Player,
-        piercing: true, // KEY: Doesn't despawn on hit
+        piercing: true, // Doesn't despawn on hit
         homing: false,
         explosion_radius: 0.0,
         locked_target_index: None,
@@ -95,7 +95,7 @@ fn fire_missile(state: &mut GameState, weapon_stats: crate::models::WeaponStats)
         weapon_type: WeaponType::Missile,
         owner: ProjectileOwner::Player,
         piercing: false,
-        homing: true, // KEY: Will track locked enemy
+        homing: true, // Will track locked enemy
         explosion_radius: 0.0,
         locked_target_index: nearest_idx, // Lock onto target at spawn
         lifetime: 0.0,
@@ -234,12 +234,30 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
     use macroquad::prelude::*;
 
     let cfg = &state.config.particles;
-    let interval = cfg.trail_spawn_interval;
+    let base_interval = cfg.trail_spawn_interval;
 
     // Collect trail spawn data (avoid borrow checker issues)
     let mut trails_to_spawn = Vec::new();
 
     for projectile in &mut state.projectiles {
+
+        let interval = match projectile.weapon_type {
+            WeaponType::Missile => base_interval * 0.5,
+            WeaponType::Laser => base_interval * 0.01,
+            WeaponType::Plasma => base_interval * 0.75,
+            WeaponType::Bombs => base_interval * 1.0,
+            WeaponType::Bullet => base_interval * 0.5,
+        };
+
+        // Determine how many particles to spawn per interval
+        let particle_count = match projectile.weapon_type {
+            WeaponType::Laser => 20,
+            WeaponType::Missile => 2,
+            WeaponType::Plasma => 2,
+            WeaponType::Bombs => 3,
+            WeaponType::Bullet => 1,
+        };
+
         // Check if it's time to spawn a trail particle
         if projectile.trail_timer >= interval {
             projectile.trail_timer = 0.0; // Reset timer
@@ -258,22 +276,54 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
                 WeaponType::Bullet => Color::new(1.0, 1.0, 0.6, 0.6), // Faint yellow
             };
 
-            trails_to_spawn.push((projectile.pos, trail_color));
+            // Spawn multiple particles for this projectile
+            for _ in 0..particle_count {
+                trails_to_spawn.push((projectile.pos, trail_color, projectile.weapon_type));
+            }
         }
     }
 
     // Spawn trail particles
-    for (pos, color) in trails_to_spawn {
+    for (pos, color, weapon_type) in trails_to_spawn {
+        // Add positional spread for lasers to create beam width (prevent overlap)
+        let (spawn_pos, velocity) = if weapon_type == WeaponType::Laser {
+            // Spawn particles in a perpendicular spread to create beam width
+            let spread = 5.0; // Beam width radius
+            let offset_x = rand::gen_range(-spread, spread);
+            let offset_y = rand::gen_range(-spread, spread);
+            
+            (
+                Position {
+                    x: pos.x + offset_x,
+                    y: pos.y + offset_y,
+                },
+                Position {
+                    x: rand::gen_range(-5.0, 5.0),
+                    y: rand::gen_range(-5.0, 5.0),
+                }
+            )
+        } else {
+            // Other weapons use normal random drift
+            (
+                pos,
+                Position {
+                    x: rand::gen_range(-10.0, 10.0),
+                    y: rand::gen_range(-10.0, 10.0),
+                }
+            )
+        };
+
         let particle = Particle {
-            pos,
-            velocity: Position {
-                x: rand::gen_range(-10.0, 10.0), // Slight random drift
-                y: rand::gen_range(-10.0, 10.0),
-            },
+            pos: spawn_pos,
+            velocity,
             lifetime: cfg.trail_lifetime,
             max_lifetime: cfg.trail_lifetime,
             color,
-            size: cfg.trail_size,
+            size: if weapon_type == WeaponType::Laser {
+                cfg.trail_size * 0.8
+            } else {
+                cfg.trail_size
+            }, // Slightly smaller laser particles
             size_decay: cfg.size_decay * 0.5, // Slower decay for trails
         };
 

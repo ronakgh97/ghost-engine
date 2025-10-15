@@ -177,6 +177,8 @@ impl EntityType {
 // Player
 pub struct Player {
     pub pos: Position,
+    pub last_pos: Position,             // Previous frame position (for velocity calculation)
+    pub velocity: Position,             // Current movement velocity (for lead targeting)
     pub stats: Stats,
     pub energy: f32,
     pub max_energy: f32,
@@ -519,6 +521,11 @@ impl GameState {
                     x: screen_width() / 2.0,
                     y: screen_height() - 50.0,
                 },
+                last_pos: Position {
+                    x: screen_width() / 2.0,
+                    y: screen_height() - 50.0,
+                },
+                velocity: Position { x: 0.0, y: 0.0 },
                 stats: Stats {
                     health: config.player.starting_health,
                     max_health: config.player.max_health,

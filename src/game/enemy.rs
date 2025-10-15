@@ -40,6 +40,7 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
             fire_enemy_weapon(
                 enemy,
                 state.player.pos,
+                state.player.velocity,
                 &mut state.projectiles,
                 enemy_cfg.basic_projectile_speed_y,
                 &state.config.weapons,
@@ -62,6 +63,7 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
 fn fire_enemy_weapon(
     enemy: &Enemy,
     player_pos: Position,
+    player_velocity: Position,
     projectiles: &mut Vec<Projectile>,
     basic_projectile_speed_y: f32,
     weapons_config: &crate::config::WeaponsConfig,
@@ -83,8 +85,10 @@ fn fire_enemy_weapon(
                     x: 0.0,
                     y: basic_projectile_speed_y,
                 },
-                EntityType::Sniper
-                | EntityType::Elite
+                EntityType::Sniper => {
+                    calculate_lead_velocity(enemy.pos, player_pos, player_velocity, basic_projectile_speed_y)
+                }
+                 EntityType::Elite
                 | EntityType::Healer
                 | EntityType::Splitter => {
                     calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
@@ -94,7 +98,7 @@ fn fire_enemy_weapon(
             projectiles.push(Projectile {
                 pos: enemy.pos,
                 velocity,
-                damage: weapon_stats.damage * 0.75, // Enemies deal half damage
+                damage: weapon_stats.damage * 0.75, // Enemies deal 75% damage
                 weapon_type: weapon,
                 owner: ProjectileOwner::Enemy,
                 piercing: false,
@@ -107,7 +111,7 @@ fn fire_enemy_weapon(
         }
         WeaponType::Laser => {
             // Lasers always aim at player
-            let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
+            let velocity = calculate_lead_velocity(enemy.pos, player_pos, player_velocity ,weapon_stats.projectile_speed);
 
             projectiles.push(Projectile {
                 pos: enemy.pos,
@@ -124,7 +128,7 @@ fn fire_enemy_weapon(
             });
         }
         WeaponType::Missile => {
-            // Enemy missiles home in on the player (high threat!)
+            // Enemy missiles home in on the player
             let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
 
             projectiles.push(Projectile {
@@ -142,7 +146,7 @@ fn fire_enemy_weapon(
             });
         }
         WeaponType::Plasma => {
-            // Enemy plasma: Fire 3 projectiles toward player
+            // Fire 3 projectiles toward player
             let spread_angle = 15.0_f32.to_radians();
             let angles = [-spread_angle, 0.0, spread_angle];
 
@@ -181,7 +185,7 @@ fn fire_enemy_weapon(
             }
         }
         WeaponType::Bombs => {
-            // Enemy bombs: AOE threat aimed at player
+            // AOE threat aimed at player
             let velocity = calculate_velocity(enemy.pos, player_pos, weapon_stats.projectile_speed);
 
             projectiles.push(Projectile {

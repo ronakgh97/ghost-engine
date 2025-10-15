@@ -3,6 +3,15 @@ use macroquad::prelude::*;
 
 /// Update player position and state
 pub fn update_player(state: &mut GameState, delta: f32) {
+    // Calculate velocity from position change (for lead targeting)
+    if delta > 0.0 {
+        state.player.velocity.x = (state.player.pos.x - state.player.last_pos.x) / delta;
+        state.player.velocity.y = (state.player.pos.y - state.player.last_pos.y) / delta;
+    }
+    
+    // Store current position for next frame
+    state.player.last_pos = state.player.pos;
+    
     // Update dash logic
     update_dash(state, delta);
     
