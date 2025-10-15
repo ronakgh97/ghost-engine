@@ -51,15 +51,21 @@ pub fn cleanup_dead_entities(state: &mut GameState) {
     }
 
     // Collect dead ghost splitters before removing
+    // Only collect NEWLY dead ghosts (not already despawning) to prevent infinite splitting!
     let dead_ghost_splitters: Vec<Ghost> = state
         .ghosts
         .iter()
-        .filter(|g| g.stats.health <= 0.0 && g.entity_type == EntityType::Splitter)
+        .filter(|g| g.stats.health <= 0.0 && g.entity_type == EntityType::Splitter && !g.anim.is_despawning)
         .cloned()
         .collect();
 
     // Remove dead ghosts
-    state.ghosts.retain(|g| g.stats.health > 0.0);
+    // Trigger despawn animation instead of instant removal
+    for ghost in state.ghosts.iter_mut() {
+        if ghost.stats.health <= 0.0 && !ghost.anim.is_despawning {
+            ghost.anim.start_despawn(state.config.animations.ghost_despawn_duration);
+        }
+    }
 
     // Handle ghost splitter splitting - spawn new ghost splits
     let new_ghost_splits =
