@@ -89,3 +89,18 @@ pub fn oscillate(time: f32, frequency: f32, amplitude: f32, offset: f32) -> f32 
 pub fn wiggle(time: f32, seed: f32) -> f32 {
     ((time * 10.0 + seed).sin() * 1000.0).sin()
 }
+
+/// Update hit flash timer (counts down to 0)
+/// Returns the flash intensity (0.0 = no flash, 1.0 = full flash)
+pub fn update_hit_flash(hit_flash_timer: &mut f32, delta: f32, duration: f32) -> f32 {
+    if *hit_flash_timer > 0.0 {
+        *hit_flash_timer -= delta;
+        if *hit_flash_timer < 0.0 {
+            *hit_flash_timer = 0.0;
+        }
+        // Return normalized intensity (1.0 at start, 0.0 at end)
+        *hit_flash_timer / duration
+    } else {
+        0.0
+    }
+}
