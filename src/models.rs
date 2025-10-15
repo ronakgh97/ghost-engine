@@ -195,6 +195,14 @@ pub struct Player {
     
     // Hit feedback
     pub hit_flash_timer: f32,           // White flash when taking damage
+    
+    // Dash mechanic
+    pub is_dashing: bool,               // Currently executing a dash
+    pub dash_timer: f32,                // Tracks dash duration (counts down)
+    pub dash_direction: Position,       // Direction vector of current dash (normalized)
+    pub dash_cooldown_timer: f32,       // Time until dash available again
+    pub i_frame_timer: f32,             // Invincibility frames during dash
+    pub dash_trail_timer: f32,          // Timer for spawning trail particles
 }
 
 // Enemy
@@ -538,6 +546,14 @@ impl GameState {
                 
                 // Hit feedback initialized
                 hit_flash_timer: 0.0,
+                
+                // Dash mechanic initialized
+                is_dashing: false,
+                dash_timer: 0.0,
+                dash_direction: Position { x: 0.0, y: 0.0 },
+                dash_cooldown_timer: 0.0,
+                i_frame_timer: 0.0,
+                dash_trail_timer: 0.0,
             },
             enemies: Vec::new(),
             ghosts: Vec::new(),

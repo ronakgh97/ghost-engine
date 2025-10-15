@@ -3,6 +3,9 @@ use macroquad::prelude::*;
 
 /// Update player position and state
 pub fn update_player(state: &mut GameState, delta: f32) {
+    // Update dash logic
+    update_dash(state, delta);
+    
     // Keep player on screen
     state.player.pos.x = state.player.pos.x.clamp(15.0, screen_width() - 15.0);
 
@@ -22,5 +25,46 @@ pub fn update_player(state: &mut GameState, delta: f32) {
     if state.player.stats.health <= 0.0 {
         // TODO: Implement game over screen
         state.player.stats.health = 0.0;
+    }
+}
+
+/// Update dash movement and timers
+fn update_dash(state: &mut GameState, delta: f32) {
+    let dash_cfg = &state.config.dash;
+    
+    // Update cooldown timer
+    if state.player.dash_cooldown_timer > 0.0 {
+        state.player.dash_cooldown_timer -= delta;
+    }
+    
+    // Update i-frame timer
+    if state.player.i_frame_timer > 0.0 {
+        state.player.i_frame_timer -= delta;
+    }
+    
+    // Handle active dash
+    if state.player.is_dashing {
+        state.player.dash_timer -= delta;
+        
+        // Calculate dash speed (distance / duration)
+        let dash_speed = dash_cfg.distance / dash_cfg.duration;
+        
+        // Apply dash movement
+        state.player.pos.x += state.player.dash_direction.x * dash_speed * delta;
+        state.player.pos.y += state.player.dash_direction.y * dash_speed * delta;
+        
+        // Spawn trail particles
+        state.player.dash_trail_timer += delta;
+        let trail_interval = 1.0 / dash_cfg.trail_spawn_rate;
+        if state.player.dash_trail_timer >= trail_interval {
+            state.player.dash_trail_timer -= trail_interval;
+            crate::game::particles::spawn_dash_trail(state, state.player.pos);
+        }
+        
+        // End dash when timer expires
+        if state.player.dash_timer <= 0.0 {
+            state.player.is_dashing = false;
+            state.player.dash_timer = 0.0;
+        }
     }
 }

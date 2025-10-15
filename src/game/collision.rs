@@ -65,12 +65,12 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                 if projectile.explosion_radius > 0.0 {
                     let mut hit_player_or_ghost = false;
 
-                    // Check player
+                    // Check player (skip if i-frames active!)
                     let distance_to_player = ((projectile.pos.x - state.player.pos.x).powi(2)
                         + (projectile.pos.y - state.player.pos.y).powi(2))
                     .sqrt();
 
-                    if distance_to_player <= projectile.explosion_radius {
+                    if state.player.i_frame_timer <= 0.0 && distance_to_player <= projectile.explosion_radius {
                         state.player.stats.health -= projectile.damage;
                         state.player.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on AOE hit!
                         player_hit_position = Some(state.player.pos); // Track for particles
@@ -96,8 +96,8 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                     }
                 } else {
                     // Standard enemy projectile collision
-                    // Check collision with player
-                    if circle_collision(
+                    // Check collision with player (skip if i-frames active!)
+                    if state.player.i_frame_timer <= 0.0 && circle_collision(
                         projectile.pos,
                         state.player.pos,
                         collision_cfg.projectile_radius,
