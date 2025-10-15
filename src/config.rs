@@ -20,7 +20,8 @@ pub struct GameConfig {
     pub screen_shake: ScreenShakeConfig,
     pub particles: ParticleConfig,
     pub background: BackgroundConfig,
-    pub animations: AnimationConfig, // NEW: Animation system config
+    pub animations: AnimationConfig, // Animation system config
+    pub dash: DashConfig,            // Dash mechanic config
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -328,4 +329,21 @@ pub struct AnimationConfig {
     pub parry_success_scale_max: f32,     // Max scale during success bounce (1.3 = 130%)
     pub parry_failed_duration: f32,       // Shrink duration on missed parry
     pub parry_failed_scale_min: f32,      // Min scale during failed shrink (0.85 = 85%)
+}
+
+// Dash mechanic configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DashConfig {
+    pub enabled: bool,               // Master toggle for dash mechanic
+    pub distance: f32,               // How far the dash travels (pixels)
+    pub duration: f32,               // How long the dash movement lasts (seconds)
+    pub i_frame_duration: f32,       // Invincibility window (seconds)
+    pub energy_cost: f32,            // Energy consumed per dash
+    pub cooldown: f32,               // Minimum time between dashes (seconds)
+    
+    // Visual effects
+    pub trail_particle_count: i32,   // Particles spawned during dash trail
+    pub trail_spawn_rate: f32,       // Trails per second during dash
+    pub glow_intensity: f32,         // Blue glow intensity during dash (0.0-1.0)
+    pub cooldown_ring_thickness: f32,// Thickness of cooldown indicator ring
 }

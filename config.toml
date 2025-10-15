@@ -214,9 +214,9 @@ size_decay = 8.0                # Shrink rate (pixels per second)
 
 # Projectile trails
 trails_enabled = true           # Enable projectile trails
-trail_spawn_interval = 0.03     # Time between trail spawns (seconds) - 0.03 = dense trail
-trail_lifetime = 0.5            # How long trail particles last (seconds)
-trail_size = 3.0                # Size of trail particles
+trail_spawn_interval = 0.01
+trail_lifetime = 0.4
+trail_size = 3.5
 
 # BACKGROUND SCROLLING
 [background]
@@ -246,3 +246,18 @@ parry_success_duration = 0.3        # Elastic bounce duration on success (second
 parry_success_scale_max = 1.3       # Max scale during success (1.3 = 130% - big pop!)
 parry_failed_duration = 0.25        # Shrink duration on missed parry (seconds)
 parry_failed_scale_min = 0.85       # Min scale during failed (0.85 = 85% - defeat feel)
+
+# Dash mechanic configuration (Shift + WASD)
+[dash]
+enabled = true                      # Master toggle for dash mechanic
+distance = 120.0                    # How far the dash travels (pixels)
+duration = 0.15                     # Dash movement duration (seconds) - 150ms = fast!
+i_frame_duration = 0.2              # Invincibility window (seconds) - can dodge through bullets!
+energy_cost = 30.0                  # Energy consumed per dash
+cooldown = 0.5                      # Minimum time between dashes (seconds)
+
+# Visual effects
+trail_particle_count = 3            # Particles spawned per trail spawn
+trail_spawn_rate = 60.0             # Trails per second during dash (60 = smooth)
+glow_intensity = 0.7                # Blue glow intensity during dash (0.0-1.0)
+cooldown_ring_thickness = 3.0       # Thickness of cooldown indicator ring (pixels)

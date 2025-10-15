@@ -22,6 +22,7 @@ pub fn default_config() -> GameConfig {
         particles: default_particles(),
         background: default_background(),
         animations: default_animations(), // Animation defaults
+        dash: default_dash(),             // Dash mechanic defaults
     }
 }
 
@@ -290,9 +291,9 @@ fn default_particles() -> ParticleConfig {
 
         // Projectile trails
         trails_enabled: true,        // Trails enabled by default
-        trail_spawn_interval: 0.005, // Spawn rate
-        trail_lifetime: 0.3,         // Trail fades in 0.5 seconds
-        trail_size: 3.5,             // Small trail particles
+        trail_spawn_interval: 0.01,
+        trail_lifetime: 0.4,
+        trail_size: 3.5,             
     }
 }
 
@@ -326,5 +327,22 @@ fn default_animations() -> AnimationConfig {
         parry_success_scale_max: 1.3,     // 130% max scale (satisfying pop!)
         parry_failed_duration: 0.25,      // 250ms shrink
         parry_failed_scale_min: 0.85,     // 85% min scale (failure feel)
+    }
+}
+
+fn default_dash() -> DashConfig {
+    DashConfig {
+        enabled: true,                    // Dash enabled by default
+        distance: 120.0,                  // 120 pixels dash distance
+        duration: 0.15,                   // 150ms dash duration (fast!)
+        i_frame_duration: 0.2,            // 200ms invincibility (can dash through bullets!)
+        energy_cost: 30.0,                // 30 energy per dash
+        cooldown: 0.5,                    // 500ms cooldown between dashes
+        
+        // Visual effects
+        trail_particle_count: 3,          // 3 afterimage particles per trail spawn
+        trail_spawn_rate: 60.0,           // 60 trails/second (smooth trail)
+        glow_intensity: 0.7,              // 70% blue glow during dash
+        cooldown_ring_thickness: 3.0,     // 3px ring thickness for cooldown indicator
     }
 }
