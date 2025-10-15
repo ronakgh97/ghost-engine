@@ -289,18 +289,39 @@ fn draw_player(player: &Player, state: &GameState) {
     let body_radius = 15.0 * player_scale;
     let core_radius = 10.0 * player_scale;
     
+    // Calculate hit flash intensity
+    let hit_flash_intensity = if player.hit_flash_timer > 0.0 {
+        (player.hit_flash_timer / anim_cfg.hit_flash_duration) * 0.8 // 80% max intensity
+    } else {
+        0.0
+    };
+    
     // Base colors with desaturation effect
-    let white_color = Color::new(
+    let base_white = Color::new(
         1.0 - player_color_blend * 0.3,
         1.0 - player_color_blend * 0.3,
         1.0 - player_color_blend * 0.3,
         1.0,
     );
-    let skyblue_color = Color::new(
+    let base_skyblue = Color::new(
         0.53 - player_color_blend * 0.3,
         0.81 - player_color_blend * 0.3,
         0.92 - player_color_blend * 0.3,
         1.0,
+    );
+    
+    // Apply hit flash (lerp toward white)
+    let white_color = Color::new(
+        base_white.r + (1.0 - base_white.r) * hit_flash_intensity,
+        base_white.g + (1.0 - base_white.g) * hit_flash_intensity,
+        base_white.b + (1.0 - base_white.b) * hit_flash_intensity,
+        base_white.a,
+    );
+    let skyblue_color = Color::new(
+        base_skyblue.r + (1.0 - base_skyblue.r) * hit_flash_intensity,
+        base_skyblue.g + (1.0 - base_skyblue.g) * hit_flash_intensity,
+        base_skyblue.b + (1.0 - base_skyblue.b) * hit_flash_intensity,
+        base_skyblue.a,
     );
     
     // Draw parry stance glow BEFORE player (behind everything)
@@ -351,12 +372,24 @@ fn draw_player(player: &Player, state: &GameState) {
         );
     }
     
-    // Player glow effect (with scale)
+    // Player glow effect (with scale and hit flash)
+    // When hit, add red/orange warning glow!
+    let glow_color = if hit_flash_intensity > 0.0 {
+        Color::new(
+            1.0,
+            0.3 + 0.7 * (1.0 - hit_flash_intensity), // Red-orange when hit
+            0.1,
+            0.2 + hit_flash_intensity * 0.5, // Brighter when hit
+        )
+    } else {
+        Color::new(1.0, 1.0, 1.0, 0.2) // Normal white glow
+    };
+    
     draw_circle(
         player.pos.x,
         player.pos.y,
-        glow_radius,
-        Color::new(1.0, 1.0, 1.0, 0.2),
+        glow_radius + (hit_flash_intensity * 10.0), // Expand when hit
+        glow_color,
     );
 
     // Main player body (with scale and color)
