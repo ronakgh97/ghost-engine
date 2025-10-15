@@ -25,6 +25,9 @@ pub fn attempt_parry(state: &mut GameState) {
     state.player.parry_active = true;
     state.player.parry_window = state.config.player.parry_window;
     state.player.energy -= parry_cost;
+    
+    // Start stance glow animation (lasts longer than parry window!)
+    state.player.parry_stance_glow_timer = state.config.animations.parry_stance_glow_duration;
 
     // TODO: Play parry animation/sound
 }
@@ -56,6 +59,9 @@ pub fn update_parry(state: &mut GameState, delta: f32) {
     }
     if state.player.parry_failed_timer > 0.0 {
         state.player.parry_failed_timer -= delta;
+    }
+    if state.player.parry_stance_glow_timer > 0.0 {
+        state.player.parry_stance_glow_timer -= delta;
     }
 }
 
@@ -101,6 +107,12 @@ pub fn check_parry_projectiles(state: &mut GameState) {
         
         // Trigger success animation (elastic bounce)
         state.player.parry_success_scale_timer = state.config.animations.parry_success_duration;
+        
+        // BOOST stance glow for burst effect! (extends and intensifies the glow)
+        let burst_duration = state.config.animations.parry_success_duration;
+        if state.player.parry_stance_glow_timer < burst_duration {
+            state.player.parry_stance_glow_timer = burst_duration; // Extend to at least bounce duration
+        }
         
         shake_on_parry(state);
         spawn_parry_effect(state, state.player.pos); // Particle burst!

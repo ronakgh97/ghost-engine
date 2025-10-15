@@ -261,33 +261,109 @@ fn draw_stat_bar(x: f32, y: f32, w: f32, h: f32, ratio: f32, color: Color, label
 
 /// Draw player entity with enhanced visuals
 fn draw_player(player: &Player, state: &GameState) {
-    // Player glow effect
-    draw_circle(
-        player.pos.x,
-        player.pos.y,
-        20.0,
-        Color::new(1.0, 1.0, 1.0, 0.2),
+    let anim_cfg = &state.config.animations;
+    
+    // Calculate parry animation states
+    let mut player_scale = 1.0;
+    let mut player_color_blend = 0.0; // 0.0 = normal, 1.0 = desaturated
+    
+    // Success animation: Elastic bounce (1.0 → 1.3 → 1.0)
+    if player.parry_success_scale_timer > 0.0 {
+        let t = 1.0 - (player.parry_success_scale_timer / anim_cfg.parry_success_duration);
+        // Use ease_out_elastic for satisfying bounce
+        let bounce_t = crate::game::animation::ease_out_elastic(t);
+        player_scale = 1.0 + (anim_cfg.parry_success_scale_max - 1.0) * (1.0 - bounce_t);
+    }
+    
+    // Failed animation: Shrink (1.0 → 0.85 → 1.0) + desaturation
+    if player.parry_failed_timer > 0.0 {
+        let t = player.parry_failed_timer / anim_cfg.parry_failed_duration;
+        // Use ease_out_quad for smooth recovery
+        let shrink_t = crate::game::animation::ease_out_quad(t);
+        player_scale = 1.0 - (1.0 - anim_cfg.parry_failed_scale_min) * shrink_t;
+        player_color_blend = shrink_t * 0.5; // Desaturate up to 50%
+    }
+    
+    // Apply scale to all radii
+    let glow_radius = 20.0 * player_scale;
+    let body_radius = 15.0 * player_scale;
+    let core_radius = 10.0 * player_scale;
+    
+    // Base colors with desaturation effect
+    let white_color = Color::new(
+        1.0 - player_color_blend * 0.3,
+        1.0 - player_color_blend * 0.3,
+        1.0 - player_color_blend * 0.3,
+        1.0,
     );
-
-    // Main player body
-    draw_circle(player.pos.x, player.pos.y, 15.0, WHITE);
-
-    // Inner core
-    draw_circle(player.pos.x, player.pos.y, 10.0, SKYBLUE);
-
-    // Draw parry shield if active
-    if player.parry_active {
-        let parry_radius = state.config.collision.player_radius + 25.0;
-        let pulse = (macroquad::time::get_time() * 10.0).sin() as f32 * 3.0;
-        draw_circle_lines(player.pos.x, player.pos.y, parry_radius + pulse, 4.0, BLUE);
+    let skyblue_color = Color::new(
+        0.53 - player_color_blend * 0.3,
+        0.81 - player_color_blend * 0.3,
+        0.92 - player_color_blend * 0.3,
+        1.0,
+    );
+    
+    // Draw parry stance glow BEFORE player (behind everything)
+    // Now uses stance_glow_timer instead of parry_active for independent control!
+    if player.parry_stance_glow_timer > 0.0 {
+        let time = macroquad::time::get_time() as f32;
+        let pulse = (time * anim_cfg.parry_stance_pulse_speed * std::f32::consts::TAU).sin() * 0.5 + 0.5;
+        
+        // Calculate base glow intensity with smooth fade-out
+        let fade_t = player.parry_stance_glow_timer / anim_cfg.parry_stance_glow_duration;
+        let base_intensity = anim_cfg.parry_stance_glow_intensity * fade_t;
+        
+        // Add burst effect on successful parry!
+        let burst_multiplier = if player.parry_success_scale_timer > 0.0 {
+            // Glow BURSTS brighter at the start of success animation, then fades
+            let burst_t = player.parry_success_scale_timer / anim_cfg.parry_success_duration;
+            1.0 + (anim_cfg.parry_success_glow_burst - 1.0) * burst_t // Starts at 2x, fades to 1x
+        } else {
+            1.0 // Normal intensity
+        };
+        
+        let glow_intensity = base_intensity * pulse * burst_multiplier;
+        
+        // Pulsing blue aura (with burst effect!)
+        draw_circle(
+            player.pos.x,
+            player.pos.y,
+            glow_radius + 15.0,
+            Color::new(0.0, 0.5, 1.0, glow_intensity * 0.4),
+        );
+        
+        // Expanding shield ring (with burst effect!)
+        let ring_radius = state.config.collision.player_radius + 25.0;
+        let ring_pulse = (time * 10.0).sin() as f32 * 3.0;
         draw_circle_lines(
             player.pos.x,
             player.pos.y,
-            parry_radius + pulse - 5.0,
+            ring_radius + ring_pulse,
+            4.0,
+            Color::new(0.0, 0.5, 1.0, glow_intensity),
+        );
+        draw_circle_lines(
+            player.pos.x,
+            player.pos.y,
+            ring_radius + ring_pulse - 5.0,
             2.0,
-            SKYBLUE,
+            Color::new(0.53, 0.81, 0.92, glow_intensity * 0.8),
         );
     }
+    
+    // Player glow effect (with scale)
+    draw_circle(
+        player.pos.x,
+        player.pos.y,
+        glow_radius,
+        Color::new(1.0, 1.0, 1.0, 0.2),
+    );
+
+    // Main player body (with scale and color)
+    draw_circle(player.pos.x, player.pos.y, body_radius, white_color);
+
+    // Inner core (with scale and color)
+    draw_circle(player.pos.x, player.pos.y, core_radius, skyblue_color);
 
     // Health bar above player
     let health_ratio = player.stats.health / player.stats.max_health;
