@@ -165,6 +165,30 @@ pub fn spawn_player_hit_effect(state: &mut GameState, pos: Position) {
     }
 }
 
+/// Spawn dash trail particles (blue speed afterimages)
+pub fn spawn_dash_trail(state: &mut GameState, pos: Position) {
+    let dash_cfg = &state.config.dash;
+    
+    // Spawn multiple small blue particles as afterimage
+    for _ in 0..dash_cfg.trail_particle_count {
+        let angle = macroquad::rand::gen_range(0.0, std::f32::consts::TAU);
+        let speed = macroquad::rand::gen_range(5.0, 15.0);
+        
+        state.particles.push(Particle {
+            pos,
+            velocity: Position {
+                x: angle.cos() * speed,
+                y: angle.sin() * speed,
+            },
+            lifetime: 0.3,                   // Short-lived trail
+            max_lifetime: 0.3,
+            color: Color::new(0.0, 0.5, 1.0, 0.8), // Cyan/blue
+            size: 4.0,
+            size_decay: 8.0,                 // Fade quickly
+        });
+    }
+}
+
 /// Update all particles (movement, lifetime, cleanup)
 pub fn update_particles(state: &mut GameState, delta: f32) {
     let friction = state.config.particles.friction;

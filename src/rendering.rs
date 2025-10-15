@@ -372,6 +372,23 @@ fn draw_player(player: &Player, state: &GameState) {
         );
     }
     
+    // Dash glow effect (blue speed glow during dash)
+    if player.is_dashing {
+        let dash_glow_intensity = state.config.dash.glow_intensity;
+        draw_circle(
+            player.pos.x,
+            player.pos.y,
+            glow_radius + 15.0,
+            Color::new(0.0, 0.5, 1.0, dash_glow_intensity * 0.5), // Cyan glow
+        );
+        draw_circle(
+            player.pos.x,
+            player.pos.y,
+            glow_radius + 10.0,
+            Color::new(0.53, 0.81, 0.92, dash_glow_intensity), // Bright core
+        );
+    }
+    
     // Player glow effect (with scale and hit flash)
     // When hit, add red/orange warning glow!
     let glow_color = if hit_flash_intensity > 0.0 {
@@ -408,6 +425,33 @@ fn draw_player(player: &Player, state: &GameState) {
         4.0,
         GREEN,
     );
+    
+    // Dash cooldown indicator (circular ring around player)
+    if state.config.dash.enabled && player.dash_cooldown_timer > 0.0 {
+        let cooldown_ratio = player.dash_cooldown_timer / state.config.dash.cooldown;
+        let ring_radius = state.config.collision.player_radius + 20.0;
+        let arc_length = std::f32::consts::TAU * (1.0 - cooldown_ratio); // Full circle when ready
+        
+        // Draw arc showing cooldown progress
+        // Note: macroquad doesn't have draw_arc, so we'll use circle segments
+        let segments = 32;
+        let angle_per_segment = arc_length / segments as f32;
+        for i in 0..segments {
+            let angle1 = i as f32 * angle_per_segment - std::f32::consts::PI / 2.0; // Start at top
+            let angle2 = (i + 1) as f32 * angle_per_segment - std::f32::consts::PI / 2.0;
+            
+            let x1 = player.pos.x + angle1.cos() * ring_radius;
+            let y1 = player.pos.y + angle1.sin() * ring_radius;
+            let x2 = player.pos.x + angle2.cos() * ring_radius;
+            let y2 = player.pos.y + angle2.sin() * ring_radius;
+            
+            draw_line(
+                x1, y1, x2, y2,
+                state.config.dash.cooldown_ring_thickness,
+                Color::new(0.0, 0.7, 1.0, 0.6), // Cyan, semi-transparent
+            );
+        }
+    }
 }
 
 /// Draw all enemies with enhanced visuals
