@@ -31,7 +31,7 @@ async fn main() {
             Some(tex)
         }
         Err(e) => {
-            println!("✗ Failed to load background: {}", e);
+            println!("✗ Failed to load background: {e}");
             None
         }
     };
@@ -49,7 +49,7 @@ async fn main() {
                     game_state.apply_config(&new_config);
                 }
                 Err(e) => {
-                    println!("✗ Failed to reload config: {}", e);
+                    println!("✗ Failed to reload config: {e}");
                 }
             }
         }

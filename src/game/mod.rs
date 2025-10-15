@@ -1,17 +1,19 @@
+mod animation; // Easing functions and animation helpers
 mod cancel_summon;
 mod collision;
 mod combat;
 mod enemy;
 mod energy;
 mod ghost;
-mod healer; // NEW: Healing system for healer enemies/ghosts
+mod ghost_animation; // Ghost spawn/despawn animations
+mod healer; // Healing system for healer enemies/ghosts
 mod input;
 mod parry;
 mod particles;
 mod player;
 mod screen_shake;
 mod spawn;
-mod splitter; // NEW: Splitting system for splitter enemies/ghosts
+mod splitter; // Splitting system for splitter enemies/ghosts
 mod utils;
 pub mod wave; // Public module for WaveManager
 mod weapons;
@@ -47,6 +49,9 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
     update_player(state, delta);
     update_enemies(state, delta);
     update_ghosts(state, delta);
+    
+    // Update ghost animations (spawn/despawn effects)
+    ghost_animation::update_ghost_animations(&mut state.ghosts, delta, &state.config.animations);
 
     // Update healing (healers heal allies, healer ghosts heal player)
     healer::update_healer_healing(state, delta);
