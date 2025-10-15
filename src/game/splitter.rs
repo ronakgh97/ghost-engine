@@ -151,6 +151,7 @@ pub fn handle_ghost_splitter_damage(
         weapon_type: ghost.weapon_type.clone(),
         entity_type: EntityType::Splitter,
         energy_drain_per_sec: 0.0, // Clones don't drain energy!
+        anim: EntityAnimState::new_spawning(0.3), // Quick spawn animation for clones
     };
 
     println!("✓ Ghost splitter created a clone!");
@@ -199,6 +200,7 @@ pub fn handle_ghost_splits(
                 weapon_type: ghost.weapon_type.clone(), // Inherit weapons
                 entity_type: EntityType::BasicFighter,  // Splits become basic fighters
                 energy_drain_per_sec: ghost.energy_drain_per_sec, // Same energy drain
+                anim: EntityAnimState::new_spawning(0.4), // Spawn animation for splits
             };
 
             new_ghosts.push(split_ghost);

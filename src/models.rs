@@ -198,6 +198,56 @@ pub struct Enemy {
     pub entity_type: EntityType,
 }
 
+// Animation state for entities (ghosts, enemies, etc.)
+#[derive(Clone)]
+pub struct EntityAnimState {
+    // Lifecycle timers
+    pub spawn_timer: f32,     // Fade in on spawn
+    pub despawn_timer: f32,   // Fade out on despawn
+    pub is_spawning: bool,    // Currently playing spawn animation
+    pub is_despawning: bool,  // Currently playing despawn animation
+    
+    // Visual modifiers (applied during rendering)
+    pub scale: f32,           // Size multiplier (1.0 = normal)
+    pub rotation: f32,        // Rotation in radians
+    pub alpha: f32,           // Opacity (0.0 - 1.0)
+}
+
+impl Default for EntityAnimState {
+    fn default() -> Self {
+        Self {
+            spawn_timer: 0.0,
+            despawn_timer: 0.0,
+            is_spawning: false,
+            is_despawning: false,
+            scale: 1.0,
+            rotation: 0.0,
+            alpha: 1.0,
+        }
+    }
+}
+
+impl EntityAnimState {
+    /// Create new animation state for spawning entity
+    pub fn new_spawning(duration: f32) -> Self {
+        Self {
+            spawn_timer: duration,
+            despawn_timer: 0.0,
+            is_spawning: true,
+            is_despawning: false,
+            scale: 0.3,     // Start small
+            rotation: 0.0,
+            alpha: 0.0,     // Start invisible
+        }
+    }
+    
+    /// Trigger despawn animation
+    pub fn start_despawn(&mut self, duration: f32) {
+        self.is_despawning = true;
+        self.despawn_timer = duration;
+    }
+}
+
 // Ghost
 #[derive(Clone)]
 pub struct Ghost {
@@ -206,6 +256,7 @@ pub struct Ghost {
     pub weapon_type: Vec<WeaponType>,
     pub entity_type: EntityType,
     pub energy_drain_per_sec: f32,
+    pub anim: EntityAnimState,  // Animation state
 }
 
 #[allow(dead_code)]
@@ -316,6 +367,7 @@ impl Ghost {
             },
             entity_type,
             energy_drain_per_sec: entity_type.get_energy_cost(&config.entities) * 0.1,
+            anim: EntityAnimState::new_spawning(0.5), // 0.5s spawn animation
         }
     }
 }
