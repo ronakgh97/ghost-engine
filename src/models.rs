@@ -187,6 +187,10 @@ pub struct Player {
     pub parry_cooldown: f32, // Time until parry available again
     pub parry_window: f32,   // How long parry is active (0.2 seconds)
     pub parry_active: bool,  // Currently in parry stance
+    
+    // Parry animations
+    pub parry_success_scale_timer: f32, // Elastic bounce on successful deflection
+    pub parry_failed_timer: f32,        // Shrink/desaturation on missed parry
 }
 
 // Enemy
@@ -522,6 +526,10 @@ impl GameState {
                 parry_cooldown: 0.0,
                 parry_window: 0.0,
                 parry_active: false,
+                
+                // Parry animations initialized
+                parry_success_scale_timer: 0.0,
+                parry_failed_timer: 0.0,
             },
             enemies: Vec::new(),
             ghosts: Vec::new(),

@@ -1,4 +1,4 @@
-mod animation; // Easing functions and animation helpers
+pub mod animation; // Easing functions and animation helpers (public for rendering)
 mod cancel_summon;
 mod collision;
 mod combat;
