@@ -218,6 +218,31 @@ trail_spawn_interval = 0.03     # Time between trail spawns (seconds) - 0.03 = d
 trail_lifetime = 0.5            # How long trail particles last (seconds)
 trail_size = 3.0                # Size of trail particles
 
-# === BACKGROUND SCROLLING ===
+# BACKGROUND SCROLLING
 [background]
 scroll_speed = 50.0             # Vertical scroll speed (pixels/second) - adjust for desired pace
+
+# ANIMATION SYSTEM
+[animations]
+# Ghost spawn animation (fade in + elastic bounce)
+ghost_spawn_duration = 0.5          # Total spawn time (seconds)
+ghost_spawn_scale_start = 0.3       # Starting size (0.3 = 30% of normal)
+ghost_spawn_rotation_speed = 8.0    # Rotation speed during spawn (rad/s)
+
+# Ghost despawn animation (shrink + spin + fade out)
+ghost_despawn_duration = 0.4        # Total despawn time (seconds)
+ghost_despawn_rotation_speed = 12.0 # Rotation speed during despawn (rad/s)
+
+# Hit flash effect (damage feedback)
+hit_flash_duration = 0.15           # Flash duration (seconds) - 150ms is snappy
+hit_flash_intensity = 0.8           # White blend amount (0.0-1.0) - 0.8 = strong flash
+
+# Parry animations (defensive stance + success/fail feedback)
+parry_stance_glow_intensity = 0.6   # Glow brightness while parry active (0.0-1.0)
+parry_stance_pulse_speed = 4.0      # Pulse frequency (Hz) - 4 = urgent/fast
+parry_stance_glow_duration = 0.5    # Stance glow duration (seconds) - outlasts parry window!
+parry_success_glow_burst = 2.0      # Glow burst multiplier on success (2.0 = 200% BRIGHT!)
+parry_success_duration = 0.3        # Elastic bounce duration on success (seconds)
+parry_success_scale_max = 1.3       # Max scale during success (1.3 = 130% - big pop!)
+parry_failed_duration = 0.25        # Shrink duration on missed parry (seconds)
+parry_failed_scale_min = 0.85       # Min scale during failed (0.85 = 85% - defeat feel)

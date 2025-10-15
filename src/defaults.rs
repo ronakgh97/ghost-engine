@@ -21,6 +21,7 @@ pub fn default_config() -> GameConfig {
         screen_shake: default_screen_shake(),
         particles: default_particles(),
         background: default_background(),
+        animations: default_animations(), // Animation defaults
     }
 }
 
@@ -298,5 +299,32 @@ fn default_particles() -> ParticleConfig {
 fn default_background() -> BackgroundConfig {
     BackgroundConfig {
         scroll_speed: 10.0, // Pixels per second
+    }
+}
+
+fn default_animations() -> AnimationConfig {
+    AnimationConfig {
+        // Ghost spawn animation (elastic bounce-in)
+        ghost_spawn_duration: 0.5,        // 500ms spawn time
+        ghost_spawn_scale_start: 0.3,     // Start at 30% size
+        ghost_spawn_rotation_speed: 8.0,  // 8 rad/s rotation during spawn
+        
+        // Ghost despawn animation
+        ghost_despawn_duration: 0.4,      // 400ms despawn time
+        ghost_despawn_rotation_speed: 12.0, // 12 rad/s rotation during despawn
+        
+        // Hit flash effect (damage feedback)
+        hit_flash_duration: 0.18,         // 180ms flash
+        hit_flash_intensity: 0.8,         // 80% white blend
+        
+        // Parry animations (defensive stance + success/fail feedback)
+        parry_stance_glow_intensity: 0.6, // 60% glow brightness
+        parry_stance_pulse_speed: 4.0,    // 4 Hz pulse (fast, urgent feel)
+        parry_stance_glow_duration: 0.5,  // 500ms stance glow (outlasts parry window!)
+        parry_success_glow_burst: 2.0,    // 200% burst on success (BRIGHT flash!)
+        parry_success_duration: 0.3,      // 300ms elastic bounce
+        parry_success_scale_max: 1.3,     // 130% max scale (satisfying pop!)
+        parry_failed_duration: 0.25,      // 250ms shrink
+        parry_failed_scale_min: 0.85,     // 85% min scale (failure feel)
     }
 }

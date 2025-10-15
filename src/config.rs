@@ -20,6 +20,7 @@ pub struct GameConfig {
     pub screen_shake: ScreenShakeConfig,
     pub particles: ParticleConfig,
     pub background: BackgroundConfig,
+    pub animations: AnimationConfig, // NEW: Animation system config
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -263,7 +264,7 @@ impl GameConfig {
                 config
             }
             Err(e) => {
-                println!("✗  Could not load config.toml: {}", e);
+                println!("✗  Could not load config.toml: {e}");
                 println!("✓ Using compiled-in defaults");
                 default_config()
             }
@@ -300,4 +301,31 @@ impl Default for GameConfig {
     fn default() -> Self {
         default_config()
     }
+}
+
+// Animation system configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AnimationConfig {
+    // Ghost spawn animation
+    pub ghost_spawn_duration: f32,      // Total spawn animation time
+    pub ghost_spawn_scale_start: f32,   // Starting scale (0.3 = 30% size)
+    pub ghost_spawn_rotation_speed: f32,// Rotation while spawning (rad/s)
+    
+    // Ghost despawn animation
+    pub ghost_despawn_duration: f32,    // Total despawn animation time
+    pub ghost_despawn_rotation_speed: f32, // Spin speed while despawning (rad/s)
+    
+    // Hit flash effect (when taking damage)
+    pub hit_flash_duration: f32,        // How long the flash lasts (seconds)
+    pub hit_flash_intensity: f32,       // How much white to blend (0.0-1.0)
+    
+    // Parry animations
+    pub parry_stance_glow_intensity: f32, // Glow brightness while parry active (0.0-1.0)
+    pub parry_stance_pulse_speed: f32,    // How fast stance glow pulses (Hz)
+    pub parry_stance_glow_duration: f32,  // How long stance glow lasts (seconds)
+    pub parry_success_glow_burst: f32,    // Glow intensity multiplier on success (e.g., 2.0 = 200%)
+    pub parry_success_duration: f32,      // Elastic bounce duration on success
+    pub parry_success_scale_max: f32,     // Max scale during success bounce (1.3 = 130%)
+    pub parry_failed_duration: f32,       // Shrink duration on missed parry
+    pub parry_failed_scale_min: f32,      // Min scale during failed shrink (0.85 = 85%)
 }
