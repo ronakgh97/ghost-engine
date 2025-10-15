@@ -42,6 +42,7 @@ pub fn handle_enemy_splits(
                 },
                 weapon: enemy.weapon.clone(),          // Inherit weapons
                 entity_type: EntityType::BasicFighter, // Splits become basic fighters (don't split again!)
+                anim: EntityAnimState::default(), // Default animation state for splits
             };
 
             new_enemies.push(split_enemy);
@@ -199,7 +200,7 @@ pub fn handle_ghost_splits(
                 },
                 weapon_type: ghost.weapon_type.clone(), // Inherit weapons
                 entity_type: EntityType::BasicFighter,  // Splits become basic fighters
-                energy_drain_per_sec: ghost.energy_drain_per_sec, // Same energy drain
+                energy_drain_per_sec: ghost.energy_drain_per_sec * 0.0, // Doesn't drain energy
                 anim: EntityAnimState::new_spawning(0.4), // Spawn animation for splits
             };
 
