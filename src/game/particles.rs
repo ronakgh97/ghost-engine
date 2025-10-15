@@ -120,6 +120,51 @@ pub fn spawn_parry_effect(state: &mut GameState, pos: Position) {
     spawn_explosion(state, pos, white_count, WHITE);
 }
 
+/// Spawn player hit effect (red/orange burst when player takes damage)
+pub fn spawn_player_hit_effect(state: &mut GameState, pos: Position) {
+    // Red impact burst (damage indication)
+    for _ in 0..8 {
+        let angle = rand::gen_range(0.0, std::f32::consts::PI * 2.0);
+        let speed = rand::gen_range(50.0, 120.0);
+
+        let particle = Particle {
+            pos,
+            velocity: Position {
+                x: angle.cos() * speed,
+                y: angle.sin() * speed,
+            },
+            lifetime: rand::gen_range(0.2, 0.4),
+            max_lifetime: 0.4,
+            color: RED,
+            size: rand::gen_range(4.0, 8.0),
+            size_decay: 0.9,
+        };
+
+        state.particles.push(particle);
+    }
+    
+    // Orange warning particles
+    for _ in 0..6 {
+        let angle = rand::gen_range(0.0, std::f32::consts::PI * 2.0);
+        let speed = rand::gen_range(70.0, 150.0);
+
+        let particle = Particle {
+            pos,
+            velocity: Position {
+                x: angle.cos() * speed,
+                y: angle.sin() * speed,
+            },
+            lifetime: rand::gen_range(0.15, 0.35),
+            max_lifetime: 0.35,
+            color: ORANGE,
+            size: rand::gen_range(3.0, 6.0),
+            size_decay: 0.85,
+        };
+
+        state.particles.push(particle);
+    }
+}
+
 /// Update all particles (movement, lifetime, cleanup)
 pub fn update_particles(state: &mut GameState, delta: f32) {
     let friction = state.config.particles.friction;
