@@ -62,6 +62,7 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             stats: entity_stats,
             entity_type,
             weapon: final_weapons,
+            anim: EntityAnimState::default(), // Start with default animation state (no spawn animation for now)
         };
 
         state.enemies.push(enemy);

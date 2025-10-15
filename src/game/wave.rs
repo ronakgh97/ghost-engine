@@ -230,6 +230,7 @@ impl WaveManager {
                     stats: entity_stats,
                     entity_type: spawn.enemy_type,
                     weapon: final_weapons,
+                    anim: EntityAnimState::default(), // Default animation state
                 };
 
                 game_state.enemies.push(enemy);
