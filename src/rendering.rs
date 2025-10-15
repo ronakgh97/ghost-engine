@@ -151,7 +151,7 @@ pub fn render_ui(state: &GameState) {
 
     // Display formation name and ghost count
     draw_text(
-        &format!("{} ({}/{})", formation_name, available_count, optimal),
+        &format!("{formation_name} ({available_count}/{optimal})"),
         20.0,
         ui_y,
         16.0,
@@ -167,7 +167,7 @@ pub fn render_ui(state: &GameState) {
     };
 
     draw_text(
-        &format!("Cost: {:.0} NRG", formation_cost),
+        &format!("Cost: {formation_cost:.0} NRG"),
         20.0,
         ui_y,
         16.0,
@@ -204,37 +204,37 @@ pub fn render_ui(state: &GameState) {
     // BasicFighter
     let count = ghost_counts.get(&EntityType::BasicFighter);
     draw_circle(25.0, line_y - 5.0, 6.0, RED);
-    draw_text(&format!("Fighter: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Fighter: {count:?}"), 40.0, line_y, 16.0, WHITE);
     line_y += 22.0;
 
     // Sniper
     let count = ghost_counts.get(&EntityType::Sniper);
     draw_circle(25.0, line_y - 5.0, 6.0, BLUE);
-    draw_text(&format!("Sniper: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Sniper: {count:?}"), 40.0, line_y, 16.0, WHITE);
     line_y += 22.0;
 
     // Tank
     let count = ghost_counts.get(&EntityType::Tank);
     draw_circle(25.0, line_y - 5.0, 6.0, GREEN);
-    draw_text(&format!("Tank: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Tank: {count:?}"), 40.0, line_y, 16.0, WHITE);
     line_y += 22.0;
 
     // Healer
     let count = ghost_counts.get(&EntityType::Healer);
     draw_circle(25.0, line_y - 5.0, 6.0, LIME);
-    draw_text(&format!("Healer: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Healer: {count:?}"), 40.0, line_y, 16.0, WHITE);
     line_y += 22.0;
 
     // Splitter
     let count = ghost_counts.get(&EntityType::Splitter);
     draw_circle(25.0, line_y - 5.0, 6.0, ORANGE);
-    draw_text(&format!("Splitter: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Splitter: {count:?}"), 40.0, line_y, 16.0, WHITE);
     line_y += 22.0;
 
     // Elite
     let count = ghost_counts.get(&EntityType::Elite);
     draw_circle(25.0, line_y - 5.0, 6.0, GOLD);
-    draw_text(&format!("Elite: {:?}", count), 40.0, line_y, 16.0, WHITE);
+    draw_text(&format!("Elite: {count:?}"), 40.0, line_y, 16.0, WHITE);
 }
 
 /// Draw modern panel with shadow
@@ -365,11 +365,20 @@ fn draw_enemies(enemies: &[Enemy]) {
 /// Draw all ghosts with transparency
 fn draw_ghosts(ghosts: &[Ghost]) {
     for ghost in ghosts {
+        // Apply animation state
+        let anim = &ghost.anim;
+        let base_radius = 12.0;
+        let glow_radius = 18.0;
+        
+        // Apply scale and alpha from animation
+        let radius = base_radius * anim.scale;
+        let glow_rad = glow_radius * anim.scale;
+        
         // Draw healing field for healer ghosts (pulsing green circle)
         if ghost.entity_type == EntityType::Healer {
             // Pulse effect using sine wave
             let pulse = (macroquad::time::get_time() * 2.0).sin() as f32 * 0.1 + 0.9;
-            let heal_radius = 150.0 * pulse;
+            let heal_radius = 150.0 * pulse * anim.scale; // Scale healing field too
 
             // Draw healing radius (transparent green circle)
             draw_circle_lines(
@@ -377,7 +386,7 @@ fn draw_ghosts(ghosts: &[Ghost]) {
                 ghost.pos.y,
                 heal_radius,
                 2.0,
-                Color::new(0.2, 1.0, 0.2, 0.3),
+                Color::new(0.2, 1.0, 0.2, 0.3 * anim.alpha), // Apply alpha
             );
 
             // Inner healing glow
@@ -385,38 +394,49 @@ fn draw_ghosts(ghosts: &[Ghost]) {
                 ghost.pos.x,
                 ghost.pos.y,
                 heal_radius * 0.5,
-                Color::new(0.2, 1.0, 0.2, 0.05),
+                Color::new(0.2, 1.0, 0.2, 0.05 * anim.alpha), // Apply alpha
             );
         }
 
         let color = get_ghost_color(ghost.entity_type);
 
-        // Ghost glow
+        // Ghost glow (with animation alpha)
         draw_circle(
             ghost.pos.x,
             ghost.pos.y,
-            18.0,
-            Color::new(color.r, color.g, color.b, 0.3),
+            glow_rad,
+            Color::new(color.r, color.g, color.b, 0.3 * anim.alpha),
         );
 
-        // Ghost body
+        // Ghost body (with animation scale and alpha)
         draw_circle(
             ghost.pos.x,
             ghost.pos.y,
-            12.0,
-            Color::new(color.r, color.g, color.b, 0.7),
+            radius,
+            Color::new(color.r, color.g, color.b, 0.7 * anim.alpha),
         );
 
-        // Health bar
-        let health_ratio = ghost.stats.health / ghost.stats.max_health;
-        draw_rectangle(ghost.pos.x - 12.0, ghost.pos.y - 19.0, 24.0, 2.0, BLACK);
-        draw_rectangle(
-            ghost.pos.x - 12.0,
-            ghost.pos.y - 19.0,
-            24.0 * health_ratio,
-            2.0,
-            SKYBLUE,
-        );
+        // Health bar (only show if not despawning and alpha > 0.5)
+        if !anim.is_despawning && anim.alpha > 0.5 {
+            let health_ratio = ghost.stats.health / ghost.stats.max_health;
+            let bar_width = 24.0 * anim.scale;
+            let bar_offset = radius + 7.0;
+            
+            draw_rectangle(
+                ghost.pos.x - bar_width / 2.0,
+                ghost.pos.y - bar_offset,
+                bar_width,
+                2.0,
+                Color::new(0.0, 0.0, 0.0, anim.alpha),
+            );
+            draw_rectangle(
+                ghost.pos.x - bar_width / 2.0,
+                ghost.pos.y - bar_offset,
+                bar_width * health_ratio,
+                2.0,
+                Color::new(0.53, 0.81, 0.92, anim.alpha), // SKYBLUE with alpha
+            );
+        }
     }
 }
 

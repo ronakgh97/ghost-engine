@@ -108,9 +108,9 @@ fn change_formation(state: &mut GameState) {
         if formation.is_valid_for_count(current_ghost_count) {
             state.ghost_formation = formation;
             // TODO: Play formation switch sound
-            println!("Switched to formation: {:?}", formation);
+            println!("Switched to formation: {formation:?}");
         } else {
-            println!("Not enough ghosts to form : {:?}", formation);
+            println!("Not enough ghosts to form : {formation:?}");
             // TODO: Play error sound / show message
             // Can't switch - not enough ghosts in queue
         }

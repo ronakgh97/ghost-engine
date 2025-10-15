@@ -14,7 +14,7 @@ impl LuaScripting {
         // Load init.lua for helper functions
         if Path::new("scripts/init.lua").exists() {
             let init_script = std::fs::read_to_string("scripts/init.lua")
-                .map_err(|e| LuaError::RuntimeError(format!("✘ Failed to read init.lua: {}", e)))?;
+                .map_err(|e| LuaError::RuntimeError(format!("✘ Failed to read init.lua: {e}")))?;
             lua.load(&init_script).exec()?;
             println!("✓ Loaded scripts/init.lua");
         } else {
@@ -28,18 +28,16 @@ impl LuaScripting {
 
     /// Load a wave definition from Lua script
     pub fn load_wave(&self, wave_num: usize) -> LuaResult<LuaWaveDefinition> {
-        let wave_path = format!("scripts/waves/wave_{}.lua", wave_num);
+        let wave_path = format!("scripts/waves/wave_{wave_num}.lua");
 
         if !Path::new(&wave_path).exists() {
             return Err(LuaError::RuntimeError(format!(
-                "✘ Wave script not found: {}",
-                wave_path
+                "✘ Wave script not found: {wave_path}"
             )));
         }
 
-        let script = std::fs::read_to_string(&wave_path).map_err(|e| {
-            LuaError::RuntimeError(format!("✘ Failed to read {}: {}", wave_path, e))
-        })?;
+        let script = std::fs::read_to_string(&wave_path)
+            .map_err(|e| LuaError::RuntimeError(format!("✘ Failed to read {wave_path}: {e}")))?;
 
         // Execute script and get the wave table
         let wave_table: LuaTable = self.lua.load(&script).eval()?;

@@ -83,7 +83,7 @@ pub fn check_parry_projectiles(state: &mut GameState) {
 
     // If successful parry, deactivate and set cooldown
     if parried_count > 0 {
-        println!("✔ Parry ({} projectiles deflected)", parried_count);
+        println!("✔ Parry ({parried_count} projectiles deflected)");
         state.player.parry_active = false;
         state.player.parry_cooldown = state.config.player.parry_cooldown;
         shake_on_parry(state);
