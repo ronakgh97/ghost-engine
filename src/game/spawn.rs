@@ -1,5 +1,7 @@
 use crate::models::*;
 use macroquad::prelude::*;
+use macroquad::rand::gen_range;
+use crate::game::utils::biased_random_x;
 
 /// Spawn random enemies
 pub fn spawn_enemies(state: &mut GameState, delta: f32) {
@@ -10,7 +12,7 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
         state.spawn_timer = state.config.spawning.enemy_spawn_interval;
 
         //  Spawn pool:
-        let enemy_types = vec![
+        let enemy_types = [
             EntityType::BasicFighter,
             EntityType::BasicFighter,
             EntityType::Splitter,
@@ -50,10 +52,11 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             weapons
         };
 
-        // Create enemy at random X position
+        // Create enemy at center-biased random X position
         let enemy = Enemy {
             pos: Position {
-                x: rand::gen_range(40.0, screen_width() - 40.0),
+                //x: gen_range(50.0, screen_width() - 50.0)
+                x: biased_random_x(50.0, screen_width() - 50.0),
                 y: -30.0, // Above screen
             },
             stats: entity_stats,

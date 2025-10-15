@@ -33,6 +33,7 @@ pub fn calculate_velocity(from: Position, to: Position, speed: f32) -> Position 
 }
 
 use macroquad::prelude::screen_width;
+use macroquad::prelude::rand;
 
 /// Calculate ghost spawn position based on formation
 pub fn calculate_formation_position(
@@ -58,6 +59,16 @@ pub fn calculate_formation_position(
             calculate_circle_formation(player_pos, ghost_index, total_ghosts, config)
         }
     }
+}
+
+/// Generate a center-biased random X position for enemy spawning
+/// Uses a triangular distribution to favor center positions
+pub fn biased_random_x(min: f32, max: f32) -> f32 {
+    // Generate two random numbers and average them
+    // This creates a triangular distribution that peaks at the center
+    let r1 = rand::gen_range(min, max);
+    let r2 = rand::gen_range(min, max);
+    (r1 + r2) / 2.0
 }
 
 /// V-shaped formation (classic attack formation)

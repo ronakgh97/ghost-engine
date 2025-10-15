@@ -1,7 +1,8 @@
 use crate::models::*;
 use crate::scripting::LuaScripting;
-use macroquad::prelude::rand;
+use macroquad::prelude::*;
 use mlua::prelude::*;
+use crate::game::utils::biased_random_x;
 
 /// Manages wave progression and enemy spawning
 pub struct WaveManager {
@@ -117,7 +118,7 @@ impl WaveManager {
                     // Execute wave start callback
                     if let Some(callback) = self.on_start_callback.take() {
                         if let Err(e) = self.scripting.execute_wave_start(Some(callback)) {
-                            println!("✘ Wave start callback error: {}", e);
+                            println!("✘ Wave start callback error: {e}");
                         }
                     }
 
@@ -148,7 +149,7 @@ impl WaveManager {
                 // Wave just completed, execute callback
                 if let Some(callback) = self.on_complete_callback.take() {
                     if let Err(e) = self.scripting.execute_wave_complete(Some(callback)) {
-                        println!("✘ Wave complete callback error: {}", e);
+                        println!("✘ Wave complete callback error: {e}");
                     }
                 }
 
@@ -219,10 +220,11 @@ impl WaveManager {
                     weapons
                 };
 
-                // Create enemy
+                // Create enemy with center-biased random X position
                 let enemy = Enemy {
                     pos: Position {
-                        x: rand::gen_range(50.0, 750.0),
+                        //x: gen_range(50.0, screen_width() - 50.0)
+                        x: biased_random_x(50.0, screen_width() - 50.0),
                         y: -20.0,
                     },
                     stats: entity_stats,
