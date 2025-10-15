@@ -14,10 +14,16 @@ pub fn cancel_summon(state: &mut GameState) {
         state.player.available_ghosts.push(ghost.entity_type);
     }
 
-    // Clear all ghosts and their timers
-    state.ghosts.clear();
+    // Trigger despawn animation for all ghosts instead of instant clear
+    for ghost in &mut state.ghosts {
+        if !ghost.anim.is_despawning {
+            ghost.anim.start_despawn(state.config.animations.ghost_despawn_duration);
+        }
+    }
+    
+    // Clear timers immediately
     state.ghost_fire_timers.clear();
 
-    println!("✔ Cancel Deployed, {} ghost(s)!", ghost_count);
+    println!("✔ Cancel Deployed, {ghost_count} ghost(s)!");
     // TODO: Play despawn sound/effect
 }
