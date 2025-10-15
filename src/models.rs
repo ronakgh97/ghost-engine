@@ -192,6 +192,9 @@ pub struct Player {
     pub parry_success_scale_timer: f32, // Elastic bounce on successful deflection
     pub parry_failed_timer: f32,        // Shrink/desaturation on missed parry
     pub parry_stance_glow_timer: f32,   // Blue glow duration (independent from parry_active)
+    
+    // Hit feedback
+    pub hit_flash_timer: f32,           // White flash when taking damage
 }
 
 // Enemy
@@ -532,6 +535,9 @@ impl GameState {
                 parry_success_scale_timer: 0.0,
                 parry_failed_timer: 0.0,
                 parry_stance_glow_timer: 0.0,
+                
+                // Hit feedback initialized
+                hit_flash_timer: 0.0,
             },
             enemies: Vec::new(),
             ghosts: Vec::new(),

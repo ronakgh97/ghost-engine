@@ -8,6 +8,7 @@ pub fn check_projectile_collisions(state: &mut GameState) {
     let mut projectiles_to_remove = Vec::new();
     let collision_cfg = &state.config.collision;
     let mut player_was_hit = false; // Track if player took damage
+    let mut player_hit_position: Option<Position> = None; // Track hit position for particles
     let mut weapon_hits: Vec<(WeaponType, Position)> = Vec::new(); // Track weapon hits with positions
 
     for (proj_idx, projectile) in state.projectiles.iter().enumerate() {
@@ -71,6 +72,8 @@ pub fn check_projectile_collisions(state: &mut GameState) {
 
                     if distance_to_player <= projectile.explosion_radius {
                         state.player.stats.health -= projectile.damage;
+                        state.player.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on AOE hit!
+                        player_hit_position = Some(state.player.pos); // Track for particles
                         player_was_hit = true; // Mark for shake trigger
                         hit_player_or_ghost = true;
                     }
@@ -101,6 +104,8 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                         collision_cfg.player_radius,
                     ) {
                         state.player.stats.health -= projectile.damage;
+                        state.player.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on hit!
+                        player_hit_position = Some(state.player.pos); // Save position for particle spawn
                         player_was_hit = true; // Mark for shake trigger
                         // Enemy projectiles never pierce
                         projectiles_to_remove.push(proj_idx);
@@ -137,6 +142,11 @@ pub fn check_projectile_collisions(state: &mut GameState) {
     // Trigger screen shake if player was hit
     if player_was_hit {
         shake_on_player_hit(state);
+    }
+
+    // Spawn player hit particles if player was damaged
+    if let Some(hit_pos) = player_hit_position {
+        crate::game::particles::spawn_player_hit_effect(state, hit_pos);
     }
 
     // Trigger weapon-specific shake and particles for each hit

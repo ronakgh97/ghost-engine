@@ -5,12 +5,26 @@ use crate::models::*;
 
 /// Check entity-to-entity collisions
 pub fn check_entity_collisions(state: &mut GameState) {
-    // Player collision with enemies (gradual damage)
-    for enemy in &state.enemies {
-        if circle_collision(state.player.pos, enemy.pos, 15.0, 15.0) {
-            state.player.stats.health -= enemy.stats.damage * 0.016;
-        }
-    }
+    // TODO: Implement player-enemy collision damage later
+    // When implemented, add hit flash + particles:
+    // - state.player.hit_flash_timer = state.config.animations.hit_flash_duration;
+    // - spawn_player_hit_effect(state, player.pos);
+    
+    // let mut player_hit_position: Option<Position> = None; // Track for hit effects
+    // 
+    // // Player collision with enemies (gradual damage)
+    // for enemy in &state.enemies {
+    //     if circle_collision(state.player.pos, enemy.pos, 15.0, 15.0) {
+    //         state.player.stats.health -= enemy.stats.damage * 0.016;
+    //         state.player.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on contact!
+    //         player_hit_position = Some(state.player.pos); // Track for particles (only once per frame)
+    //     }
+    // }
+    // 
+    // // Spawn player hit particles if contact damage occurred
+    // if let Some(hit_pos) = player_hit_position {
+    //     crate::game::particles::spawn_player_hit_effect(state, hit_pos);
+    // }
 }
 
 /// Clean up dead entities and add enemies to ghost queue
