@@ -1,4 +1,5 @@
 use crate::config::AnimationConfig;
+use crate::game::animation;
 use crate::game::animation::*;
 use crate::models::*;
 
@@ -94,6 +95,9 @@ pub fn update_ghost_animations(
         if ghost.anim.is_despawning {
             update_ghost_despawn_animation(ghost, delta, config);
         }
+        
+        // Update hit flash (always runs, counts down to 0)
+        animation::update_hit_flash(&mut ghost.anim.hit_flash_timer, delta, config.hit_flash_duration);
     }
 
     // Remove ghosts that finished despawning
