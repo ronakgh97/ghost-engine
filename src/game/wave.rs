@@ -222,14 +222,15 @@ impl WaveManager {
 
                 // Generate spawn position and entry path
                 let spawn_x = biased_random_x(50.0, screen_width() - 50.0);
-                let movement_state = crate::game::spawn::create_wave_enemy_path(spawn.enemy_type, spawn_x);
-                
+                let movement_state =
+                    crate::game::spawn::create_wave_enemy_path(spawn.enemy_type, spawn_x);
+
                 // Get starting position from path
                 let start_pos = match &movement_state {
                     EnemyMovementState::FollowingPath { path, .. } => path.p0,
                     EnemyMovementState::FreeMovement => Position {
                         x: spawn_x,
-                        y: -20.0,
+                        y: -25.0,
                     },
                 };
 

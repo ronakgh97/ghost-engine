@@ -35,34 +35,41 @@ pub fn handle_enemy_splits(
                 0.0 // Single split goes straight down
             } else {
                 // Spread outward: left splits go left, right splits go right
-                let normalized_pos = (i as f32 - (split_count as f32 - 1.0) / 2.0) / (split_count as f32 / 2.0);
+                let normalized_pos =
+                    (i as f32 - (split_count as f32 - 1.0) / 2.0) / (split_count as f32 / 2.0);
                 normalized_pos * 80.0 + rand::gen_range(-20.0, 20.0) // ±80px base + randomness
             };
 
             let start_x = enemy.pos.x + x_offset;
             let start_y = enemy.pos.y + rand::gen_range(-10.0, 10.0);
-            
-            // Create short Bezier path for spread effect (reuse existing system!)
+
+            // Create short Bezier path for spread effect
             let spread_path = BezierPath {
-                p0: Position { x: start_x, y: start_y },
-                p1: Position { 
-                    x: start_x + spread_x * 0.5, 
-                    y: start_y + 40.0 
+                p0: Position {
+                    x: start_x,
+                    y: start_y,
                 },
-                p2: Position { 
-                    x: start_x + spread_x, 
-                    y: start_y + 80.0 
+                p1: Position {
+                    x: start_x + spread_x * 0.5,
+                    y: start_y + 40.0,
                 },
-                p3: Position { 
-                    x: start_x + spread_x, 
-                    y: start_y + 100.0 
+                p2: Position {
+                    x: start_x + spread_x,
+                    y: start_y + 80.0,
                 },
-                duration: rand::gen_range(0.5, 0.8), // Quick spread
+                p3: Position {
+                    x: start_x + spread_x,
+                    y: start_y + 100.0,
+                },
+                duration: rand::gen_range(1.25, 2.0), // Quick spread
                 use_cubic: true,
             };
 
             let split_enemy = Enemy {
-                pos: Position { x: start_x, y: start_y },
+                pos: Position {
+                    x: start_x,
+                    y: start_y,
+                },
                 stats: Stats {
                     health: split_hp,
                     max_health: split_hp,
@@ -83,8 +90,8 @@ pub fn handle_enemy_splits(
 
         // Console feedback
         //println!(
-            //"✓ Splitter split into {} enemies at ({:.0}, {:.0})!",
-            //split_count, enemy.pos.x, enemy.pos.y
+        //"✓ Splitter split into {} enemies at ({:.0}, {:.0})!",
+        //split_count, enemy.pos.x, enemy.pos.y
         //);
     }
 

@@ -25,7 +25,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let space_texture = match load_texture("assets/background/space_2.png").await {
+    let space_texture = match load_texture("assets/art/space_2.png").await {
         Ok(tex) => {
             println!("✓ Space background loaded successfully!");
             Some(tex)

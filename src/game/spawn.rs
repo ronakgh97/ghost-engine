@@ -11,7 +11,7 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
 
     match entity_type {
         EntityType::BasicFighter => {
-            // Random variant: 3 different entry styles
+            // Random variant
             let variant = gen_range(0, 3);
             let path = match variant {
                 0 => {
@@ -19,21 +19,21 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
                     BezierPath {
                         p0: Position {
                             x: spawn_x,
-                            y: -30.0,
+                            y: gen_range(-30.0, -10.0),
                         },
                         p1: Position {
                             x: spawn_x + gen_range(-80.0, 80.0),
-                            y: 40.0,
+                            y: gen_range(30.0, 45.0),
                         },
                         p2: Position {
                             x: spawn_x + gen_range(-40.0, 40.0),
-                            y: 100.0,
+                            y: gen_range(90.0, 120.0),
                         },
                         p3: Position {
                             x: spawn_x,
-                            y: 140.0,
+                            y: gen_range(100.0, 140.0),
                         },
-                        duration: gen_range(1.2, 1.8),
+                        duration: gen_range(1.5, 2.0),
                         use_cubic: true,
                     }
                 }
@@ -140,7 +140,7 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
                             x: 100.0,
                             y: gen_range(140.0, 170.0),
                         },
-                        duration: gen_range(1.8, 2.3),
+                        duration: gen_range(1.5, 2.5),
                         use_cubic: true,
                     }
                 }
@@ -187,7 +187,7 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
                             x: screen_w - 100.0,
                             y: gen_range(140.0, 170.0),
                         },
-                        duration: gen_range(1.8, 2.3),
+                        duration: gen_range(1.5, 2.5),
                         use_cubic: true,
                     }
                 }
@@ -223,7 +223,7 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
                             x: gen_range(100.0, 200.0),
                             y: gen_range(160.0, 200.0),
                         },
-                        duration: gen_range(2.2, 2.8),
+                        duration: gen_range(2.0, 3.0),
                         use_cubic: true,
                     }
                 } else {
@@ -241,7 +241,7 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
                             x: gen_range(screen_w - 200.0, screen_w - 100.0),
                             y: gen_range(160.0, 200.0),
                         },
-                        duration: gen_range(2.2, 2.8),
+                        duration: gen_range(2.5, 3.0),
                         use_cubic: true,
                     }
                 }
@@ -321,7 +321,7 @@ pub fn create_wave_enemy_path(entity_type: EntityType, spawn_x: f32) -> EnemyMov
                             x: screen_w / 2.0,
                             y: 120.0,
                         },
-                        duration: 2.2,
+                        duration: 2.0,
                         use_cubic: true,
                     }
                 }

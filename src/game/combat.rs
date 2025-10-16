@@ -4,7 +4,8 @@ use crate::game::utils::circle_collision;
 use crate::models::*;
 
 /// Check entity-to-entity collisions
-pub fn check_entity_collisions(state: &mut GameState) {
+#[allow(dead_code)] //TODO: may be useful later
+pub fn check_entity_collisions(_state: &mut GameState) {
     // TODO: Implement player-enemy collision damage later
     // When implemented, add hit flash + particles:
     // - state.player.hit_flash_timer = state.config.animations.hit_flash_duration;

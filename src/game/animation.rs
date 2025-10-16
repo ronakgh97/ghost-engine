@@ -4,6 +4,7 @@ use macroquad::prelude::*;
 /// All functions take normalized time t (0.0 to 1.0) and return eased value (0.0 to 1.0)
 
 /// Linear interpolation - no easing
+#[allow(dead_code)] //TODO: may be useful later
 pub fn linear(t: f32) -> f32 {
     t
 }
@@ -19,6 +20,7 @@ pub fn ease_out_quad(t: f32) -> f32 {
 }
 
 /// Ease in-out quadratic - smooth both ends
+#[allow(dead_code)] //TODO: may be useful later
 pub fn ease_in_out_quad(t: f32) -> f32 {
     if t < 0.5 {
         2.0 * t * t
@@ -28,11 +30,13 @@ pub fn ease_in_out_quad(t: f32) -> f32 {
 }
 
 /// Ease in cubic - stronger acceleration
+#[allow(dead_code)] //TODO: may be useful later
 pub fn ease_in_cubic(t: f32) -> f32 {
     t * t * t
 }
 
 /// Ease out cubic - stronger deceleration
+#[allow(dead_code)] //TODO: may be useful later
 pub fn ease_out_cubic(t: f32) -> f32 {
     let t1 = t - 1.0;
     t1 * t1 * t1 + 1.0
@@ -50,6 +54,7 @@ pub fn ease_out_elastic(t: f32) -> f32 {
 }
 
 /// Ease out bounce - bouncy landing
+#[allow(dead_code)] //TODO: may be useful later
 pub fn ease_out_bounce(t: f32) -> f32 {
     if t < 1.0 / 2.75 {
         7.5625 * t * t
@@ -66,11 +71,13 @@ pub fn ease_out_bounce(t: f32) -> f32 {
 }
 
 /// Linear interpolation between two values
+#[allow(dead_code)] //TODO: may be useful later
 pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
     a + (b - a) * t
 }
 
 /// Linear interpolation between two colors
+#[allow(dead_code)] //TODO: may be useful later
 pub fn lerp_color(a: Color, b: Color, t: f32) -> Color {
     Color::new(
         lerp(a.r, b.r, t),
@@ -81,11 +88,13 @@ pub fn lerp_color(a: Color, b: Color, t: f32) -> Color {
 }
 
 /// Oscillate using sine wave
+#[allow(dead_code)] //TODO: may be useful later
 pub fn oscillate(time: f32, frequency: f32, amplitude: f32, offset: f32) -> f32 {
     offset + amplitude * (time * frequency * std::f32::consts::TAU).sin()
 }
 
 /// Simple noise approximation for wiggle effects
+#[allow(dead_code)] //TODO: may be useful later
 pub fn wiggle(time: f32, seed: f32) -> f32 {
     ((time * 10.0 + seed).sin() * 1000.0).sin()
 }

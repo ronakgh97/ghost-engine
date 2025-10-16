@@ -44,7 +44,7 @@ pub fn quadratic_bezier(p0: Position, p1: Position, p2: Position, t: f32) -> Pos
 }
 
 /// Get the tangent (direction) of a cubic Bezier curve at point t
-/// Useful for orienting sprites along the path
+#[allow(dead_code)] //TODO: may be useful later
 pub fn cubic_bezier_tangent(
     p0: Position,
     p1: Position,

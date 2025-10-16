@@ -177,7 +177,7 @@ pub fn render_ui(state: &GameState) {
 
     // Parry status
     let (parry_text, parry_color) = if state.player.parry_active {
-        ("PARRY ACTIVE", BLUE)
+        ("Parry Active", BLUE)
     } else if state.player.parry_cooldown > 0.0 {
         ("Parry Cooldown", RED)
     } else {
@@ -242,7 +242,7 @@ fn draw_panel(x: f32, y: f32, w: f32, h: f32) {
     // Shadow
     draw_rectangle(x + 4.0, y + 4.0, w, h, Color::from_rgba(0, 0, 0, 100));
     // Background
-    draw_rectangle(x, y, w, h, Color::from_rgba(0, 0, 0, 50));
+    draw_rectangle(x, y, w, h, Color::from_rgba(0, 0, 0, 10));
     // Border
     draw_rectangle_lines(x, y, w, h, 4.0, Color::from_rgba(100, 150, 200, 180));
 }
@@ -262,19 +262,19 @@ fn draw_stat_bar(x: f32, y: f32, w: f32, h: f32, ratio: f32, color: Color, label
 /// Draw player entity with enhanced visuals
 fn draw_player(player: &Player, state: &GameState) {
     let anim_cfg = &state.config.animations;
-    
+
     // Calculate parry animation states
     let mut player_scale = 1.0;
     let mut player_color_blend = 0.0; // 0.0 = normal, 1.0 = desaturated
-    
-    // Success animation: Elastic bounce (1.0 → 1.3 → 1.0)
+
+    // Success animation: Elastic bounce (1.0 → 1.0 + max_window ~ 0.3 → 1.0)
     if player.parry_success_scale_timer > 0.0 {
         let t = 1.0 - (player.parry_success_scale_timer / anim_cfg.parry_success_duration);
         // Use ease_out_elastic for satisfying bounce
         let bounce_t = crate::game::animation::ease_out_elastic(t);
         player_scale = 1.0 + (anim_cfg.parry_success_scale_max - 1.0) * (1.0 - bounce_t);
     }
-    
+
     // Failed animation: Shrink (1.0 → 0.85 → 1.0) + desaturation
     if player.parry_failed_timer > 0.0 {
         let t = player.parry_failed_timer / anim_cfg.parry_failed_duration;
@@ -283,19 +283,19 @@ fn draw_player(player: &Player, state: &GameState) {
         player_scale = 1.0 - (1.0 - anim_cfg.parry_failed_scale_min) * shrink_t;
         player_color_blend = shrink_t * 0.5; // Desaturate up to 50%
     }
-    
+
     // Apply scale to all radii
     let glow_radius = 20.0 * player_scale;
     let body_radius = 15.0 * player_scale;
     let core_radius = 10.0 * player_scale;
-    
+
     // Calculate hit flash intensity
     let hit_flash_intensity = if player.hit_flash_timer > 0.0 {
         (player.hit_flash_timer / anim_cfg.hit_flash_duration) * 0.8 // 80% max intensity
     } else {
         0.0
     };
-    
+
     // Base colors with desaturation effect
     let base_white = Color::new(
         1.0 - player_color_blend * 0.3,
@@ -309,7 +309,7 @@ fn draw_player(player: &Player, state: &GameState) {
         0.92 - player_color_blend * 0.3,
         1.0,
     );
-    
+
     // Apply hit flash (lerp toward white)
     let white_color = Color::new(
         base_white.r + (1.0 - base_white.r) * hit_flash_intensity,
@@ -323,17 +323,18 @@ fn draw_player(player: &Player, state: &GameState) {
         base_skyblue.b + (1.0 - base_skyblue.b) * hit_flash_intensity,
         base_skyblue.a,
     );
-    
+
     // Draw parry stance glow BEFORE player (behind everything)
     // Now uses stance_glow_timer instead of parry_active for independent control!
     if player.parry_stance_glow_timer > 0.0 {
         let time = macroquad::time::get_time() as f32;
-        let pulse = (time * anim_cfg.parry_stance_pulse_speed * std::f32::consts::TAU).sin() * 0.5 + 0.5;
-        
+        let pulse =
+            (time * anim_cfg.parry_stance_pulse_speed * std::f32::consts::TAU).sin() * 0.5 + 0.5;
+
         // Calculate base glow intensity with smooth fade-out
         let fade_t = player.parry_stance_glow_timer / anim_cfg.parry_stance_glow_duration;
         let base_intensity = anim_cfg.parry_stance_glow_intensity * fade_t;
-        
+
         // Add burst effect on successful parry!
         let burst_multiplier = if player.parry_success_scale_timer > 0.0 {
             // Glow BURSTS brighter at the start of success animation, then fades
@@ -342,9 +343,9 @@ fn draw_player(player: &Player, state: &GameState) {
         } else {
             1.0 // Normal intensity
         };
-        
+
         let glow_intensity = base_intensity * pulse * burst_multiplier;
-        
+
         // Pulsing blue aura (with burst effect!)
         draw_circle(
             player.pos.x,
@@ -352,7 +353,7 @@ fn draw_player(player: &Player, state: &GameState) {
             glow_radius + 15.0,
             Color::new(0.0, 0.5, 1.0, glow_intensity * 0.4),
         );
-        
+
         // Expanding shield ring (with burst effect!)
         let ring_radius = state.config.collision.player_radius + 25.0;
         let ring_pulse = (time * 10.0).sin() as f32 * 3.0;
@@ -371,7 +372,7 @@ fn draw_player(player: &Player, state: &GameState) {
             Color::new(0.53, 0.81, 0.92, glow_intensity * 0.8),
         );
     }
-    
+
     // Dash glow effect (blue speed glow during dash)
     if player.is_dashing {
         let dash_glow_intensity = state.config.dash.glow_intensity;
@@ -388,7 +389,7 @@ fn draw_player(player: &Player, state: &GameState) {
             Color::new(0.53, 0.81, 0.92, dash_glow_intensity), // Bright core
         );
     }
-    
+
     // Player glow effect (with scale and hit flash)
     // When hit, add red/orange warning glow!
     let glow_color = if hit_flash_intensity > 0.0 {
@@ -401,7 +402,7 @@ fn draw_player(player: &Player, state: &GameState) {
     } else {
         Color::new(1.0, 1.0, 1.0, 0.2) // Normal white glow
     };
-    
+
     draw_circle(
         player.pos.x,
         player.pos.y,
@@ -425,13 +426,13 @@ fn draw_player(player: &Player, state: &GameState) {
         4.0,
         GREEN,
     );
-    
+
     // Dash cooldown indicator (circular ring around player)
     if state.config.dash.enabled && player.dash_cooldown_timer > 0.0 {
         let cooldown_ratio = player.dash_cooldown_timer / state.config.dash.cooldown;
         let ring_radius = state.config.collision.player_radius + 20.0;
         let arc_length = std::f32::consts::TAU * (1.0 - cooldown_ratio); // Full circle when ready
-        
+
         // Draw arc showing cooldown progress
         // Note: macroquad doesn't have draw_arc, so we'll use circle segments
         let segments = 32;
@@ -439,14 +440,17 @@ fn draw_player(player: &Player, state: &GameState) {
         for i in 0..segments {
             let angle1 = i as f32 * angle_per_segment - std::f32::consts::PI / 2.0; // Start at top
             let angle2 = (i + 1) as f32 * angle_per_segment - std::f32::consts::PI / 2.0;
-            
+
             let x1 = player.pos.x + angle1.cos() * ring_radius;
             let y1 = player.pos.y + angle1.sin() * ring_radius;
             let x2 = player.pos.x + angle2.cos() * ring_radius;
             let y2 = player.pos.y + angle2.sin() * ring_radius;
-            
+
             draw_line(
-                x1, y1, x2, y2,
+                x1,
+                y1,
+                x2,
+                y2,
                 state.config.dash.cooldown_ring_thickness,
                 Color::new(0.0, 0.7, 1.0, 0.6), // Cyan, semi-transparent
             );
@@ -459,7 +463,7 @@ fn draw_enemies(enemies: &[Enemy]) {
     for enemy in enemies {
         // Apply animation state
         let anim = &enemy.anim;
-        
+
         // Draw healing field for healers (pulsing green circle)
         if enemy.entity_type == EntityType::Healer {
             // Pulse effect using sine wave
@@ -485,7 +489,7 @@ fn draw_enemies(enemies: &[Enemy]) {
         }
 
         let base_color = get_enemy_color(enemy.entity_type);
-        
+
         // Apply hit flash (lerp toward white when hit)
         let flash_intensity = anim.hit_flash_timer / 0.15; // Normalize (assumes 0.15s duration)
         let color = Color::new(
@@ -534,11 +538,11 @@ fn draw_ghosts(ghosts: &[Ghost]) {
         let anim = &ghost.anim;
         let base_radius = 12.0;
         let glow_radius = 18.0;
-        
+
         // Apply scale and alpha from animation
         let radius = base_radius * anim.scale;
         let glow_rad = glow_radius * anim.scale;
-        
+
         // Draw healing field for healer ghosts (pulsing green circle)
         if ghost.entity_type == EntityType::Healer {
             // Pulse effect using sine wave
@@ -564,7 +568,7 @@ fn draw_ghosts(ghosts: &[Ghost]) {
         }
 
         let base_color = get_ghost_color(ghost.entity_type);
-        
+
         // Apply hit flash (lerp toward white when hit)
         let flash_intensity = anim.hit_flash_timer / 0.15; // Normalize (assumes 0.15s duration)
         let color = Color::new(
@@ -595,7 +599,7 @@ fn draw_ghosts(ghosts: &[Ghost]) {
             let health_ratio = ghost.stats.health / ghost.stats.max_health;
             let bar_width = 24.0 * anim.scale;
             let bar_offset = radius + 7.0;
-            
+
             draw_rectangle(
                 ghost.pos.x - bar_width / 2.0,
                 ghost.pos.y - bar_offset,
@@ -655,8 +659,10 @@ fn draw_projectiles(projectiles: &[Projectile]) {
 
         // Missile fins
         if matches!(proj.weapon_type, WeaponType::Missile) {
+            draw_circle(proj.pos.x - 5.0, proj.pos.y + 5.0, 2.0, GRAY);
+            draw_circle(proj.pos.x - 5.0, proj.pos.y - 5.0, 2.0, GRAY);
             draw_circle(proj.pos.x + 5.0, proj.pos.y + 5.0, 2.0, GRAY);
-            draw_circle(proj.pos.x + 5.0, proj.pos.y + 5.0, 2.0, GRAY);
+            draw_circle(proj.pos.x + 5.0, proj.pos.y - 5.0, 2.0, GRAY);
         }
     }
 }
