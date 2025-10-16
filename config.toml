@@ -19,6 +19,11 @@ parry_cooldown = 1.5
 parry_window = 0.3
 parry_energy_cost = 5.0
 
+# Physics-based movement
+acceleration = 2500.0       # How fast you speed up (px/s²) - higher = more responsive
+friction = 0.96             # Momentum decay (0.96 = 4% slowdown/frame) - lower = more drift
+responsiveness = 12.0       # Turn speed (higher = tighter turns) - affects direction changes
+
 [energy]
 regen_rate_idle = 30.0
 regen_rate_active = 1.0
@@ -186,17 +191,17 @@ explosion_speed_max = 150.0
 spark_count = 10                 # Number of sparks per hit
 spark_lifetime_min = 0.15       # Fast-fading sparks
 spark_lifetime_max = 0.3
-spark_size_min = 2.0           
+spark_size_min = 2.0
 spark_size_max = 4.0
 spark_speed_min = 80.0
 spark_speed_max = 200.0
 
 # Weapon-specific particle counts
-bullet_particle_count = 10      
-laser_particle_count = 18        
-missile_particle_count = 12     
-plasma_particle_count = 6       
-bomb_red_particle_count = 20  
+bullet_particle_count = 10
+laser_particle_count = 18
+missile_particle_count = 12
+plasma_particle_count = 6
+bomb_red_particle_count = 20
 bomb_orange_particle_count = 15
 
 # Death explosion counts
@@ -234,30 +239,30 @@ ghost_despawn_duration = 0.4        # Total despawn time (seconds)
 ghost_despawn_rotation_speed = 12.0 # Rotation speed during despawn (rad/s)
 
 # Hit flash effect (damage feedback)
-hit_flash_duration = 0.15           # Flash duration (seconds) - 150ms is snappy
-hit_flash_intensity = 0.8           # White blend amount (0.0-1.0) - 0.8 = strong flash
+hit_flash_duration = 0.15           # Flash duration (seconds)
+hit_flash_intensity = 0.8           # White blend amount (0.0-1.0)
 
 # Parry animations (defensive stance + success/fail feedback)
 parry_stance_glow_intensity = 0.6   # Glow brightness while parry active (0.0-1.0)
 parry_stance_pulse_speed = 4.0      # Pulse frequency (Hz) - 4 = urgent/fast
-parry_stance_glow_duration = 0.5    # Stance glow duration (seconds) - outlasts parry window!
-parry_success_glow_burst = 2.0      # Glow burst multiplier on success (2.0 = 200% BRIGHT!)
-parry_success_duration = 0.3        # Elastic bounce duration on success (seconds)
-parry_success_scale_max = 1.3       # Max scale during success (1.3 = 130% - big pop!)
+parry_stance_glow_duration = 0.5    # Stance glow duration (seconds) - outlasts parry window
+parry_success_glow_burst = 2.0      # Glow burst multiplier on success
+parry_success_duration = 0.3        # Elastic bounce duration on success
+parry_success_scale_max = 1.3       # Max scale during success
 parry_failed_duration = 0.25        # Shrink duration on missed parry (seconds)
-parry_failed_scale_min = 0.85       # Min scale during failed (0.85 = 85% - defeat feel)
+parry_failed_scale_min = 0.85       # Min scale during failed (defeat feeling)
 
 # Dash mechanic configuration (Shift + WASD)
 [dash]
 enabled = true                      # Master toggle for dash mechanic
-distance = 120.0                    # How far the dash travels (pixels)
-duration = 0.15                     # Dash movement duration (seconds) - 150ms = fast!
-i_frame_duration = 0.2              # Invincibility window (seconds) - can dodge through bullets!
+distance = 120.0                    # How far the dash travels
+duration = 0.15                     # Dash movement duration
+i_frame_duration = 0.2              # Invincibility window
 energy_cost = 30.0                  # Energy consumed per dash
-cooldown = 0.5                      # Minimum time between dashes (seconds)
+cooldown = 0.5
 
 # Visual effects
-trail_particle_count = 3            # Particles spawned per trail spawn
-trail_spawn_rate = 60.0             # Trails per second during dash (60 = smooth)
-glow_intensity = 0.7                # Blue glow intensity during dash (0.0-1.0)
-cooldown_ring_thickness = 3.0       # Thickness of cooldown indicator ring (pixels)
+trail_particle_count = 3
+trail_spawn_rate = 60.0
+glow_intensity = 0.7
+cooldown_ring_thickness = 3.0

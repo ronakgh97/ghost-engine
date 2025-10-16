@@ -53,6 +53,11 @@ fn default_player() -> PlayerConfig {
         parry_cooldown: 1.5,
         parry_window: 0.3,
         parry_energy_cost: 5.0,
+
+        // Physics-based movement
+        acceleration: 5000.0, // Fast acceleration for responsive feel
+        friction: 1.0,        // Gentle drift (4% slowdown per frame)
+        responsiveness: 15.0, // Fast turn speed
     }
 }
 
@@ -68,23 +73,23 @@ fn default_entities() -> EntitiesConfig {
         basic_fighter: EntityStats {
             health: 50.0,
             damage: 10.0,
-            energy_cost: 15.0,
+            energy_cost: 10.0,
             fire_interval: 2.0,
-            weapons: vec!["Bullet".to_string()], // Simple straight shots
+            weapons: vec!["Bullet".to_string()],
         },
         sniper: EntityStats {
             health: 30.0,
             damage: 25.0,
             energy_cost: 25.0,
-            fire_interval: 4.0,
-            weapons: vec!["Laser".to_string()], // Piercing beam
+            fire_interval: 3.5,
+            weapons: vec!["Laser".to_string()],
         },
         tank: EntityStats {
             health: 150.0,
             damage: 15.0,
             energy_cost: 40.0,
             fire_interval: 1.5,
-            weapons: vec!["Missile".to_string(), "Plasma".to_string()], // Homing + Spread
+            weapons: vec!["Missile".to_string()],
         },
         elite: EntityStats {
             health: 500.0,
@@ -127,12 +132,12 @@ fn default_weapons() -> WeaponsConfig {
         bullet: WeaponStats {
             damage: 10.0,
             fire_rate: 0.1,
-            projectile_speed: 500.0,
+            projectile_speed: 350.0,
         },
         laser: WeaponStats {
             damage: 60.0,
             fire_rate: 1.5,
-            projectile_speed: 800.0,
+            projectile_speed: 850.0,
         },
         missile: WeaponStats {
             damage: 30.0,
@@ -290,10 +295,10 @@ fn default_particles() -> ParticleConfig {
         size_decay: 8.0, // Shrinks 8 pixels/sec
 
         // Projectile trails
-        trails_enabled: true,        // Trails enabled by default
+        trails_enabled: true, // Trails enabled by default
         trail_spawn_interval: 0.01,
         trail_lifetime: 0.4,
-        trail_size: 3.5,             
+        trail_size: 3.5,
     }
 }
 
@@ -306,25 +311,25 @@ fn default_background() -> BackgroundConfig {
 fn default_animations() -> AnimationConfig {
     AnimationConfig {
         // Ghost spawn animation (elastic bounce-in)
-        ghost_spawn_duration: 0.5,        // 500ms spawn time
-        ghost_spawn_scale_start: 0.3,     // Start at 30% size
-        ghost_spawn_rotation_speed: 8.0,  // 8 rad/s rotation during spawn
-        
+        ghost_spawn_duration: 0.5,       // 500ms spawn time
+        ghost_spawn_scale_start: 0.3,    // Start at 30% size
+        ghost_spawn_rotation_speed: 8.0, // 8 rad/s rotation during spawn
+
         // Ghost despawn animation
-        ghost_despawn_duration: 0.4,      // 400ms despawn time
+        ghost_despawn_duration: 0.4,        // 400ms despawn time
         ghost_despawn_rotation_speed: 12.0, // 12 rad/s rotation during despawn
-        
+
         // Hit flash effect (damage feedback)
-        hit_flash_duration: 0.18,         // 180ms flash
-        hit_flash_intensity: 0.8,         // 80% white blend
-        
+        hit_flash_duration: 0.18, // 180ms flash
+        hit_flash_intensity: 0.8, // 80% white blend
+
         // Parry animations (defensive stance + success/fail feedback)
         parry_stance_glow_intensity: 0.6, // 60% glow brightness
         parry_stance_pulse_speed: 4.0,    // 4 Hz pulse (fast, urgent feel)
-        parry_stance_glow_duration: 0.5,  // 500ms stance glow (outlasts parry window!)
-        parry_success_glow_burst: 2.0,    // 200% burst on success (BRIGHT flash!)
+        parry_stance_glow_duration: 0.5,  // 500ms stance glow (outlasts parry window)
+        parry_success_glow_burst: 2.0,    // 200% burst on success
         parry_success_duration: 0.3,      // 300ms elastic bounce
-        parry_success_scale_max: 1.3,     // 130% max scale (satisfying pop!)
+        parry_success_scale_max: 1.3,     // 130% max scale
         parry_failed_duration: 0.25,      // 250ms shrink
         parry_failed_scale_min: 0.85,     // 85% min scale (failure feel)
     }
@@ -332,17 +337,17 @@ fn default_animations() -> AnimationConfig {
 
 fn default_dash() -> DashConfig {
     DashConfig {
-        enabled: true,                    // Dash enabled by default
-        distance: 120.0,                  // 120 pixels dash distance
-        duration: 0.15,                   // 150ms dash duration (fast!)
-        i_frame_duration: 0.2,            // 200ms invincibility (can dash through bullets!)
-        energy_cost: 30.0,                // 30 energy per dash
-        cooldown: 0.5,                    // 500ms cooldown between dashes
-        
+        enabled: true,         // Dash enabled by default
+        distance: 120.0,       // 120 pixels dash distance
+        duration: 0.15,        // 150ms dash duration
+        i_frame_duration: 0.2, // 200ms invincibility (can dash through bullets)
+        energy_cost: 30.0,     // 30 energy per dash
+        cooldown: 0.5,         // 500ms cooldown between dashes
+
         // Visual effects
-        trail_particle_count: 3,          // 3 afterimage particles per trail spawn
-        trail_spawn_rate: 60.0,           // 60 trails/second (smooth trail)
-        glow_intensity: 0.7,              // 70% blue glow during dash
-        cooldown_ring_thickness: 3.0,     // 3px ring thickness for cooldown indicator
+        trail_particle_count: 3, // 3 afterimage particles per trail spawn
+        trail_spawn_rate: 60.0,  // 60 trails/second (smooth trail)
+        glow_intensity: 0.7,     // 70% blue glow during dash
+        cooldown_ring_thickness: 3.0, // 3px ring thickness for cooldown indicator
     }
 }

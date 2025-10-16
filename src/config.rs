@@ -45,6 +45,11 @@ pub struct PlayerConfig {
     pub parry_cooldown: f32,
     pub parry_window: f32,
     pub parry_energy_cost: f32,
+
+    // Physics-based movement
+    pub acceleration: f32,   // How fast you speed up (px/s²)
+    pub friction: f32,       // Momentum decay (0.88 = 12% slowdown/frame)
+    pub responsiveness: f32, // How quickly you change direction (higher = tighter turns)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -308,18 +313,18 @@ impl Default for GameConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnimationConfig {
     // Ghost spawn animation
-    pub ghost_spawn_duration: f32,      // Total spawn animation time
-    pub ghost_spawn_scale_start: f32,   // Starting scale (0.3 = 30% size)
-    pub ghost_spawn_rotation_speed: f32,// Rotation while spawning (rad/s)
-    
+    pub ghost_spawn_duration: f32,       // Total spawn animation time
+    pub ghost_spawn_scale_start: f32,    // Starting scale (0.3 = 30% size)
+    pub ghost_spawn_rotation_speed: f32, // Rotation while spawning (rad/s)
+
     // Ghost despawn animation
-    pub ghost_despawn_duration: f32,    // Total despawn animation time
+    pub ghost_despawn_duration: f32, // Total despawn animation time
     pub ghost_despawn_rotation_speed: f32, // Spin speed while despawning (rad/s)
-    
+
     // Hit flash effect (when taking damage)
-    pub hit_flash_duration: f32,        // How long the flash lasts (seconds)
-    pub hit_flash_intensity: f32,       // How much white to blend (0.0-1.0)
-    
+    pub hit_flash_duration: f32,  // How long the flash lasts (seconds)
+    pub hit_flash_intensity: f32, // How much white to blend (0.0-1.0)
+
     // Parry animations
     pub parry_stance_glow_intensity: f32, // Glow brightness while parry active (0.0-1.0)
     pub parry_stance_pulse_speed: f32,    // How fast stance glow pulses (Hz)
@@ -334,16 +339,16 @@ pub struct AnimationConfig {
 // Dash mechanic configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DashConfig {
-    pub enabled: bool,               // Master toggle for dash mechanic
-    pub distance: f32,               // How far the dash travels (pixels)
-    pub duration: f32,               // How long the dash movement lasts (seconds)
-    pub i_frame_duration: f32,       // Invincibility window (seconds)
-    pub energy_cost: f32,            // Energy consumed per dash
-    pub cooldown: f32,               // Minimum time between dashes (seconds)
-    
+    pub enabled: bool,         // Master toggle for dash mechanic
+    pub distance: f32,         // How far the dash travels (pixels)
+    pub duration: f32,         // How long the dash movement lasts (seconds)
+    pub i_frame_duration: f32, // Invincibility window (seconds)
+    pub energy_cost: f32,      // Energy consumed per dash
+    pub cooldown: f32,         // Minimum time between dashes (seconds)
+
     // Visual effects
-    pub trail_particle_count: i32,   // Particles spawned during dash trail
-    pub trail_spawn_rate: f32,       // Trails per second during dash
-    pub glow_intensity: f32,         // Blue glow intensity during dash (0.0-1.0)
-    pub cooldown_ring_thickness: f32,// Thickness of cooldown indicator ring
+    pub trail_particle_count: i32, // Particles spawned during dash trail
+    pub trail_spawn_rate: f32,     // Trails per second during dash
+    pub glow_intensity: f32,       // Blue glow intensity during dash (0.0-1.0)
+    pub cooldown_ring_thickness: f32, // Thickness of cooldown indicator ring
 }
