@@ -39,19 +39,11 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
                 // Interpolate position along Bezier curve
                 if path.use_cubic {
                     enemy.pos = crate::game::bezier::cubic_bezier(
-                        path.p0,
-                        path.p1,
-                        path.p2,
-                        path.p3,
-                        *progress,
+                        path.p0, path.p1, path.p2, path.p3, *progress,
                     );
                 } else {
-                    enemy.pos = crate::game::bezier::quadratic_bezier(
-                        path.p0,
-                        path.p1,
-                        path.p2,
-                        *progress,
-                    );
+                    enemy.pos =
+                        crate::game::bezier::quadratic_bezier(path.p0, path.p1, path.p2, *progress);
                 }
 
                 // Transition to free movement when path complete

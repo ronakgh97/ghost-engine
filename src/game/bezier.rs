@@ -2,7 +2,7 @@ use crate::models::Position;
 
 /// Cubic Bezier curve interpolation
 /// P(t) = (1-t)³*P0 + 3(1-t)²*t*P1 + 3(1-t)*t²*P2 + t³*P3
-/// 
+///
 /// # Arguments
 /// * `p0` - Start point
 /// * `p1` - First control point
@@ -25,7 +25,7 @@ pub fn cubic_bezier(p0: Position, p1: Position, p2: Position, p3: Position, t: f
 
 /// Quadratic Bezier curve interpolation (simpler, 3 points)
 /// P(t) = (1-t)²*P0 + 2(1-t)*t*P1 + t²*P2
-/// 
+///
 /// # Arguments
 /// * `p0` - Start point
 /// * `p1` - Control point
@@ -45,7 +45,13 @@ pub fn quadratic_bezier(p0: Position, p1: Position, p2: Position, t: f32) -> Pos
 
 /// Get the tangent (direction) of a cubic Bezier curve at point t
 /// Useful for orienting sprites along the path
-pub fn cubic_bezier_tangent(p0: Position, p1: Position, p2: Position, p3: Position, t: f32) -> Position {
+pub fn cubic_bezier_tangent(
+    p0: Position,
+    p1: Position,
+    p2: Position,
+    p3: Position,
+    t: f32,
+) -> Position {
     let t = t.clamp(0.0, 1.0);
     let t2 = t * t;
     let mt = 1.0 - t;

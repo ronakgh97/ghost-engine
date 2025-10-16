@@ -51,7 +51,7 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
     update_player(state, delta);
     update_enemies(state, delta);
     update_ghosts(state, delta);
-    
+
     // Update ghost animations (spawn/despawn effects)
     ghost_animation::update_ghost_animations(&mut state.ghosts, delta, &state.config.animations);
 
