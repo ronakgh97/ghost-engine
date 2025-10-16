@@ -7,24 +7,42 @@ use macroquad::input::*;
 pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
     // Dash input (Shift + WASD) - Handle BEFORE normal movement!
     handle_dash_input(game_state);
-    
-    // Player movement (only if not dashing)
+
+    // Player movement input (only if not dashing)
+    // We now just calculate input direction, actual movement happens in player.rs with physics
     if !game_state.player.is_dashing {
+        let mut input_direction = (0.0, 0.0);
+
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-            game_state.player.pos.y += game_state.config.player.movement_speed * delta_time;
+            input_direction.1 += 1.0;
         }
-
         if is_key_down(KeyCode::Up) || is_key_down(KeyCode::W) {
-            game_state.player.pos.y -= game_state.config.player.movement_speed * delta_time;
+            input_direction.1 -= 1.0;
         }
-
         if is_key_down(KeyCode::Left) || is_key_down(KeyCode::A) {
-            game_state.player.pos.x -= game_state.config.player.movement_speed * delta_time;
+            input_direction.0 -= 1.0;
+        }
+        if is_key_down(KeyCode::Right) || is_key_down(KeyCode::D) {
+            input_direction.0 += 1.0;
         }
 
-        if is_key_down(KeyCode::Right) || is_key_down(KeyCode::D) {
-            game_state.player.pos.x += game_state.config.player.movement_speed * delta_time;
+        // Normalize diagonal movement
+        let magnitude = ((input_direction.0 * input_direction.0
+            + input_direction.1 * input_direction.1) as f32)
+            .sqrt();
+        if magnitude > 0.0 {
+            input_direction.0 /= magnitude;
+            input_direction.1 /= magnitude;
         }
+
+        // Store input direction for physics-based movement
+        game_state.player.input_direction = crate::models::Position {
+            x: input_direction.0,
+            y: input_direction.1,
+        };
+    } else {
+        // No input during dash
+        game_state.player.input_direction = crate::models::Position { x: 0.0, y: 0.0 };
     }
 
     // Fire Bullets
@@ -213,21 +231,21 @@ fn spawn_formation(state: &mut GameState) {
 /// Handle dash input with 8-directional movement
 fn handle_dash_input(state: &mut GameState) {
     let dash_cfg = &state.config.dash;
-    
+
     // Can't dash if disabled, already dashing, or on cooldown
     if !dash_cfg.enabled || state.player.is_dashing || state.player.dash_cooldown_timer > 0.0 {
         return;
     }
-    
+
     // Check if Shift is held
     if !is_key_down(KeyCode::LeftShift) && !is_key_down(KeyCode::RightShift) {
         return;
     }
-    
+
     // Calculate dash direction from WASD input
     let mut dir_x = 0.0;
     let mut dir_y = 0.0;
-    
+
     if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
         dir_y = -1.0;
     }
@@ -240,26 +258,26 @@ fn handle_dash_input(state: &mut GameState) {
     if is_key_down(KeyCode::D) || is_key_down(KeyCode::Right) {
         dir_x = 1.0;
     }
-    
+
     // No direction = no dash
     if dir_x == 0.0 && dir_y == 0.0 {
         return;
     }
-    
+
     // Normalize diagonal directions
     // Diagonal movement would be sqrt(1^2 + 1^2) = 1.414x faster without normalization
     let magnitude = ((dir_x * dir_x + dir_y * dir_y) as f32).sqrt();
     dir_x /= magnitude;
     dir_y /= magnitude;
-    
+
     // Check energy requirement
     if state.player.energy < dash_cfg.energy_cost {
         return; // Not enough energy!
     }
-    
+
     // Consume energy
     state.player.energy -= dash_cfg.energy_cost;
-    
+
     // Activate dash!
     state.player.is_dashing = true;
     state.player.dash_timer = dash_cfg.duration;

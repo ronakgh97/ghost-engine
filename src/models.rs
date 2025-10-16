@@ -177,8 +177,9 @@ impl EntityType {
 // Player
 pub struct Player {
     pub pos: Position,
-    pub last_pos: Position,             // Previous frame position (for velocity calculation)
-    pub velocity: Position,             // Current movement velocity (for lead targeting)
+    pub last_pos: Position, // Previous frame position (for velocity calculation)
+    pub velocity: Position, // Current movement velocity (for lead targeting)
+    pub input_direction: Position, // Input direction from WASD (normalized, for physics)
     pub stats: Stats,
     pub energy: f32,
     pub max_energy: f32,
@@ -189,22 +190,22 @@ pub struct Player {
     pub parry_cooldown: f32, // Time until parry available again
     pub parry_window: f32,   // How long parry is active (0.2 seconds)
     pub parry_active: bool,  // Currently in parry stance
-    
+
     // Parry animations
     pub parry_success_scale_timer: f32, // Elastic bounce on successful deflection
     pub parry_failed_timer: f32,        // Shrink/desaturation on missed parry
     pub parry_stance_glow_timer: f32,   // Blue glow duration (independent from parry_active)
-    
+
     // Hit feedback
-    pub hit_flash_timer: f32,           // White flash when taking damage
-    
+    pub hit_flash_timer: f32, // White flash when taking damage
+
     // Dash mechanic
-    pub is_dashing: bool,               // Currently executing a dash
-    pub dash_timer: f32,                // Tracks dash duration (counts down)
-    pub dash_direction: Position,       // Direction vector of current dash (normalized)
-    pub dash_cooldown_timer: f32,       // Time until dash available again
-    pub i_frame_timer: f32,             // Invincibility frames during dash
-    pub dash_trail_timer: f32,          // Timer for spawning trail particles
+    pub is_dashing: bool,         // Currently executing a dash
+    pub dash_timer: f32,          // Tracks dash duration (counts down)
+    pub dash_direction: Position, // Direction vector of current dash (normalized)
+    pub dash_cooldown_timer: f32, // Time until dash available again
+    pub i_frame_timer: f32,       // Invincibility frames during dash
+    pub dash_trail_timer: f32,    // Timer for spawning trail particles
 }
 
 // Enemy
@@ -221,16 +222,16 @@ pub struct Enemy {
 #[derive(Clone)]
 pub struct EntityAnimState {
     // Lifecycle timers
-    pub spawn_timer: f32,     // Fade in on spawn
-    pub despawn_timer: f32,   // Fade out on despawn
-    pub is_spawning: bool,    // Currently playing spawn animation
-    pub is_despawning: bool,  // Currently playing despawn animation
-    
+    pub spawn_timer: f32,    // Fade in on spawn
+    pub despawn_timer: f32,  // Fade out on despawn
+    pub is_spawning: bool,   // Currently playing spawn animation
+    pub is_despawning: bool, // Currently playing despawn animation
+
     // Visual modifiers (applied during rendering)
-    pub scale: f32,           // Size multiplier (1.0 = normal)
-    pub rotation: f32,        // Rotation in radians
-    pub alpha: f32,           // Opacity (0.0 - 1.0)
-    
+    pub scale: f32,    // Size multiplier (1.0 = normal)
+    pub rotation: f32, // Rotation in radians
+    pub alpha: f32,    // Opacity (0.0 - 1.0)
+
     // Hit feedback
     pub hit_flash_timer: f32, // White flash when taking damage (counts down from duration)
 }
@@ -258,13 +259,13 @@ impl EntityAnimState {
             despawn_timer: 0.0,
             is_spawning: true,
             is_despawning: false,
-            scale: 0.3,     // Start small
+            scale: 0.3, // Start small
             rotation: 0.0,
-            alpha: 0.0,     // Start invisible
+            alpha: 0.0, // Start invisible
             hit_flash_timer: 0.0,
         }
     }
-    
+
     /// Trigger despawn animation
     pub fn start_despawn(&mut self, duration: f32) {
         self.is_despawning = true;
@@ -280,7 +281,7 @@ pub struct Ghost {
     pub weapon_type: Vec<WeaponType>,
     pub entity_type: EntityType,
     pub energy_drain_per_sec: f32,
-    pub anim: EntityAnimState,  // Animation state
+    pub anim: EntityAnimState, // Animation state
 }
 
 #[allow(dead_code)]
@@ -526,6 +527,7 @@ impl GameState {
                     y: screen_height() - 50.0,
                 },
                 velocity: Position { x: 0.0, y: 0.0 },
+                input_direction: Position { x: 0.0, y: 0.0 }, // No input at start
                 stats: Stats {
                     health: config.player.starting_health,
                     max_health: config.player.max_health,
@@ -545,15 +547,15 @@ impl GameState {
                 parry_cooldown: 0.0,
                 parry_window: 0.0,
                 parry_active: false,
-                
+
                 // Parry animations initialized
                 parry_success_scale_timer: 0.0,
                 parry_failed_timer: 0.0,
                 parry_stance_glow_timer: 0.0,
-                
+
                 // Hit feedback initialized
                 hit_flash_timer: 0.0,
-                
+
                 // Dash mechanic initialized
                 is_dashing: false,
                 dash_timer: 0.0,
