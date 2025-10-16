@@ -25,7 +25,7 @@ pub fn attempt_parry(state: &mut GameState) {
     state.player.parry_active = true;
     state.player.parry_window = state.config.player.parry_window;
     state.player.energy -= parry_cost;
-    
+
     // Start stance glow animation (lasts longer than parry window!)
     state.player.parry_stance_glow_timer = state.config.animations.parry_stance_glow_duration;
 
@@ -40,10 +40,10 @@ pub fn update_parry(state: &mut GameState, delta: f32) {
         if state.player.parry_window <= 0.0 {
             state.player.parry_active = false;
             state.player.parry_cooldown = state.config.player.parry_cooldown;
-            
+
             // Trigger failed parry animation (shrink + desaturation)
             state.player.parry_failed_timer = state.config.animations.parry_failed_duration;
-            
+
             println!("✘ Parry window missed!");
         }
     }
@@ -52,7 +52,7 @@ pub fn update_parry(state: &mut GameState, delta: f32) {
     if state.player.parry_cooldown > 0.0 {
         state.player.parry_cooldown -= delta;
     }
-    
+
     // Update animation timers
     if state.player.parry_success_scale_timer > 0.0 {
         state.player.parry_success_scale_timer -= delta;
@@ -104,16 +104,16 @@ pub fn check_parry_projectiles(state: &mut GameState) {
         println!("✔ Parry ({parried_count} projectiles deflected)");
         state.player.parry_active = false;
         state.player.parry_cooldown = state.config.player.parry_cooldown;
-        
+
         // Trigger success animation (elastic bounce)
         state.player.parry_success_scale_timer = state.config.animations.parry_success_duration;
-        
+
         // BOOST stance glow for burst effect! (extends and intensifies the glow)
         let burst_duration = state.config.animations.parry_success_duration;
         if state.player.parry_stance_glow_timer < burst_duration {
             state.player.parry_stance_glow_timer = burst_duration; // Extend to at least bounce duration
         }
-        
+
         shake_on_parry(state);
         spawn_parry_effect(state, state.player.pos); // Particle burst!
         // TODO: Sound effect

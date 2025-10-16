@@ -12,7 +12,9 @@ pub fn manage_energy(state: &mut GameState, delta: f32) {
         // Trigger despawn animation for all ghosts
         for ghost in &mut state.ghosts {
             if !ghost.anim.is_despawning {
-                ghost.anim.start_despawn(state.config.animations.ghost_despawn_duration);
+                ghost
+                    .anim
+                    .start_despawn(state.config.animations.ghost_despawn_duration);
             }
         }
         state.player.energy = 0.0;

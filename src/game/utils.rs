@@ -34,7 +34,7 @@ pub fn calculate_velocity(from: Position, to: Position, speed: f32) -> Position 
 
 /// Calculate lead targeting velocity (predictive shooting)
 /// Predicts where the target will be when the projectile arrives
-/// 
+///
 /// Solves the intercept problem using quadratic equation
 /// - Target moves at constant velocity
 /// - Projectile moves at constant speed toward intercept point
@@ -48,30 +48,30 @@ pub fn calculate_lead_velocity(
     // Calculate relative position
     let dx = target_pos.x - from.x;
     let dy = target_pos.y - from.y;
-    
+
     // Get target velocity components
     let vx = target_velocity.x;
     let vy = target_velocity.y;
-    
+
     // Quadratic equation coefficients: a*t² + b*t + c = 0
     // Where t is the time to intercept
     let a = vx * vx + vy * vy - projectile_speed * projectile_speed;
     let b = 2.0 * (dx * vx + dy * vy);
     let c = dx * dx + dy * dy;
-    
+
     // Solve quadratic equation
     let discriminant = b * b - 4.0 * a * c;
-    
+
     // If no solution or target not moving, fall back to direct aim
     if discriminant < 0.0 || a.abs() < 0.001 {
         return calculate_velocity(from, target_pos, projectile_speed);
     }
-    
+
     // Get smallest positive solution (earliest intercept time)
     let sqrt_discriminant = discriminant.sqrt();
     let t1 = (-b + sqrt_discriminant) / (2.0 * a);
     let t2 = (-b - sqrt_discriminant) / (2.0 * a);
-    
+
     let t = if t1 > 0.0 && t2 > 0.0 {
         t1.min(t2) // Both positive, take smallest
     } else if t1 > 0.0 {
@@ -82,17 +82,24 @@ pub fn calculate_lead_velocity(
         // No positive solution, fall back to direct aim
         return calculate_velocity(from, target_pos, projectile_speed);
     };
-    
+
     // Calculate predicted intercept position
     let intercept_x = target_pos.x + target_velocity.x * t;
     let intercept_y = target_pos.y + target_velocity.y * t;
-    
+
     // Aim at intercept point
-    calculate_velocity(from, Position { x: intercept_x, y: intercept_y }, projectile_speed)
+    calculate_velocity(
+        from,
+        Position {
+            x: intercept_x,
+            y: intercept_y,
+        },
+        projectile_speed,
+    )
 }
 
-use macroquad::prelude::screen_width;
 use macroquad::prelude::rand;
+use macroquad::prelude::screen_width;
 
 /// Calculate ghost spawn position based on formation
 pub fn calculate_formation_position(

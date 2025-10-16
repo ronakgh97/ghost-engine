@@ -70,7 +70,9 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                         + (projectile.pos.y - state.player.pos.y).powi(2))
                     .sqrt();
 
-                    if state.player.i_frame_timer <= 0.0 && distance_to_player <= projectile.explosion_radius {
+                    if state.player.i_frame_timer <= 0.0
+                        && distance_to_player <= projectile.explosion_radius
+                    {
                         state.player.stats.health -= projectile.damage;
                         state.player.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on AOE hit!
                         player_hit_position = Some(state.player.pos); // Track for particles
@@ -97,12 +99,14 @@ pub fn check_projectile_collisions(state: &mut GameState) {
                 } else {
                     // Standard enemy projectile collision
                     // Check collision with player (skip if i-frames active!)
-                    if state.player.i_frame_timer <= 0.0 && circle_collision(
-                        projectile.pos,
-                        state.player.pos,
-                        collision_cfg.projectile_radius,
-                        collision_cfg.player_radius,
-                    ) {
+                    if state.player.i_frame_timer <= 0.0
+                        && circle_collision(
+                            projectile.pos,
+                            state.player.pos,
+                            collision_cfg.projectile_radius,
+                            collision_cfg.player_radius,
+                        )
+                    {
                         state.player.stats.health -= projectile.damage;
                         state.player.hit_flash_timer = state.config.animations.hit_flash_duration; // Flash on hit!
                         player_hit_position = Some(state.player.pos); // Save position for particle spawn

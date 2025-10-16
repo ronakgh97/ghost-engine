@@ -9,9 +9,9 @@ pub fn check_entity_collisions(state: &mut GameState) {
     // When implemented, add hit flash + particles:
     // - state.player.hit_flash_timer = state.config.animations.hit_flash_duration;
     // - spawn_player_hit_effect(state, player.pos);
-    
+
     // let mut player_hit_position: Option<Position> = None; // Track for hit effects
-    // 
+    //
     // // Player collision with enemies (gradual damage)
     // for enemy in &state.enemies {
     //     if circle_collision(state.player.pos, enemy.pos, 15.0, 15.0) {
@@ -20,7 +20,7 @@ pub fn check_entity_collisions(state: &mut GameState) {
     //         player_hit_position = Some(state.player.pos); // Track for particles (only once per frame)
     //     }
     // }
-    // 
+    //
     // // Spawn player hit particles if contact damage occurred
     // if let Some(hit_pos) = player_hit_position {
     //     crate::game::particles::spawn_player_hit_effect(state, hit_pos);
@@ -69,7 +69,9 @@ pub fn cleanup_dead_entities(state: &mut GameState) {
     let dead_ghost_splitters: Vec<Ghost> = state
         .ghosts
         .iter()
-        .filter(|g| g.stats.health <= 0.0 && g.entity_type == EntityType::Splitter && !g.anim.is_despawning)
+        .filter(|g| {
+            g.stats.health <= 0.0 && g.entity_type == EntityType::Splitter && !g.anim.is_despawning
+        })
         .cloned()
         .collect();
 
@@ -77,7 +79,9 @@ pub fn cleanup_dead_entities(state: &mut GameState) {
     // Trigger despawn animation instead of instant removal
     for ghost in state.ghosts.iter_mut() {
         if ghost.stats.health <= 0.0 && !ghost.anim.is_despawning {
-            ghost.anim.start_despawn(state.config.animations.ghost_despawn_duration);
+            ghost
+                .anim
+                .start_despawn(state.config.animations.ghost_despawn_duration);
         }
     }
 

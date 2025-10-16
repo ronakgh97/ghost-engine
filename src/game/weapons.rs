@@ -240,7 +240,6 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
     let mut trails_to_spawn = Vec::new();
 
     for projectile in &mut state.projectiles {
-
         let interval = match projectile.weapon_type {
             WeaponType::Missile => base_interval * 0.5,
             WeaponType::Laser => base_interval * 0.01,
@@ -252,10 +251,10 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
         // Determine how many particles to spawn per interval
         let particle_count = match projectile.weapon_type {
             WeaponType::Laser => 20,
-            WeaponType::Missile => 2,
-            WeaponType::Plasma => 2,
+            WeaponType::Missile => 3,
+            WeaponType::Plasma => 3,
             WeaponType::Bombs => 3,
-            WeaponType::Bullet => 1,
+            WeaponType::Bullet => 2,
         };
 
         // Check if it's time to spawn a trail particle
@@ -288,10 +287,10 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
         // Add positional spread for lasers to create beam width (prevent overlap)
         let (spawn_pos, velocity) = if weapon_type == WeaponType::Laser {
             // Spawn particles in a perpendicular spread to create beam width
-            let spread = 5.0; // Beam width radius
+            let spread = 5.5; // Beam width radius
             let offset_x = rand::gen_range(-spread, spread);
             let offset_y = rand::gen_range(-spread, spread);
-            
+
             (
                 Position {
                     x: pos.x + offset_x,
@@ -300,7 +299,7 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
                 Position {
                     x: rand::gen_range(-5.0, 5.0),
                     y: rand::gen_range(-5.0, 5.0),
-                }
+                },
             )
         } else {
             // Other weapons use normal random drift
@@ -309,7 +308,7 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
                 Position {
                     x: rand::gen_range(-10.0, 10.0),
                     y: rand::gen_range(-10.0, 10.0),
-                }
+                },
             )
         };
 

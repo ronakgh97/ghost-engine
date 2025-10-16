@@ -1,7 +1,7 @@
+use crate::game::utils::biased_random_x;
 use crate::models::*;
 use macroquad::prelude::*;
 use macroquad::rand::gen_range;
-use crate::game::utils::biased_random_x;
 
 /// Spawn random enemies
 pub fn spawn_enemies(state: &mut GameState, delta: f32) {
@@ -17,8 +17,9 @@ pub fn spawn_enemies(state: &mut GameState, delta: f32) {
             EntityType::BasicFighter,
             EntityType::Splitter,
             EntityType::Splitter,
-            EntityType::Healer,
             EntityType::Sniper,
+            EntityType::Sniper,
+            EntityType::Tank,
             EntityType::Tank,
             EntityType::Elite,
         ];

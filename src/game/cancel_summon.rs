@@ -17,10 +17,12 @@ pub fn cancel_summon(state: &mut GameState) {
     // Trigger despawn animation for all ghosts instead of instant clear
     for ghost in &mut state.ghosts {
         if !ghost.anim.is_despawning {
-            ghost.anim.start_despawn(state.config.animations.ghost_despawn_duration);
+            ghost
+                .anim
+                .start_despawn(state.config.animations.ghost_despawn_duration);
         }
     }
-    
+
     // Clear timers immediately
     state.ghost_fire_timers.clear();
 

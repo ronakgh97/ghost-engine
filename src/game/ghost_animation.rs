@@ -80,11 +80,7 @@ pub fn update_ghost_despawn_animation(
 }
 
 /// Update all ghost animations
-pub fn update_ghost_animations(
-    ghosts: &mut Vec<Ghost>,
-    delta: f32,
-    config: &AnimationConfig,
-) {
+pub fn update_ghost_animations(ghosts: &mut Vec<Ghost>, delta: f32, config: &AnimationConfig) {
     for ghost in ghosts.iter_mut() {
         // Update spawn animation if spawning
         if ghost.anim.is_spawning {
@@ -95,9 +91,13 @@ pub fn update_ghost_animations(
         if ghost.anim.is_despawning {
             update_ghost_despawn_animation(ghost, delta, config);
         }
-        
+
         // Update hit flash (always runs, counts down to 0)
-        animation::update_hit_flash(&mut ghost.anim.hit_flash_timer, delta, config.hit_flash_duration);
+        animation::update_hit_flash(
+            &mut ghost.anim.hit_flash_timer,
+            delta,
+            config.hit_flash_duration,
+        );
     }
 
     // Remove ghosts that finished despawning

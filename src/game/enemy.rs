@@ -20,11 +20,11 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
     for (idx, enemy) in state.enemies.iter_mut().enumerate() {
         // Update hit flash animation
         crate::game::animation::update_hit_flash(
-            &mut enemy.anim.hit_flash_timer, 
-            delta, 
-            state.config.animations.hit_flash_duration
+            &mut enemy.anim.hit_flash_timer,
+            delta,
+            state.config.animations.hit_flash_duration,
         );
-        
+
         // Movement logic
         if enemy.pos.y < enemy_cfg.movement_threshold_y {
             enemy.pos.y += enemy_cfg.fast_descent_speed * delta;
@@ -81,16 +81,20 @@ fn fire_enemy_weapon(
         WeaponType::Bullet => {
             // Shoot straight down or aimed based on enemy type
             let velocity = match enemy.entity_type {
-                EntityType::BasicFighter | EntityType::Tank => Position {
+                EntityType::BasicFighter => Position {
                     x: 0.0,
                     y: basic_projectile_speed_y,
                 },
-                EntityType::Sniper => {
-                    calculate_lead_velocity(enemy.pos, player_pos, player_velocity, basic_projectile_speed_y)
+
+                EntityType::Tank | EntityType::Sniper | EntityType::Elite => {
+                    calculate_lead_velocity(
+                        enemy.pos,
+                        player_pos,
+                        player_velocity,
+                        basic_projectile_speed_y,
+                    )
                 }
-                 EntityType::Elite
-                | EntityType::Healer
-                | EntityType::Splitter => {
+                EntityType::Healer | EntityType::Splitter => {
                     calculate_velocity(enemy.pos, player_pos, basic_projectile_speed_y)
                 }
             };
@@ -111,7 +115,12 @@ fn fire_enemy_weapon(
         }
         WeaponType::Laser => {
             // Lasers always aim at player
-            let velocity = calculate_lead_velocity(enemy.pos, player_pos, player_velocity ,weapon_stats.projectile_speed);
+            let velocity = calculate_lead_velocity(
+                enemy.pos,
+                player_pos,
+                player_velocity,
+                weapon_stats.projectile_speed,
+            );
 
             projectiles.push(Projectile {
                 pos: enemy.pos,

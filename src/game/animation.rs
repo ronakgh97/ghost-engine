@@ -43,7 +43,7 @@ pub fn ease_out_elastic(t: f32) -> f32 {
     if t == 0.0 || t == 1.0 {
         return t;
     }
-    
+
     let p = 0.3;
     let s = p / 4.0;
     2.0_f32.powf(-10.0 * t) * ((t - s) * (2.0 * std::f32::consts::PI) / p).sin() + 1.0

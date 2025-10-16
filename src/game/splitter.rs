@@ -42,7 +42,7 @@ pub fn handle_enemy_splits(
                 },
                 weapon: enemy.weapon.clone(),          // Inherit weapons
                 entity_type: EntityType::BasicFighter, // Splits become basic fighters (don't split again!)
-                anim: EntityAnimState::default(), // Default animation state for splits
+                anim: EntityAnimState::default(),      // Default animation state for splits
             };
 
             new_enemies.push(split_enemy);

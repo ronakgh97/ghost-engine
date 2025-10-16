@@ -1,8 +1,8 @@
+use crate::game::utils::biased_random_x;
 use crate::models::*;
 use crate::scripting::LuaScripting;
 use macroquad::prelude::*;
 use mlua::prelude::*;
-use crate::game::utils::biased_random_x;
 
 /// Manages wave progression and enemy spawning
 pub struct WaveManager {
