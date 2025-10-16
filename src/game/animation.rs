@@ -71,7 +71,6 @@ pub fn ease_out_bounce(t: f32) -> f32 {
 }
 
 /// Linear interpolation between two values
-#[allow(dead_code)] //TODO: may be useful later
 pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
     a + (b - a) * t
 }

@@ -3,7 +3,7 @@
 A fast-paced 2D top-down shooter where you pilot a ship alongside ghostly allies. Battle through waves of enemies—who
 can become your allies—while managing your energy and ghost formations.
 
-![demo](ghost-engine-demo.gif)
+![demo](ghostengine-demo.gif)
 
 ## Features
 
@@ -24,7 +24,7 @@ can become your allies—while managing your energy and ghost formations.
 - Dash(I-frames): Shift (costs energy)
 - Summon Ghosts: Space-bar (costs energy)
 - Parry Missiles: X (quick window, costs energy)
-- Cancel Summon: C
+- Cancel Summon: C (ghosts return to player queue)
 - Change Formation: 1–3 (Line, Circle, V-shape)
 - Single Summon: F1–F6 for ghost types
 
