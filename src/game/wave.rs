@@ -220,17 +220,27 @@ impl WaveManager {
                     weapons
                 };
 
-                // Create enemy with center-biased random X position
-                let enemy = Enemy {
-                    pos: Position {
-                        //x: gen_range(50.0, screen_width() - 50.0)
-                        x: biased_random_x(50.0, screen_width() - 50.0),
+                // Generate spawn position and entry path
+                let spawn_x = biased_random_x(50.0, screen_width() - 50.0);
+                let movement_state = crate::game::spawn::create_wave_enemy_path(spawn.enemy_type, spawn_x);
+                
+                // Get starting position from path
+                let start_pos = match &movement_state {
+                    EnemyMovementState::FollowingPath { path, .. } => path.p0,
+                    EnemyMovementState::FreeMovement => Position {
+                        x: spawn_x,
                         y: -20.0,
                     },
+                };
+
+                // Create enemy with Bezier entry path
+                let enemy = Enemy {
+                    pos: start_pos,
                     stats: entity_stats,
                     entity_type: spawn.enemy_type,
                     weapon: final_weapons,
-                    anim: EntityAnimState::default(), // Default animation state
+                    anim: EntityAnimState::default(),
+                    movement_state,
                 };
 
                 game_state.enemies.push(enemy);

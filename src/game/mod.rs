@@ -1,4 +1,5 @@
 pub mod animation; // Easing functions and animation helpers (public for rendering)
+mod bezier; // Bezier curve math for enemy paths
 mod cancel_summon;
 mod collision;
 mod combat;
@@ -20,6 +21,7 @@ mod weapons;
 
 // Exports (some unused until features implemented)
 // pub use cancel_summon::*; // TODO: Enable when cancel summon UI added
+pub use bezier::*;
 pub use collision::*;
 pub use combat::*;
 pub use enemy::*;

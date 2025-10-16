@@ -25,15 +25,58 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
             state.config.animations.hit_flash_duration,
         );
 
-        // Movement logic
-        if enemy.pos.y < enemy_cfg.movement_threshold_y {
-            enemy.pos.y += enemy_cfg.fast_descent_speed * delta;
-        } else {
-            enemy.pos.y += enemy_cfg.slow_hover_speed * delta;
+        // Movement logic - Check if following Bezier path or free movement
+        match &mut enemy.movement_state {
+            EnemyMovementState::FollowingPath {
+                path,
+                progress,
+                elapsed_time,
+            } => {
+                // Update path progress
+                *elapsed_time += delta;
+                *progress = (*elapsed_time / path.duration).min(1.0);
+
+                // Interpolate position along Bezier curve
+                if path.use_cubic {
+                    enemy.pos = crate::game::bezier::cubic_bezier(
+                        path.p0,
+                        path.p1,
+                        path.p2,
+                        path.p3,
+                        *progress,
+                    );
+                } else {
+                    enemy.pos = crate::game::bezier::quadratic_bezier(
+                        path.p0,
+                        path.p1,
+                        path.p2,
+                        *progress,
+                    );
+                }
+
+                // Transition to free movement when path complete
+                if *progress >= 1.0 {
+                    enemy.movement_state = EnemyMovementState::FreeMovement;
+                }
+            }
+            EnemyMovementState::FreeMovement => {
+                // Normal descent movement (original behavior)
+                if enemy.pos.y < enemy_cfg.movement_threshold_y {
+                    enemy.pos.y += enemy_cfg.fast_descent_speed * delta;
+                } else {
+                    enemy.pos.y += enemy_cfg.slow_hover_speed * delta;
+                }
+            }
         }
 
-        // Fire based on enemy type
-        if idx < state.enemy_fire_timers.len()
+        // Fire based on enemy type (only in free movement or near end of path)
+        let can_fire = match &enemy.movement_state {
+            EnemyMovementState::FollowingPath { progress, .. } => *progress > 0.7, // Can fire near end of path
+            EnemyMovementState::FreeMovement => true,
+        };
+
+        if can_fire
+            && idx < state.enemy_fire_timers.len()
             && state.enemy_fire_timers[idx] <= 0.0
             && enemy.pos.y > enemy_cfg.fire_threshold_y
         {

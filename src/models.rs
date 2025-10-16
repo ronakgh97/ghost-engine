@@ -208,6 +208,28 @@ pub struct Player {
     pub dash_trail_timer: f32,    // Timer for spawning trail particles
 }
 
+// Bezier path for enemy entry curves
+#[derive(Clone)]
+pub struct BezierPath {
+    pub p0: Position,      // Start point
+    pub p1: Position,      // First control point
+    pub p2: Position,      // Second control point
+    pub p3: Position,      // End point
+    pub duration: f32,     // How long to follow path (seconds)
+    pub use_cubic: bool,   // true = cubic (4 points), false = quadratic (3 points, p3 unused)
+}
+
+// Enemy movement state
+#[derive(Clone)]
+pub enum EnemyMovementState {
+    FollowingPath {
+        path: BezierPath,
+        progress: f32,      // 0.0 to 1.0 (time / duration)
+        elapsed_time: f32,  // Track time spent on path
+    },
+    FreeMovement, // Normal attacking/movement behavior
+}
+
 // Enemy
 #[derive(Clone)] // Needed for splitter system
 pub struct Enemy {
@@ -216,6 +238,7 @@ pub struct Enemy {
     pub weapon: Vec<WeaponType>,
     pub entity_type: EntityType,
     pub anim: EntityAnimState, // Animation state (hit flash, spawn, despawn)
+    pub movement_state: EnemyMovementState, // Path-following or free movement
 }
 
 // Animation state for entities (ghosts, enemies, etc.)
