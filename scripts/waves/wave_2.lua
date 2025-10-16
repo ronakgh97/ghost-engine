@@ -18,15 +18,9 @@ return {
 			delay = 5.0
 		},
 		{
-			type = "Healer",
-			count = 4,
-			interval = 1.0,
-			delay = 10.0
-		},
-		{
 			type = "Splitter",
-			count = 6,
-			interval = 2.0,
+			count = 5,
+			interval = 2.5,
 			delay = 15.0
 		},
 	},

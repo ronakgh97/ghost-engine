@@ -15,8 +15,8 @@ return {
 		{
 			type = "Splitter",
 			count = 5,
-			interval = 2.0,
-			delay = 5.0
+			interval = 2.5,
+			delay = 10.0
 		}
 	},
 

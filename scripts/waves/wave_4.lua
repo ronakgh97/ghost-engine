@@ -8,7 +8,7 @@ return {
 		{
 			type = "BasicFighter",
 			count = 10,
-			interval = 1.2,
+			interval = 2.0,
 			delay = 0.0
 		},
 		{
@@ -19,15 +19,15 @@ return {
 		},
 		{
 			type = "Tank",
-			count = 3,
-			interval = 3.0,
-			delay = 8.0
+			count = 5,
+			interval = 3.5,
+			delay = 7.5
 		},
 		{
 			type = "Elite",
-			count = 6,
-			interval = 1.0,
-			delay = 12.0
+			count = 3,
+			interval = 5.0,
+			delay = 15.0
 		},
 	},
 
