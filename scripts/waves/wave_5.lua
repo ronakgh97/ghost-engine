@@ -7,25 +7,25 @@ return {
 	spawns = {
 		{
 			type = "BasicFighter",
-			count = 10,
+			count = 8,
 			interval = 1.5,
 			delay = 0.0
 		},
 		{
 			type = "Sniper",
-			count = 5,
+			count = 3,
 			interval = 2.0,
 			delay = 2.0
 		},
 		{
 			type = "Elite",
-			count = 5,
+			count = 2,
 			interval = 1.0,
 			delay = 5.0
 		},
 		{
 			type = "Tank",
-			count = 5,
+			count = 3,
 			interval = 4.0,
 			delay = 10.0
 		},
@@ -33,7 +33,7 @@ return {
 			type = "Healer",
 			count = 5,
 			interval = 2.5,
-			delay = 15.0
+			delay = 7.0
 		},
 		{
 			type = "Splitter",

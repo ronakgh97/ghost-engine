@@ -2,7 +2,7 @@
 
 use crate::config::*;
 
-/// Get default configuration (always available)
+/// Get default configuration
 pub fn default_config() -> GameConfig {
     GameConfig {
         window: default_window(),
@@ -39,8 +39,8 @@ fn default_player() -> PlayerConfig {
     PlayerConfig {
         starting_health: 100.0,
         max_health: 100.0,
-        starting_energy: 200.0,
-        max_energy: 500.0,
+        starting_energy: 500.0,
+        max_energy: 1000.0,
         movement_speed: 250.0,
         starting_weapons: vec![
             "Bullet".to_string(),
@@ -55,15 +55,15 @@ fn default_player() -> PlayerConfig {
         parry_energy_cost: 5.0,
 
         // Physics-based movement
-        acceleration: 5000.0, // Fast acceleration for responsive feel
-        friction: 1.0,        // Gentle drift (4% slowdown per frame)
-        responsiveness: 15.0, // Fast turn speed
+        acceleration: 3000.0,
+        friction: 0.97,
+        responsiveness: 15.0,
     }
 }
 
 fn default_energy() -> EnergyConfig {
     EnergyConfig {
-        regen_rate_idle: 30.0,
+        regen_rate_idle: 50.0,
         regen_rate_active: 1.0,
     }
 }
@@ -71,31 +71,31 @@ fn default_energy() -> EnergyConfig {
 fn default_entities() -> EntitiesConfig {
     EntitiesConfig {
         basic_fighter: EntityStats {
-            health: 50.0,
-            damage: 10.0,
+            health: 40.0,
+            damage: 0.0,
             energy_cost: 10.0,
-            fire_interval: 2.0,
+            fire_interval: 1.5,
             weapons: vec!["Bullet".to_string()],
         },
         sniper: EntityStats {
             health: 30.0,
-            damage: 25.0,
+            damage: 0.0,
             energy_cost: 25.0,
-            fire_interval: 3.5,
+            fire_interval: 3.0,
             weapons: vec!["Laser".to_string()],
         },
         tank: EntityStats {
             health: 150.0,
-            damage: 15.0,
+            damage: 0.0,
             energy_cost: 40.0,
-            fire_interval: 1.5,
+            fire_interval: 2.0,
             weapons: vec!["Missile".to_string()],
         },
         elite: EntityStats {
             health: 500.0,
-            damage: 50.0,
+            damage: 0.0,
             energy_cost: 80.0,
-            fire_interval: 0.8,
+            fire_interval: 1.0,
             weapons: vec![
                 "Laser".to_string(),
                 "Missile".to_string(),
@@ -104,7 +104,7 @@ fn default_entities() -> EntitiesConfig {
         },
         healer: HealerStats {
             health: 60.0,
-            damage: 5.0,
+            damage: 0.0,
             energy_cost: 20.0,
             fire_interval: 3.0,
             weapons: vec!["Bullet".to_string()],
@@ -114,12 +114,12 @@ fn default_entities() -> EntitiesConfig {
         },
         splitter: SplitterStats {
             health: 80.0,
-            damage: 12.0,
+            damage: 0.0,
             energy_cost: 25.0,
-            fire_interval: 2.0,
+            fire_interval: 0.5,
             weapons: vec!["Bullet".to_string()],
             // Splitting stats
-            split_count: 3,
+            split_count: 4,
             split_health_ratio: 0.3,
             split_speed_multiplier: 2.0,
         },
@@ -130,23 +130,23 @@ fn default_entities() -> EntitiesConfig {
 fn default_weapons() -> WeaponsConfig {
     WeaponsConfig {
         bullet: WeaponStats {
-            damage: 10.0,
-            fire_rate: 0.1,
+            damage: 15.0,
+            fire_rate: 0.15,
             projectile_speed: 350.0,
         },
         laser: WeaponStats {
-            damage: 60.0,
+            damage: 75.0,
             fire_rate: 1.5,
             projectile_speed: 850.0,
         },
         missile: WeaponStats {
             damage: 30.0,
-            fire_rate: 0.5,
+            fire_rate: 1.5,
             projectile_speed: 250.0,
         },
         plasma: WeaponStats {
             damage: 25.0,
-            fire_rate: 0.4,
+            fire_rate: 0.5,
             projectile_speed: 500.0,
         },
         bombs: WeaponStats {
@@ -159,10 +159,10 @@ fn default_weapons() -> WeaponsConfig {
 
 fn default_spawning() -> SpawningConfig {
     SpawningConfig {
-        wave_mode: false,          // Enable Lua wave system by default
-        wave_count: 5,             // 5 waves total
-        enemy_spawn_interval: 2.2, // Random spawn timer
-        initial_delay: 3.0,        // Initial delay before spawning
+        wave_mode: true,           // Enable Lua wave system by default
+        wave_count: 5,
+        enemy_spawn_interval: 2.5,
+        initial_delay: 3.0,
     }
 }
 
@@ -197,8 +197,8 @@ fn default_ghost_behavior() -> GhostBehaviorConfig {
     GhostBehaviorConfig {
         fire_interval: 1.0,
         movement_threshold_y: 200.0,
-        fast_ascent_speed: 50.0,
-        slow_hover_speed: 100.0,
+        fast_ascent_speed: 100.0,
+        slow_hover_speed: 50.0,
         projectile_speed: 350.0,
         screen_boundary_top: -50.0,
     }
@@ -207,8 +207,8 @@ fn default_ghost_behavior() -> GhostBehaviorConfig {
 fn default_enemy_behavior() -> EnemyBehaviorConfig {
     EnemyBehaviorConfig {
         movement_threshold_y: 200.0,
-        fast_descent_speed: 100.0,
-        slow_hover_speed: 50.0,
+        fast_descent_speed: 75.0,
+        slow_hover_speed: 25.0,
         fire_threshold_y: 50.0,
         screen_boundary_bottom: 650.0,
         basic_projectile_speed_y: 250.0,
@@ -236,7 +236,7 @@ fn default_projectile_bounds() -> ProjectileBoundsConfig {
 fn default_screen_shake() -> ScreenShakeConfig {
     ScreenShakeConfig {
         bullet_hit_intensity: 0.8,
-        laser_hit_intensity: 4.0,
+        laser_hit_intensity: 5.0,
         missile_hit_intensity: 2.5,
         plasma_hit_intensity: 1.5,
         bomb_hit_intensity: 5.0,
@@ -338,16 +338,16 @@ fn default_animations() -> AnimationConfig {
 fn default_dash() -> DashConfig {
     DashConfig {
         enabled: true,         // Dash enabled by default
-        distance: 120.0,       // 120 pixels dash distance
-        duration: 0.15,        // 150ms dash duration
-        i_frame_duration: 0.2, // 200ms invincibility (can dash through bullets)
-        energy_cost: 30.0,     // 30 energy per dash
-        cooldown: 0.5,         // 500ms cooldown between dashes
+        distance: 120.0,
+        duration: 0.15,
+        i_frame_duration: 0.3,
+        energy_cost: 20.0,
+        cooldown: 0.5,
 
         // Visual effects
-        trail_particle_count: 3, // 3 afterimage particles per trail spawn
-        trail_spawn_rate: 60.0,  // 60 trails/second (smooth trail)
-        glow_intensity: 0.7,     // 70% blue glow during dash
-        cooldown_ring_thickness: 3.0, // 3px ring thickness for cooldown indicator
+        trail_particle_count: 5,
+        trail_spawn_rate: 75.0,
+        glow_intensity: 0.5,
+        cooldown_ring_thickness: 3.0,
     }
 }

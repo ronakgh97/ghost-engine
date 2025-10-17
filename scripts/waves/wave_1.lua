@@ -8,13 +8,13 @@ return {
 
 		{
 			type = "BasicFighter",
-			count = 10,
+			count = 8,
 			interval = 2.0,
 			delay = 0.0
 		},
 		{
 			type = "Splitter",
-			count = 5,
+			count = 3,
 			interval = 2.5,
 			delay = 10.0
 		}
