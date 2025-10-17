@@ -3,7 +3,7 @@
 A fast-paced 2D top-down shooter where you pilot a ship alongside ghostly allies. Battle through waves of enemies—who
 can become your allies—while managing your energy and ghost formations.
 
-![demo](ghostengine-demo.gif)
+![demo](demo.gif)
 
 ## Features
 
