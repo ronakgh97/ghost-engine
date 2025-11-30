@@ -11,25 +11,24 @@ pub fn handle_input(game_state: &mut GameState, _delta_time: f32) {
     // Player movement input (only if not dashing)
     // We now just calculate input direction, actual movement happens in player.rs with physics
     if !game_state.player.is_dashing {
-        let mut input_direction = (0.0, 0.0);
+        let mut input_direction = (0.0f32, 0.0f32);
 
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-            input_direction.1 += 1.0;
+            input_direction.1 += 1.0f32;
         }
         if is_key_down(KeyCode::Up) || is_key_down(KeyCode::W) {
-            input_direction.1 -= 1.0;
+            input_direction.1 -= 1.0f32;
         }
         if is_key_down(KeyCode::Left) || is_key_down(KeyCode::A) {
-            input_direction.0 -= 1.0;
+            input_direction.0 -= 1.0f32;
         }
         if is_key_down(KeyCode::Right) || is_key_down(KeyCode::D) {
-            input_direction.0 += 1.0;
+            input_direction.0 += 1.0f32;
         }
 
         // Normalize diagonal movement
-        let magnitude = ((input_direction.0 * input_direction.0
-            + input_direction.1 * input_direction.1) as f32)
-            .sqrt();
+        let magnitude =
+            (input_direction.0 * input_direction.0 + input_direction.1 * input_direction.1).sqrt();
         if magnitude > 0.0 {
             input_direction.0 /= magnitude;
             input_direction.1 /= magnitude;
@@ -240,20 +239,20 @@ fn handle_dash_input(state: &mut GameState) {
     }
 
     // Calculate dash direction from WASD input
-    let mut dir_x = 0.0;
-    let mut dir_y = 0.0;
+    let mut dir_x = 0.0f32;
+    let mut dir_y = 0.0f32;
 
     if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
-        dir_y = -1.0;
+        dir_y = -1.0f32;
     }
     if is_key_down(KeyCode::S) || is_key_down(KeyCode::Down) {
-        dir_y = 1.0;
+        dir_y = 1.0f32;
     }
     if is_key_down(KeyCode::A) || is_key_down(KeyCode::Left) {
-        dir_x = -1.0;
+        dir_x = -1.0f32;
     }
     if is_key_down(KeyCode::D) || is_key_down(KeyCode::Right) {
-        dir_x = 1.0;
+        dir_x = 1.0f32;
     }
 
     // No direction = no dash
@@ -263,7 +262,7 @@ fn handle_dash_input(state: &mut GameState) {
 
     // Normalize diagonal directions
     // Diagonal movement would be sqrt(1^2 + 1^2) = 1.414x faster without normalization
-    let magnitude = ((dir_x * dir_x + dir_y * dir_y) as f32).sqrt();
+    let magnitude = (dir_x * dir_x + dir_y * dir_y).sqrt();
     dir_x /= magnitude;
     dir_y /= magnitude;
 
