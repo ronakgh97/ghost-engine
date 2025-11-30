@@ -116,10 +116,10 @@ impl WaveManager {
 
                 if self.prep_timer <= 0.0 {
                     // Execute wave start callback
-                    if let Some(callback) = self.on_start_callback.take() {
-                        if let Err(e) = self.scripting.execute_wave_start(Some(callback)) {
-                            println!("✘ Wave start callback error: {e}");
-                        }
+                    if let Some(callback) = self.on_start_callback.take()
+                        && let Err(e) = self.scripting.execute_wave_start(Some(callback))
+                    {
+                        println!("✘ Wave start callback error: {e}");
                     }
 
                     self.state = WaveState::Active;
@@ -147,10 +147,10 @@ impl WaveManager {
 
             WaveState::Complete => {
                 // Wave just completed, execute callback
-                if let Some(callback) = self.on_complete_callback.take() {
-                    if let Err(e) = self.scripting.execute_wave_complete(Some(callback)) {
-                        println!("✘ Wave complete callback error: {e}");
-                    }
+                if let Some(callback) = self.on_complete_callback.take()
+                    && let Err(e) = self.scripting.execute_wave_complete(Some(callback))
+                {
+                    println!("✘ Wave complete callback error: {e}");
                 }
 
                 // Transition to next wave
