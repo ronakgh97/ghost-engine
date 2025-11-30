@@ -4,7 +4,7 @@ use crate::models::{EntityType, GameState, Ghost};
 use macroquad::input::*;
 
 /// Handle all player input
-pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
+pub fn handle_input(game_state: &mut GameState, _delta_time: f32) {
     // Dash input (Shift + WASD) - Handle BEFORE normal movement!
     handle_dash_input(game_state);
 
@@ -36,13 +36,11 @@ pub fn handle_input(game_state: &mut GameState, delta_time: f32) {
         }
 
         // Store input direction for physics-based movement
-        game_state.player.input_direction = crate::models::Position {
-            x: input_direction.0,
-            y: input_direction.1,
-        };
+        game_state.player.input_direction =
+            macroquad::math::Vec2::new(input_direction.0, input_direction.1);
     } else {
         // No input during dash
-        game_state.player.input_direction = crate::models::Position { x: 0.0, y: 0.0 };
+        game_state.player.input_direction = macroquad::math::Vec2::ZERO;
     }
 
     // Fire Bullets
@@ -171,7 +169,6 @@ fn try_spawn_ghost(state: &mut GameState, desired_type: EntityType) {
 
         // All checks passed - spawn and deduct
         state.ghosts.push(ghost);
-        state.ghost_fire_timers.push(0.0); // Add timer for new ghost
         state.player.available_ghosts.remove(index);
         state.player.energy -= energy_cost;
     }

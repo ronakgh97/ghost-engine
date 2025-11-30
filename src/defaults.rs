@@ -159,7 +159,7 @@ fn default_weapons() -> WeaponsConfig {
 
 fn default_spawning() -> SpawningConfig {
     SpawningConfig {
-        wave_mode: false,           // Enable Lua wave system by default
+        wave_mode: false,          // Enable Lua wave system by default
         wave_count: 5,             // 5 waves total
         enemy_spawn_interval: 2.2, // Random spawn timer
         initial_delay: 3.0,        // Initial delay before spawning

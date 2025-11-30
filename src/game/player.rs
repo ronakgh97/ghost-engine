@@ -50,16 +50,13 @@ fn apply_physics_movement(state: &mut GameState, delta: f32) {
     let input = &state.player.input_direction;
 
     // Calculate target velocity based on input
-    let target_velocity = Position {
-        x: input.x * cfg.movement_speed,
-        y: input.y * cfg.movement_speed,
-    };
+    let target_velocity = Vec2::new(input.x * cfg.movement_speed, input.y * cfg.movement_speed);
 
     // Apply acceleration force towards target velocity (responsiveness controls turn speed)
-    let acceleration_force = Position {
-        x: (target_velocity.x - state.player.velocity.x) * cfg.responsiveness,
-        y: (target_velocity.y - state.player.velocity.y) * cfg.responsiveness,
-    };
+    let acceleration_force = Vec2::new(
+        (target_velocity.x - state.player.velocity.x) * cfg.responsiveness,
+        (target_velocity.y - state.player.velocity.y) * cfg.responsiveness,
+    );
 
     // Update velocity with acceleration
     state.player.velocity.x += acceleration_force.x * delta;

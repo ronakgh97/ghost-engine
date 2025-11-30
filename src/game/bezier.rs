@@ -1,4 +1,5 @@
 use crate::models::Position;
+use macroquad::math::Vec2;
 
 /// Cubic Bezier curve interpolation
 /// P(t) = (1-t)³*P0 + 3(1-t)²*t*P1 + 3(1-t)*t²*P2 + t³*P3
@@ -17,10 +18,10 @@ pub fn cubic_bezier(p0: Position, p1: Position, p2: Position, p3: Position, t: f
     let mt2 = mt * mt;
     let mt3 = mt2 * mt;
 
-    Position {
-        x: mt3 * p0.x + 3.0 * mt2 * t * p1.x + 3.0 * mt * t2 * p2.x + t3 * p3.x,
-        y: mt3 * p0.y + 3.0 * mt2 * t * p1.y + 3.0 * mt * t2 * p2.y + t3 * p3.y,
-    }
+    Vec2::new(
+        mt3 * p0.x + 3.0 * mt2 * t * p1.x + 3.0 * mt * t2 * p2.x + t3 * p3.x,
+        mt3 * p0.y + 3.0 * mt2 * t * p1.y + 3.0 * mt * t2 * p2.y + t3 * p3.y,
+    )
 }
 
 /// Quadratic Bezier curve interpolation (simpler, 3 points)
@@ -37,10 +38,10 @@ pub fn quadratic_bezier(p0: Position, p1: Position, p2: Position, t: f32) -> Pos
     let mt = 1.0 - t;
     let mt2 = mt * mt;
 
-    Position {
-        x: mt2 * p0.x + 2.0 * mt * t * p1.x + t2 * p2.x,
-        y: mt2 * p0.y + 2.0 * mt * t * p1.y + t2 * p2.y,
-    }
+    Vec2::new(
+        mt2 * p0.x + 2.0 * mt * t * p1.x + t2 * p2.x,
+        mt2 * p0.y + 2.0 * mt * t * p1.y + t2 * p2.y,
+    )
 }
 
 /// Get the tangent (direction) of a cubic Bezier curve at point t
@@ -58,10 +59,10 @@ pub fn cubic_bezier_tangent(
     let mt2 = mt * mt;
 
     // Derivative of cubic Bezier
-    Position {
-        x: 3.0 * mt2 * (p1.x - p0.x) + 6.0 * mt * t * (p2.x - p1.x) + 3.0 * t2 * (p3.x - p2.x),
-        y: 3.0 * mt2 * (p1.y - p0.y) + 6.0 * mt * t * (p2.y - p1.y) + 3.0 * t2 * (p3.y - p2.y),
-    }
+    Vec2::new(
+        3.0 * mt2 * (p1.x - p0.x) + 6.0 * mt * t * (p2.x - p1.x) + 3.0 * t2 * (p3.x - p2.x),
+        3.0 * mt2 * (p1.y - p0.y) + 6.0 * mt * t * (p2.y - p1.y) + 3.0 * t2 * (p3.y - p2.y),
+    )
 }
 
 #[cfg(test)]
@@ -70,10 +71,10 @@ mod tests {
 
     #[test]
     fn test_cubic_bezier_endpoints() {
-        let p0 = Position { x: 0.0, y: 0.0 };
-        let p1 = Position { x: 100.0, y: 100.0 };
-        let p2 = Position { x: 200.0, y: 100.0 };
-        let p3 = Position { x: 300.0, y: 0.0 };
+        let p0 = Vec2::new(0.0, 0.0);
+        let p1 = Vec2::new(100.0, 100.0);
+        let p2 = Vec2::new(200.0, 100.0);
+        let p3 = Vec2::new(300.0, 0.0);
 
         // At t=0, should be at start point
         let start = cubic_bezier(p0, p1, p2, p3, 0.0);
@@ -88,9 +89,9 @@ mod tests {
 
     #[test]
     fn test_quadratic_bezier_midpoint() {
-        let p0 = Position { x: 0.0, y: 0.0 };
-        let p1 = Position { x: 50.0, y: 100.0 };
-        let p2 = Position { x: 100.0, y: 0.0 };
+        let p0 = Vec2::new(0.0, 0.0);
+        let p1 = Vec2::new(50.0, 100.0);
+        let p2 = Vec2::new(100.0, 0.0);
 
         // At t=0.5, should be pulled toward control point
         let mid = quadratic_bezier(p0, p1, p2, 0.5);

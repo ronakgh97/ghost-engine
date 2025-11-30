@@ -1,6 +1,6 @@
 use crate::game::particles::spawn_death_explosion;
 use crate::game::screen_shake::shake_on_enemy_death;
-use crate::game::utils::circle_collision;
+// use crate::game::utils::circle_collision; // Uncomment when entity collision is implemented
 use crate::models::*;
 
 /// Check entity-to-entity collisions

@@ -5,18 +5,14 @@ use crate::models::*;
 pub fn update_ghosts(state: &mut GameState, delta: f32) {
     let ghost_cfg = &state.config.ghost_behavior;
 
-    // Ensure we have timers for all ghosts
-    while state.ghost_fire_timers.len() < state.ghosts.len() {
-        state.ghost_fire_timers.push(0.0);
-    }
-
-    // Update all fire timers
-    for timer in &mut state.ghost_fire_timers {
-        *timer = (*timer - delta).max(0.0);
-    }
-
-    // Update each ghost
+    // Update each ghost (fire timers now embedded in Ghost struct!)
     let total_ghosts = state.ghosts.len();
+    for ghost in state.ghosts.iter_mut() {
+        // Update fire timer
+        ghost.fire_timer = (ghost.fire_timer - delta).max(0.0);
+    }
+
+    // Second pass for firing and movement (need index for formation position)
     for (idx, ghost) in state.ghosts.iter_mut().enumerate() {
         // Calculate target position using current formation
         let target_pos = calculate_formation_position(
@@ -28,34 +24,14 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
         );
 
         // Calculate distance to target
-        let dx = target_pos.x - ghost.pos.x;
-        let dy = target_pos.y - ghost.pos.y;
-        let distance = (dx * dx + dy * dy).sqrt();
+        let diff = target_pos - ghost.pos;
+        let distance = diff.length();
 
         // Only move if far enough from target (prevents jitter/oscillation)
         if distance > 2.0 {
             // Smoothly interpolate to formation position (feels more natural than instant)
             let follow_speed = 3.0; // Smooth movement
-            ghost.pos.x += dx * follow_speed * delta;
-            ghost.pos.y += dy * follow_speed * delta;
-        }
-
-        // Auto-fire at nearest enemy
-        if idx < state.ghost_fire_timers.len()
-            && state.ghost_fire_timers[idx] <= 0.0
-            && !state.enemies.is_empty()
-        {
-            if let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies) {
-                fire_ghost_weapon(
-                    ghost,
-                    target,
-                    &mut state.projectiles,
-                    &state.enemies, // Pass enemies for missile targeting
-                    ghost_cfg.projectile_speed,
-                    &state.config.weapons,
-                );
-                state.ghost_fire_timers[idx] = ghost_cfg.fire_interval;
-            }
+            ghost.pos += diff * follow_speed * delta;
         }
     }
 
@@ -63,16 +39,43 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
     state
         .ghosts
         .retain(|g| g.pos.y > ghost_cfg.screen_boundary_top && g.pos.y < 1000.0);
+}
 
-    // Clean up excess timers
-    state.ghost_fire_timers.truncate(state.ghosts.len());
+/// Auto-fire ghosts at enemies (called separately to avoid borrow issues)
+pub fn update_ghost_firing(state: &mut GameState) {
+    let ghost_cfg = &state.config.ghost_behavior;
+
+    // Collect firing data first to avoid borrow issues
+    let mut fire_events: Vec<(usize, Position)> = Vec::new();
+
+    for (idx, ghost) in state.ghosts.iter().enumerate() {
+        if ghost.fire_timer <= 0.0 && !state.enemies.is_empty() {
+            if let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies) {
+                fire_events.push((idx, target));
+            }
+        }
+    }
+
+    // Execute firing
+    for (idx, target) in fire_events {
+        let ghost = &state.ghosts[idx];
+        fire_ghost_weapon(
+            ghost,
+            target,
+            &mut state.projectiles,
+            &state.enemies,
+            ghost_cfg.projectile_speed,
+            &state.config.weapons,
+        );
+        state.ghosts[idx].fire_timer = ghost_cfg.fire_interval;
+    }
 }
 
 /// Find the nearest enemy to a ghost
 fn find_nearest_enemy(ghost_pos: Position, enemies: &[Enemy]) -> Option<Position> {
     enemies.iter().map(|e| e.pos).min_by(|a, b| {
-        let dist_a = distance_sq(ghost_pos, *a);
-        let dist_b = distance_sq(ghost_pos, *b);
+        let dist_a = (*a - ghost_pos).length_squared();
+        let dist_b = (*b - ghost_pos).length_squared();
         dist_a.partial_cmp(&dist_b).unwrap()
     })
 }
@@ -83,8 +86,8 @@ fn find_nearest_enemy_index(ghost_pos: Position, enemies: &[Enemy]) -> Option<us
         .iter()
         .enumerate()
         .min_by(|(_, a), (_, b)| {
-            let dist_a = distance_sq(ghost_pos, a.pos);
-            let dist_b = distance_sq(ghost_pos, b.pos);
+            let dist_a = (a.pos - ghost_pos).length_squared();
+            let dist_b = (b.pos - ghost_pos).length_squared();
             dist_a.partial_cmp(&dist_b).unwrap()
         })
         .map(|(idx, _)| idx)
@@ -99,6 +102,8 @@ fn fire_ghost_weapon(
     projectile_speed: f32,
     weapons_config: &crate::config::WeaponsConfig,
 ) {
+    use macroquad::math::Vec2;
+
     // Pick random weapon from arsenal
     if ghost.weapon_type.is_empty() {
         return; // No weapons available
@@ -171,23 +176,21 @@ fn fire_ghost_weapon(
             let angles = [-spread_angle, 0.0, spread_angle];
 
             for &angle in &angles {
-                let base_dir_x = target.x - ghost.pos.x;
-                let base_dir_y = target.y - ghost.pos.y;
-                let base_distance = (base_dir_x * base_dir_x + base_dir_y * base_dir_y).sqrt();
+                let base_dir = target - ghost.pos;
+                let base_distance = base_dir.length();
 
                 if base_distance > 0.1 {
-                    let norm_x = base_dir_x / base_distance;
-                    let norm_y = base_dir_y / base_distance;
+                    let norm = base_dir / base_distance;
 
-                    let rotated_x = norm_x * angle.cos() - norm_y * angle.sin();
-                    let rotated_y = norm_x * angle.sin() + norm_y * angle.cos();
+                    let rotated_x = norm.x * angle.cos() - norm.y * angle.sin();
+                    let rotated_y = norm.x * angle.sin() + norm.y * angle.cos();
 
                     projectiles.push(Projectile {
                         pos: ghost.pos,
-                        velocity: Position {
-                            x: rotated_x * weapon_stats.projectile_speed,
-                            y: rotated_y * weapon_stats.projectile_speed,
-                        },
+                        velocity: Vec2::new(
+                            rotated_x * weapon_stats.projectile_speed,
+                            rotated_y * weapon_stats.projectile_speed,
+                        ),
                         damage: weapon_stats.damage * 0.5, // Ghost plasma does 50% damage
                         weapon_type: weapon,
                         owner: ProjectileOwner::Ghost,

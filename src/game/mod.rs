@@ -21,7 +21,7 @@ mod weapons;
 
 // Exports (some unused until features implemented)
 // pub use cancel_summon::*; // TODO: Enable when cancel summon UI added
-pub use bezier::*;
+// pub use bezier::*; // Internal module, not re-exported
 pub use collision::*;
 pub use combat::*;
 pub use enemy::*;
@@ -51,6 +51,9 @@ pub fn update_all_systems(state: &mut GameState, delta: f32) {
     update_player(state, delta);
     update_enemies(state, delta);
     update_ghosts(state, delta);
+
+    // Ghost auto-fire (separate to avoid borrow issues)
+    ghost::update_ghost_firing(state);
 
     // Update ghost animations (spawn/despawn effects)
     ghost_animation::update_ghost_animations(&mut state.ghosts, delta, &state.config.animations);

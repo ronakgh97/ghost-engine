@@ -1,34 +1,28 @@
 use crate::models::{GhostFormation, Position};
+use macroquad::math::Vec2;
 
 /// Circle-to-circle collision detection
 pub fn circle_collision(pos1: Position, pos2: Position, radius1: f32, radius2: f32) -> bool {
-    let dx = pos1.x - pos2.x;
-    let dy = pos1.y - pos2.y;
-    let distance_sq = dx * dx + dy * dy;
+    let distance_sq = (pos1 - pos2).length_squared();
     let radii_sum = radius1 + radius2;
     distance_sq < radii_sum * radii_sum
 }
 
 /// Calculate squared distance between two positions (faster than sqrt)
+#[allow(dead_code)]
 pub fn distance_sq(a: Position, b: Position) -> f32 {
-    let dx = a.x - b.x;
-    let dy = a.y - b.y;
-    dx * dx + dy * dy
+    (a - b).length_squared()
 }
 
 /// Normalize a direction vector and return velocity
 pub fn calculate_velocity(from: Position, to: Position, speed: f32) -> Position {
-    let dx = to.x - from.x;
-    let dy = to.y - from.y;
-    let distance = (dx * dx + dy * dy).sqrt();
+    let dir = to - from;
+    let distance = dir.length();
 
     if distance > 0.0 {
-        Position {
-            x: (dx / distance) * speed,
-            y: (dy / distance) * speed,
-        }
+        dir.normalize() * speed
     } else {
-        Position { x: 0.0, y: 0.0 }
+        Vec2::ZERO
     }
 }
 
@@ -46,18 +40,16 @@ pub fn calculate_lead_velocity(
     projectile_speed: f32,
 ) -> Position {
     // Calculate relative position
-    let dx = target_pos.x - from.x;
-    let dy = target_pos.y - from.y;
+    let d = target_pos - from;
 
     // Get target velocity components
-    let vx = target_velocity.x;
-    let vy = target_velocity.y;
+    let v = target_velocity;
 
     // Quadratic equation coefficients: a*t² + b*t + c = 0
     // Where t is the time to intercept
-    let a = vx * vx + vy * vy - projectile_speed * projectile_speed;
-    let b = 2.0 * (dx * vx + dy * vy);
-    let c = dx * dx + dy * dy;
+    let a = v.length_squared() - projectile_speed * projectile_speed;
+    let b = 2.0 * d.dot(v);
+    let c = d.length_squared();
 
     // Solve quadratic equation
     let discriminant = b * b - 4.0 * a * c;
@@ -84,18 +76,10 @@ pub fn calculate_lead_velocity(
     };
 
     // Calculate predicted intercept position
-    let intercept_x = target_pos.x + target_velocity.x * t;
-    let intercept_y = target_pos.y + target_velocity.y * t;
+    let intercept = target_pos + target_velocity * t;
 
     // Aim at intercept point
-    calculate_velocity(
-        from,
-        Position {
-            x: intercept_x,
-            y: intercept_y,
-        },
-        projectile_speed,
-    )
+    calculate_velocity(from, intercept, projectile_speed)
 }
 
 use macroquad::prelude::rand;
@@ -109,11 +93,6 @@ pub fn calculate_formation_position(
     formation: GhostFormation,
     config: &crate::config::FormationSpacingConfig,
 ) -> Position {
-    // If formation is invalid for the number of ghosts, default to scattered (REMOVED)
-    //if !formation.is_valid_for_count(total_ghosts) {
-    //    return calculate_scattered_formation(player_pos, config);
-    //}
-
     match formation {
         GhostFormation::VShape => {
             calculate_v_formation(player_pos, ghost_index, total_ghosts, config)
@@ -148,10 +127,10 @@ fn calculate_v_formation(
     let side = if index % 2 == 0 { -1.0 } else { 1.0 };
     let offset = (index / 2) as f32 + 1.0;
 
-    Position {
-        x: player_pos.x + (side * offset * spacing),
-        y: player_pos.y - (offset * spacing * config.v_shape_vertical_factor),
-    }
+    Vec2::new(
+        player_pos.x + (side * offset * spacing),
+        player_pos.y - (offset * spacing * config.v_shape_vertical_factor),
+    )
 }
 
 /// Horizontal line formation (maximum firepower)
@@ -166,10 +145,10 @@ fn calculate_line_formation(
     let x_offset = (index as f32 - center_offset) * spacing;
     let padding = config.screen_edge_padding;
 
-    Position {
-        x: (player_pos.x + x_offset).clamp(padding, screen_width() - padding),
-        y: player_pos.y - config.line_height_offset,
-    }
+    Vec2::new(
+        (player_pos.x + x_offset).clamp(padding, screen_width() - padding),
+        player_pos.y - config.line_height_offset,
+    )
 }
 
 /// Circle formation (defensive)
@@ -183,8 +162,8 @@ fn calculate_circle_formation(
     let radius = config.circle_radius;
     let angle = (index as f32 / total as f32) * TAU;
 
-    Position {
-        x: player_pos.x + angle.cos() * radius,
-        y: player_pos.y + angle.sin() * radius,
-    }
+    Vec2::new(
+        player_pos.x + angle.cos() * radius,
+        player_pos.y + angle.sin() * radius,
+    )
 }

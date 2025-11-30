@@ -1,10 +1,8 @@
 use crate::config::GameConfig;
+use macroquad::math::Vec2;
 
-#[derive(Clone, Copy)]
-pub struct Position {
-    pub x: f32,
-    pub y: f32,
-}
+/// Type alias for Position - using macroquad's Vec2 for built-in vector math
+pub type Position = Vec2;
 
 #[derive(Clone, Copy)]
 pub struct Stats {
@@ -239,6 +237,7 @@ pub struct Enemy {
     pub entity_type: EntityType,
     pub anim: EntityAnimState, // Animation state (hit flash, spawn, despawn)
     pub movement_state: EnemyMovementState, // Path-following or free movement
+    pub fire_timer: f32,       // Time until next shot (embedded, no sync issues!)
 }
 
 // Animation state for entities (ghosts, enemies, etc.)
@@ -305,6 +304,7 @@ pub struct Ghost {
     pub entity_type: EntityType,
     pub energy_drain_per_sec: f32,
     pub anim: EntityAnimState, // Animation state
+    pub fire_timer: f32,       // Time until next shot (embedded, no sync issues!)
 }
 
 #[allow(dead_code)]
@@ -416,6 +416,7 @@ impl Ghost {
             entity_type,
             energy_drain_per_sec: entity_type.get_energy_cost(&config.entities) * 0.1,
             anim: EntityAnimState::new_spawning(0.5), // 0.5s spawn animation
+            fire_timer: 0.0,                          // Ready to fire immediately
         }
     }
 }
@@ -515,8 +516,8 @@ pub struct GameState {
     pub projectiles: Vec<Projectile>,
     pub particles: Vec<Particle>,
     pub player_fire_timer: f32,
-    pub enemy_fire_timers: Vec<f32>,
-    pub ghost_fire_timers: Vec<f32>,
+    // NOTE: enemy_fire_timers and ghost_fire_timers removed!
+    // Fire timers are now embedded directly in Enemy and Ghost structs
     pub spawn_timer: f32,
     pub ghost_formation: GhostFormation,
 
@@ -541,16 +542,10 @@ impl GameState {
         GameState {
             config: config.clone(),
             player: Player {
-                pos: Position {
-                    x: screen_width() / 2.0,
-                    y: screen_height() - 50.0,
-                },
-                last_pos: Position {
-                    x: screen_width() / 2.0,
-                    y: screen_height() - 50.0,
-                },
-                velocity: Position { x: 0.0, y: 0.0 },
-                input_direction: Position { x: 0.0, y: 0.0 }, // No input at start
+                pos: Vec2::new(screen_width() / 2.0, screen_height() - 50.0),
+                last_pos: Vec2::new(screen_width() / 2.0, screen_height() - 50.0),
+                velocity: Vec2::ZERO,
+                input_direction: Vec2::ZERO, // No input at start
                 stats: Stats {
                     health: config.player.starting_health,
                     max_health: config.player.max_health,
@@ -582,7 +577,7 @@ impl GameState {
                 // Dash mechanic initialized
                 is_dashing: false,
                 dash_timer: 0.0,
-                dash_direction: Position { x: 0.0, y: 0.0 },
+                dash_direction: Vec2::ZERO,
                 dash_cooldown_timer: 0.0,
                 i_frame_timer: 0.0,
                 dash_trail_timer: 0.0,
@@ -592,8 +587,6 @@ impl GameState {
             projectiles: Vec::new(),
             particles: Vec::new(),
             player_fire_timer: 0.0,
-            enemy_fire_timers: Vec::new(),
-            ghost_fire_timers: Vec::new(),
             spawn_timer: 0.0,
             ghost_formation: GhostFormation::Line,
 

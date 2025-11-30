@@ -45,31 +45,16 @@ pub fn handle_enemy_splits(
 
             // Create short Bezier path for spread effect
             let spread_path = BezierPath {
-                p0: Position {
-                    x: start_x,
-                    y: start_y,
-                },
-                p1: Position {
-                    x: start_x + spread_x * 0.5,
-                    y: start_y + 40.0,
-                },
-                p2: Position {
-                    x: start_x + spread_x,
-                    y: start_y + 80.0,
-                },
-                p3: Position {
-                    x: start_x + spread_x,
-                    y: start_y + 100.0,
-                },
+                p0: Vec2::new(start_x, start_y),
+                p1: Vec2::new(start_x + spread_x * 0.5, start_y + 40.0),
+                p2: Vec2::new(start_x + spread_x, start_y + 80.0),
+                p3: Vec2::new(start_x + spread_x, start_y + 100.0),
                 duration: rand::gen_range(1.25, 2.0), // Quick spread
                 use_cubic: true,
             };
 
             let split_enemy = Enemy {
-                pos: Position {
-                    x: start_x,
-                    y: start_y,
-                },
+                pos: Vec2::new(start_x, start_y),
                 stats: Stats {
                     health: split_hp,
                     max_health: split_hp,
@@ -83,6 +68,7 @@ pub fn handle_enemy_splits(
                     progress: 0.0,
                     elapsed_time: 0.0,
                 }, // Reuse Bezier system for spread!
+                fire_timer: rand::gen_range(0.5, 1.5), // Random initial delay for splits
             };
 
             new_enemies.push(split_enemy);
@@ -123,10 +109,7 @@ pub fn spawn_split_particles(
 
             let particle = Particle {
                 pos,
-                velocity: Position {
-                    x: (target_x - pos.x) * 3.0, // Move horizontally towards split position
-                    y: rand::gen_range(-20.0, 20.0), // Some vertical spread
-                },
+                velocity: Vec2::new((target_x - pos.x) * 3.0, rand::gen_range(-20.0, 20.0)),
                 lifetime: 0.5 + progress * 0.3, // Staggered lifetime
                 max_lifetime: 0.8,
                 color,
@@ -145,10 +128,7 @@ pub fn spawn_split_particles(
 
         let particle = Particle {
             pos,
-            velocity: Position {
-                x: angle.cos() * speed,
-                y: angle.sin() * speed,
-            },
+            velocity: Vec2::new(angle.cos() * speed, angle.sin() * speed),
             lifetime: rand::gen_range(0.3, 0.6),
             max_lifetime: 0.6,
             color,
@@ -180,10 +160,10 @@ pub fn handle_ghost_splitter_damage(
 
     // Create temporary clone with reduced stats
     let clone = Ghost {
-        pos: Position {
-            x: ghost.pos.x + rand::gen_range(-40.0, 40.0),
-            y: ghost.pos.y + rand::gen_range(-40.0, 40.0),
-        },
+        pos: Vec2::new(
+            ghost.pos.x + rand::gen_range(-40.0, 40.0),
+            ghost.pos.y + rand::gen_range(-40.0, 40.0),
+        ),
         stats: Stats {
             health: ghost.stats.health * 0.5, // Clone has 50% HP
             max_health: ghost.stats.max_health * 0.5,
@@ -193,6 +173,7 @@ pub fn handle_ghost_splitter_damage(
         entity_type: EntityType::Splitter,
         energy_drain_per_sec: 0.0, // Clones don't drain energy!
         anim: EntityAnimState::new_spawning(0.3), // Quick spawn animation for clones
+        fire_timer: 0.0,
     };
 
     println!("✓ Ghost splitter created a clone!");
@@ -229,10 +210,7 @@ pub fn handle_ghost_splits(
             };
 
             let split_ghost = Ghost {
-                pos: Position {
-                    x: ghost.pos.x + x_offset,
-                    y: ghost.pos.y, // Same Y position
-                },
+                pos: Vec2::new(ghost.pos.x + x_offset, ghost.pos.y),
                 stats: Stats {
                     health: split_hp,
                     max_health: split_hp,
@@ -242,6 +220,7 @@ pub fn handle_ghost_splits(
                 entity_type: EntityType::BasicFighter,  // Splits become basic fighters
                 energy_drain_per_sec: ghost.energy_drain_per_sec * 0.0, // Doesn't drain energy
                 anim: EntityAnimState::new_spawning(0.4), // Spawn animation for splits
+                fire_timer: rand::gen_range(0.5, 1.5),  // Random initial delay
             };
 
             new_ghosts.push(split_ghost);

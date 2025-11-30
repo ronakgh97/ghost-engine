@@ -23,9 +23,6 @@ pub fn cancel_summon(state: &mut GameState) {
         }
     }
 
-    // Clear timers immediately
-    state.ghost_fire_timers.clear();
-
     println!("✔ Cancel Deployed, {ghost_count} ghost(s)!");
     // TODO: Play despawn sound/effect
 }

@@ -228,10 +228,7 @@ impl WaveManager {
                 // Get starting position from path
                 let start_pos = match &movement_state {
                     EnemyMovementState::FollowingPath { path, .. } => path.p0,
-                    EnemyMovementState::FreeMovement => Position {
-                        x: spawn_x,
-                        y: -25.0,
-                    },
+                    EnemyMovementState::FreeMovement => Vec2::new(spawn_x, -25.0),
                 };
 
                 // Create enemy with Bezier entry path
@@ -242,10 +239,10 @@ impl WaveManager {
                     weapon: final_weapons,
                     anim: EntityAnimState::default(),
                     movement_state,
+                    fire_timer: 0.0, // Ready to fire
                 };
 
                 game_state.enemies.push(enemy);
-                game_state.enemy_fire_timers.push(0.0);
 
                 spawn.spawned += 1;
                 spawn.timer = spawn.interval; // Reset timer

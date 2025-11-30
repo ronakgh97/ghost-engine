@@ -6,18 +6,11 @@ use macroquad::prelude::*;
 pub fn update_enemies(state: &mut GameState, delta: f32) {
     let enemy_cfg = &state.config.enemy_behavior;
 
-    // Ensure we have timers for all enemies
-    while state.enemy_fire_timers.len() < state.enemies.len() {
-        state.enemy_fire_timers.push(rand::gen_range(1.0, 3.0));
-    }
+    // Update each enemy (fire timers now embedded in Enemy struct!)
+    for enemy in state.enemies.iter_mut() {
+        // Update fire timer
+        enemy.fire_timer = (enemy.fire_timer - delta).max(0.0);
 
-    // Update all fire timers
-    for timer in &mut state.enemy_fire_timers {
-        *timer = (*timer - delta).max(0.0);
-    }
-
-    // Update each enemy
-    for (idx, enemy) in state.enemies.iter_mut().enumerate() {
         // Update hit flash animation
         crate::game::animation::update_hit_flash(
             &mut enemy.anim.hit_flash_timer,
@@ -67,11 +60,7 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
             EnemyMovementState::FreeMovement => true,
         };
 
-        if can_fire
-            && idx < state.enemy_fire_timers.len()
-            && state.enemy_fire_timers[idx] <= 0.0
-            && enemy.pos.y > enemy_cfg.fire_threshold_y
-        {
+        if can_fire && enemy.fire_timer <= 0.0 && enemy.pos.y > enemy_cfg.fire_threshold_y {
             fire_enemy_weapon(
                 enemy,
                 state.player.pos,
@@ -80,8 +69,7 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
                 enemy_cfg.basic_projectile_speed_y,
                 &state.config.weapons,
             );
-            state.enemy_fire_timers[idx] =
-                enemy.entity_type.get_fire_interval(&state.config.entities);
+            enemy.fire_timer = enemy.entity_type.get_fire_interval(&state.config.entities);
         }
     }
 
@@ -89,9 +77,6 @@ pub fn update_enemies(state: &mut GameState, delta: f32) {
     state
         .enemies
         .retain(|e| e.pos.y < enemy_cfg.screen_boundary_bottom);
-
-    // Clean up excess timers
-    state.enemy_fire_timers.truncate(state.enemies.len());
 }
 
 /// Fire enemy weapon based on type
@@ -116,10 +101,7 @@ fn fire_enemy_weapon(
         WeaponType::Bullet => {
             // Shoot straight down or aimed based on enemy type
             let velocity = match enemy.entity_type {
-                EntityType::BasicFighter => Position {
-                    x: 0.0,
-                    y: basic_projectile_speed_y,
-                },
+                EntityType::BasicFighter => Vec2::new(0.0, basic_projectile_speed_y),
 
                 EntityType::Tank | EntityType::Sniper | EntityType::Elite => {
                     calculate_lead_velocity(
@@ -196,25 +178,23 @@ fn fire_enemy_weapon(
 
             for &angle in &angles {
                 // Calculate direction to player, then apply spread
-                let base_dir_x = player_pos.x - enemy.pos.x;
-                let base_dir_y = player_pos.y - enemy.pos.y;
-                let base_distance = (base_dir_x * base_dir_x + base_dir_y * base_dir_y).sqrt();
+                let base_dir = player_pos - enemy.pos;
+                let base_distance = base_dir.length();
 
                 if base_distance > 0.1 {
                     // Normalize base direction
-                    let norm_x = base_dir_x / base_distance;
-                    let norm_y = base_dir_y / base_distance;
+                    let norm = base_dir / base_distance;
 
                     // Apply angle rotation to spread pattern
-                    let rotated_x = norm_x * angle.cos() - norm_y * angle.sin();
-                    let rotated_y = norm_x * angle.sin() + norm_y * angle.cos();
+                    let rotated_x = norm.x * angle.cos() - norm.y * angle.sin();
+                    let rotated_y = norm.x * angle.sin() + norm.y * angle.cos();
 
                     projectiles.push(Projectile {
                         pos: enemy.pos,
-                        velocity: Position {
-                            x: rotated_x * weapon_stats.projectile_speed,
-                            y: rotated_y * weapon_stats.projectile_speed,
-                        },
+                        velocity: Vec2::new(
+                            rotated_x * weapon_stats.projectile_speed,
+                            rotated_y * weapon_stats.projectile_speed,
+                        ),
                         damage: weapon_stats.damage * 0.75,
                         weapon_type: weapon,
                         owner: ProjectileOwner::Enemy,

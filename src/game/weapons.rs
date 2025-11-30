@@ -40,10 +40,7 @@ pub fn player_fire_weapon(state: &mut GameState, weapon_index: usize) {
 fn fire_bullet(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
     let projectile = Projectile {
         pos: state.player.pos,
-        velocity: Position {
-            x: 0.0,
-            y: -weapon_stats.projectile_speed, // Shoot upward
-        },
+        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
         damage: weapon_stats.damage,
         weapon_type: WeaponType::Bullet,
         owner: ProjectileOwner::Player,
@@ -62,10 +59,7 @@ fn fire_bullet(state: &mut GameState, weapon_stats: crate::models::WeaponStats) 
 fn fire_laser(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
     let projectile = Projectile {
         pos: state.player.pos,
-        velocity: Position {
-            x: 0.0,
-            y: -weapon_stats.projectile_speed, // Shoot upward
-        },
+        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
         damage: weapon_stats.damage,
         weapon_type: WeaponType::Laser,
         owner: ProjectileOwner::Player,
@@ -87,10 +81,7 @@ fn fire_missile(state: &mut GameState, weapon_stats: crate::models::WeaponStats)
 
     let projectile = Projectile {
         pos: state.player.pos,
-        velocity: Position {
-            x: 0.0,
-            y: -weapon_stats.projectile_speed, // Initial upward velocity
-        },
+        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
         damage: weapon_stats.damage,
         weapon_type: WeaponType::Missile,
         owner: ProjectileOwner::Player,
@@ -113,10 +104,10 @@ fn fire_plasma(state: &mut GameState, weapon_stats: crate::models::WeaponStats) 
     for &angle in &angles {
         let projectile = Projectile {
             pos: state.player.pos,
-            velocity: Position {
-                x: weapon_stats.projectile_speed * angle.sin(),
-                y: -weapon_stats.projectile_speed * angle.cos(), // Spread pattern
-            },
+            velocity: Vec2::new(
+                weapon_stats.projectile_speed * angle.sin(),
+                -weapon_stats.projectile_speed * angle.cos(),
+            ),
             damage: weapon_stats.damage,
             weapon_type: WeaponType::Plasma,
             owner: ProjectileOwner::Player,
@@ -136,10 +127,7 @@ fn fire_plasma(state: &mut GameState, weapon_stats: crate::models::WeaponStats) 
 fn fire_bombs(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
     let projectile = Projectile {
         pos: state.player.pos,
-        velocity: Position {
-            x: 0.0,
-            y: -weapon_stats.projectile_speed, // Shoot upward
-        },
+        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
         damage: weapon_stats.damage,
         weapon_type: WeaponType::Bombs,
         owner: ProjectileOwner::Player,
@@ -292,23 +280,14 @@ fn spawn_projectile_trails(state: &mut GameState, _delta: f32) {
             let offset_y = rand::gen_range(-spread, spread);
 
             (
-                Position {
-                    x: pos.x + offset_x,
-                    y: pos.y + offset_y,
-                },
-                Position {
-                    x: rand::gen_range(-5.0, 5.0),
-                    y: rand::gen_range(-5.0, 5.0),
-                },
+                Vec2::new(pos.x + offset_x, pos.y + offset_y),
+                Vec2::new(rand::gen_range(-5.0, 5.0), rand::gen_range(-5.0, 5.0)),
             )
         } else {
             // Other weapons use normal random drift
             (
                 pos,
-                Position {
-                    x: rand::gen_range(-10.0, 10.0),
-                    y: rand::gen_range(-10.0, 10.0),
-                },
+                Vec2::new(rand::gen_range(-10.0, 10.0), rand::gen_range(-10.0, 10.0)),
             )
         };
 

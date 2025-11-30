@@ -12,10 +12,7 @@ pub fn spawn_explosion(state: &mut GameState, pos: Position, count: usize, color
 
         let particle = Particle {
             pos,
-            velocity: Position {
-                x: angle.cos() * speed,
-                y: angle.sin() * speed,
-            },
+            velocity: Vec2::new(angle.cos() * speed, angle.sin() * speed),
             lifetime,
             max_lifetime: cfg.explosion_lifetime_max,
             color,
@@ -41,10 +38,7 @@ pub fn spawn_hit_sparks(state: &mut GameState, pos: Position, direction: Positio
 
         let particle = Particle {
             pos,
-            velocity: Position {
-                x: angle.cos() * speed,
-                y: angle.sin() * speed,
-            },
+            velocity: Vec2::new(angle.cos() * speed, angle.sin() * speed),
             lifetime,
             max_lifetime: cfg.spark_lifetime_max,
             color: YELLOW,
@@ -70,7 +64,7 @@ pub fn spawn_weapon_particles(state: &mut GameState, pos: Position, weapon_type:
     match weapon_type {
         WeaponType::Bullet => {
             // Small yellow sparks
-            spawn_hit_sparks(state, pos, Position { x: 0.0, y: -1.0 });
+            spawn_hit_sparks(state, pos, Vec2::new(0.0, -1.0));
         }
         WeaponType::Laser => {
             // Cyan energy burst
@@ -129,10 +123,7 @@ pub fn spawn_player_hit_effect(state: &mut GameState, pos: Position) {
 
         let particle = Particle {
             pos,
-            velocity: Position {
-                x: angle.cos() * speed,
-                y: angle.sin() * speed,
-            },
+            velocity: Vec2::new(angle.cos() * speed, angle.sin() * speed),
             lifetime: rand::gen_range(0.2, 0.4),
             max_lifetime: 0.4,
             color: RED,
@@ -150,10 +141,7 @@ pub fn spawn_player_hit_effect(state: &mut GameState, pos: Position) {
 
         let particle = Particle {
             pos,
-            velocity: Position {
-                x: angle.cos() * speed,
-                y: angle.sin() * speed,
-            },
+            velocity: Vec2::new(angle.cos() * speed, angle.sin() * speed),
             lifetime: rand::gen_range(0.15, 0.35),
             max_lifetime: 0.35,
             color: ORANGE,
@@ -176,10 +164,7 @@ pub fn spawn_dash_trail(state: &mut GameState, pos: Position) {
 
         state.particles.push(Particle {
             pos,
-            velocity: Position {
-                x: angle.cos() * speed,
-                y: angle.sin() * speed,
-            },
+            velocity: Vec2::new(angle.cos() * speed, angle.sin() * speed),
             lifetime: 0.3, // Short-lived trail
             max_lifetime: 0.3,
             color: Color::new(0.0, 0.5, 1.0, 0.8), // Cyan/blue
