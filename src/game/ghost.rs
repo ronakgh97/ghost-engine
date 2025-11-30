@@ -49,10 +49,11 @@ pub fn update_ghost_firing(state: &mut GameState) {
     let mut fire_events: Vec<(usize, Position)> = Vec::new();
 
     for (idx, ghost) in state.ghosts.iter().enumerate() {
-        if ghost.fire_timer <= 0.0 && !state.enemies.is_empty() {
-            if let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies) {
-                fire_events.push((idx, target));
-            }
+        if ghost.fire_timer <= 0.0
+            && !state.enemies.is_empty()
+            && let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies)
+        {
+            fire_events.push((idx, target));
         }
     }
 
