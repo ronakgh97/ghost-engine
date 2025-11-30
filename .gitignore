@@ -3,3 +3,6 @@
 .idea
 
 .github
+
+# No GIF files (use PNG for demos)
+*.gif
