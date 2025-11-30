@@ -1,9 +1,11 @@
-use crate::game::utils::*;
+use crate::game::utils::calculate_formation_position;
+use crate::game::weapons::{FireWeaponParams, FiringDirection, fire_weapon};
 use crate::models::*;
+use macroquad::prelude::*;
 
 /// Update all ghosts (movement, auto-fire, cleanup)
 pub fn update_ghosts(state: &mut GameState, delta: f32) {
-    let ghost_cfg = &state.config.ghost_behavior;
+    let screen_boundary_top = state.config.ghost_behavior.screen_boundary_top;
 
     // Update each ghost (fire timers now embedded in Ghost struct!)
     let total_ghosts = state.ghosts.len();
@@ -12,7 +14,7 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
         ghost.fire_timer = (ghost.fire_timer - delta).max(0.0);
     }
 
-    // Second pass for firing and movement (need index for formation position)
+    // Second pass for movement (need index for formation position)
     for (idx, ghost) in state.ghosts.iter_mut().enumerate() {
         // Calculate target position using current formation
         let target_pos = calculate_formation_position(
@@ -38,37 +40,50 @@ pub fn update_ghosts(state: &mut GameState, delta: f32) {
     // Remove off-screen ghosts (safety cleanup, shouldn't happen with formation following)
     state
         .ghosts
-        .retain(|g| g.pos.y > ghost_cfg.screen_boundary_top && g.pos.y < 1000.0);
+        .retain(|g| g.pos.y > screen_boundary_top && g.pos.y < 1000.0);
 }
 
 /// Auto-fire ghosts at enemies (called separately to avoid borrow issues)
 pub fn update_ghost_firing(state: &mut GameState) {
-    let ghost_cfg = &state.config.ghost_behavior;
+    let fire_interval = state.config.ghost_behavior.fire_interval;
 
     // Collect firing data first to avoid borrow issues
-    let mut fire_events: Vec<(usize, Position)> = Vec::new();
+    let mut fire_events: Vec<(Vec2, WeaponType, Vec2)> = Vec::new(); // (pos, weapon, target)
 
-    for (idx, ghost) in state.ghosts.iter().enumerate() {
-        if ghost.fire_timer <= 0.0
-            && !state.enemies.is_empty()
-            && let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies)
-        {
-            fire_events.push((idx, target));
+    // Collect enemy positions for missile targeting
+    let enemy_positions: Vec<Vec2> = state.enemies.iter().map(|e| e.pos).collect();
+
+    for ghost in state.ghosts.iter_mut() {
+        if ghost.fire_timer <= 0.0 && !state.enemies.is_empty() {
+            // Find nearest enemy
+            if let Some(target) = find_nearest_enemy(ghost.pos, &state.enemies) {
+                // Pick random weapon from arsenal
+                if !ghost.weapon_type.is_empty() {
+                    let random_idx = rand::gen_range(0, ghost.weapon_type.len());
+                    let weapon = ghost.weapon_type[random_idx];
+
+                    fire_events.push((ghost.pos, weapon, target));
+
+                    // Reset fire timer
+                    ghost.fire_timer = fire_interval;
+                }
+            }
         }
     }
 
-    // Execute firing
-    for (idx, target) in fire_events {
-        let ghost = &state.ghosts[idx];
-        fire_ghost_weapon(
-            ghost,
-            target,
-            &mut state.projectiles,
-            &state.enemies,
-            ghost_cfg.projectile_speed,
-            &state.config.weapons,
+    // Execute firing using unified system
+    for (shooter_pos, weapon, target) in fire_events {
+        fire_weapon(
+            FireWeaponParams {
+                shooter_pos,
+                owner: ProjectileOwner::Ghost,
+                weapon,
+                direction: FiringDirection::AtTarget(target),
+                damage_multiplier: 0.5, // Ghosts deal 50% damage
+                enemies: Some(enemy_positions.clone()), // For missile targeting
+            },
+            state,
         );
-        state.ghosts[idx].fire_timer = ghost_cfg.fire_interval;
     }
 }
 
@@ -79,148 +94,4 @@ fn find_nearest_enemy(ghost_pos: Position, enemies: &[Enemy]) -> Option<Position
         let dist_b = (*b - ghost_pos).length_squared();
         dist_a.partial_cmp(&dist_b).unwrap()
     })
-}
-
-/// Find the index of the nearest enemy for missile locking
-fn find_nearest_enemy_index(ghost_pos: Position, enemies: &[Enemy]) -> Option<usize> {
-    enemies
-        .iter()
-        .enumerate()
-        .min_by(|(_, a), (_, b)| {
-            let dist_a = (a.pos - ghost_pos).length_squared();
-            let dist_b = (b.pos - ghost_pos).length_squared();
-            dist_a.partial_cmp(&dist_b).unwrap()
-        })
-        .map(|(idx, _)| idx)
-}
-
-/// Fire ghost weapon at target
-fn fire_ghost_weapon(
-    ghost: &Ghost,
-    target: Position,
-    projectiles: &mut Vec<Projectile>,
-    enemies: &[Enemy], // Need enemies for missile targeting
-    projectile_speed: f32,
-    weapons_config: &crate::config::WeaponsConfig,
-) {
-    use macroquad::math::Vec2;
-
-    // Pick random weapon from arsenal
-    if ghost.weapon_type.is_empty() {
-        return; // No weapons available
-    }
-
-    use macroquad::rand;
-    let random_idx = rand::gen_range(0, ghost.weapon_type.len());
-    let weapon = ghost.weapon_type[random_idx];
-
-    let weapon_stats = weapon.get_weapon_stats(weapons_config);
-
-    match weapon {
-        WeaponType::Bullet => {
-            let velocity = calculate_velocity(ghost.pos, target, projectile_speed);
-
-            projectiles.push(Projectile {
-                pos: ghost.pos,
-                velocity,
-                damage: weapon_stats.damage * 0.5, // Ghost bullets do 50% damage
-                weapon_type: weapon,
-                owner: ProjectileOwner::Ghost,
-                piercing: false,
-                homing: false,
-                explosion_radius: 0.0,
-                locked_target_index: None,
-                lifetime: 0.0,
-                trail_timer: 0.0,
-            });
-        }
-        WeaponType::Laser => {
-            let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
-
-            projectiles.push(Projectile {
-                pos: ghost.pos,
-                velocity,
-                damage: weapon_stats.damage * 0.5, // Ghost lasers do 50% damage
-                weapon_type: weapon,
-                owner: ProjectileOwner::Ghost,
-                piercing: true, // Ghost lasers also pierce
-                homing: false,
-                explosion_radius: 0.0,
-                locked_target_index: None,
-                lifetime: 0.0,
-                trail_timer: 0.0,
-            });
-        }
-        WeaponType::Missile => {
-            // Ghost missiles ARE homing (exact copy of enemy behavior!)
-            // Find nearest enemy to lock onto
-            let nearest_idx = find_nearest_enemy_index(ghost.pos, enemies);
-            let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
-
-            projectiles.push(Projectile {
-                pos: ghost.pos,
-                velocity,
-                damage: weapon_stats.damage * 0.5, // Ghost missiles do 50% damage
-                weapon_type: weapon,
-                owner: ProjectileOwner::Ghost,
-                piercing: false,
-                homing: true,
-                explosion_radius: 0.0,
-                locked_target_index: nearest_idx, // Lock onto nearest enemy
-                lifetime: 0.0,
-                trail_timer: 0.0,
-            });
-        }
-        WeaponType::Plasma => {
-            // Ghost plasma: 3-projectile spread toward target
-            let spread_angle = 15.0_f32.to_radians();
-            let angles = [-spread_angle, 0.0, spread_angle];
-
-            for &angle in &angles {
-                let base_dir = target - ghost.pos;
-                let base_distance = base_dir.length();
-
-                if base_distance > 0.1 {
-                    let norm = base_dir / base_distance;
-
-                    let rotated_x = norm.x * angle.cos() - norm.y * angle.sin();
-                    let rotated_y = norm.x * angle.sin() + norm.y * angle.cos();
-
-                    projectiles.push(Projectile {
-                        pos: ghost.pos,
-                        velocity: Vec2::new(
-                            rotated_x * weapon_stats.projectile_speed,
-                            rotated_y * weapon_stats.projectile_speed,
-                        ),
-                        damage: weapon_stats.damage * 0.5, // Ghost plasma does 50% damage
-                        weapon_type: weapon,
-                        owner: ProjectileOwner::Ghost,
-                        piercing: false,
-                        homing: false,
-                        explosion_radius: 0.0,
-                        locked_target_index: None,
-                        lifetime: 0.0,
-                        trail_timer: 0.0,
-                    });
-                }
-            }
-        }
-        WeaponType::Bombs => {
-            let velocity = calculate_velocity(ghost.pos, target, weapon_stats.projectile_speed);
-
-            projectiles.push(Projectile {
-                pos: ghost.pos,
-                velocity,
-                damage: weapon_stats.damage * 0.5, // Ghost bombs do 50% damage
-                weapon_type: weapon,
-                owner: ProjectileOwner::Ghost,
-                piercing: false,
-                homing: false,
-                explosion_radius: 70.0, // Ghost bomb AOE
-                locked_target_index: None,
-                lifetime: 0.0,
-                trail_timer: 0.0,
-            });
-        }
-    }
 }

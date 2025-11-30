@@ -1,6 +1,231 @@
 use crate::models::*;
 use macroquad::prelude::*;
 
+// UNIFIED WEAPON FIRING SYSTEM
+
+/// Direction strategy for projectile firing
+#[derive(Clone, Copy)]
+pub enum FiringDirection {
+    /// Fire straight up (player default)
+    Up,
+    /// Fire straight down (basic enemy default)
+    Down,
+    /// Fire directly at target position
+    AtTarget(Vec2),
+    /// Lead the target based on its velocity (predictive aiming)
+    LeadTarget { target_pos: Vec2, target_vel: Vec2 },
+}
+
+/// Configuration for a single weapon firing event
+pub struct FireWeaponParams {
+    pub shooter_pos: Vec2,
+    pub owner: ProjectileOwner,
+    pub weapon: WeaponType,
+    pub direction: FiringDirection,
+    pub damage_multiplier: f32,
+    pub enemies: Option<Vec<Vec2>>, // Enemy positions for missile targeting (None for enemy shooters)
+}
+
+/// Unified weapon firing function - ALL entities use this!
+pub fn fire_weapon(params: FireWeaponParams, state: &mut GameState) {
+    let weapon_stats = params.weapon.get_weapon_stats(&state.config.weapons);
+    let speed = weapon_stats.projectile_speed;
+
+    // Calculate base velocity based on direction strategy
+    let base_velocity = match params.direction {
+        FiringDirection::Up => Vec2::new(0.0, -speed),
+        FiringDirection::Down => Vec2::new(0.0, speed),
+        FiringDirection::AtTarget(target) => {
+            crate::game::utils::calculate_velocity(params.shooter_pos, target, speed)
+        }
+        FiringDirection::LeadTarget {
+            target_pos,
+            target_vel,
+        } => crate::game::utils::calculate_lead_velocity(
+            params.shooter_pos,
+            target_pos,
+            target_vel,
+            speed,
+        ),
+    };
+
+    // Get target position for spread calculations
+    let target_pos = match params.direction {
+        FiringDirection::Up => params.shooter_pos + Vec2::new(0.0, -100.0),
+        FiringDirection::Down => params.shooter_pos + Vec2::new(0.0, 100.0),
+        FiringDirection::AtTarget(t) => t,
+        FiringDirection::LeadTarget { target_pos, .. } => target_pos,
+    };
+
+    let final_damage = weapon_stats.damage * params.damage_multiplier;
+
+    match params.weapon {
+        WeaponType::Bullet => {
+            state.projectiles.push(create_projectile(
+                params.shooter_pos,
+                base_velocity,
+                final_damage,
+                params.weapon,
+                params.owner,
+                false, // piercing
+                false, // homing
+                0.0,   // explosion_radius
+                None,  // locked_target
+            ));
+        }
+
+        WeaponType::Laser => {
+            state.projectiles.push(create_projectile(
+                params.shooter_pos,
+                base_velocity,
+                final_damage,
+                params.weapon,
+                params.owner,
+                true,  // piercing - lasers go through targets
+                false, // homing
+                0.0,   // explosion_radius
+                None,  // locked_target
+            ));
+        }
+
+        WeaponType::Missile => {
+            // Find target for homing
+            let locked_target = match params.owner {
+                ProjectileOwner::Player | ProjectileOwner::Ghost => {
+                    // Lock onto nearest enemy
+                    params.enemies.as_ref().and_then(|enemies| {
+                        find_nearest_position_index(params.shooter_pos, enemies)
+                    })
+                }
+                ProjectileOwner::Enemy => {
+                    // Enemy missiles track player (index 0 convention)
+                    Some(0)
+                }
+            };
+
+            state.projectiles.push(create_projectile(
+                params.shooter_pos,
+                base_velocity,
+                final_damage,
+                params.weapon,
+                params.owner,
+                false,         // piercing
+                true,          // homing
+                0.0,           // explosion_radius
+                locked_target, // locked_target
+            ));
+        }
+
+        WeaponType::Plasma => {
+            // 3-projectile spread pattern
+            let spread_angle = 15.0_f32.to_radians();
+            let angles = [-spread_angle, 0.0, spread_angle];
+
+            for &angle in &angles {
+                let spread_velocity =
+                    calculate_spread_velocity(params.shooter_pos, target_pos, speed, angle);
+
+                state.projectiles.push(create_projectile(
+                    params.shooter_pos,
+                    spread_velocity,
+                    final_damage,
+                    params.weapon,
+                    params.owner,
+                    false, // piercing
+                    false, // homing
+                    0.0,   // explosion_radius
+                    None,  // locked_target
+                ));
+            }
+        }
+
+        WeaponType::Bombs => {
+            // AOE radius varies by owner
+            let explosion_radius = match params.owner {
+                ProjectileOwner::Player => 80.0,
+                ProjectileOwner::Ghost => 70.0,
+                ProjectileOwner::Enemy => 60.0,
+            };
+
+            state.projectiles.push(create_projectile(
+                params.shooter_pos,
+                base_velocity,
+                final_damage,
+                params.weapon,
+                params.owner,
+                false,            // piercing
+                false,            // homing
+                explosion_radius, // explosion_radius
+                None,             // locked_target
+            ));
+        }
+    }
+}
+
+/// Helper: Create a projectile with all fields
+fn create_projectile(
+    pos: Vec2,
+    velocity: Vec2,
+    damage: f32,
+    weapon_type: WeaponType,
+    owner: ProjectileOwner,
+    piercing: bool,
+    homing: bool,
+    explosion_radius: f32,
+    locked_target_index: Option<usize>,
+) -> Projectile {
+    Projectile {
+        pos,
+        velocity,
+        damage,
+        weapon_type,
+        owner,
+        piercing,
+        homing,
+        explosion_radius,
+        locked_target_index,
+        lifetime: 0.0,
+        trail_timer: 0.0,
+    }
+}
+
+/// Helper: Calculate velocity with angular spread (for plasma)
+fn calculate_spread_velocity(from: Vec2, to: Vec2, speed: f32, angle: f32) -> Vec2 {
+    let dir = to - from;
+    let distance = dir.length();
+
+    if distance < 0.1 {
+        return Vec2::new(0.0, speed); // Fallback
+    }
+
+    let norm = dir / distance;
+
+    // Rotate by angle
+    let rotated_x = norm.x * angle.cos() - norm.y * angle.sin();
+    let rotated_y = norm.x * angle.sin() + norm.y * angle.cos();
+
+    Vec2::new(rotated_x * speed, rotated_y * speed)
+}
+
+/// Helper: Find nearest position in a list and return its index
+fn find_nearest_position_index(from: Vec2, positions: &[Vec2]) -> Option<usize> {
+    if positions.is_empty() {
+        return None;
+    }
+
+    positions
+        .iter()
+        .enumerate()
+        .min_by(|(_, a), (_, b)| {
+            let dist_a = (**a - from).length_squared();
+            let dist_b = (**b - from).length_squared();
+            dist_a.partial_cmp(&dist_b).unwrap()
+        })
+        .map(|(idx, _)| idx)
+}
+
+// PLAYER WEAPON INTERFACE (uses unified system)
+
 /// Update all weapon timers and projectiles
 pub fn update_weapons(state: &mut GameState, delta: f32) {
     // Countdown fire cooldown
@@ -26,120 +251,21 @@ pub fn player_fire_weapon(state: &mut GameState, weapon_index: usize) {
     let weapon_stats = weapon.get_weapon_stats(&state.config.weapons);
     state.player_fire_timer = weapon_stats.fire_rate;
 
-    // Fire weapon based on type (different behaviors)
-    match weapon {
-        WeaponType::Bullet => fire_bullet(state, weapon_stats),
-        WeaponType::Laser => fire_laser(state, weapon_stats),
-        WeaponType::Missile => fire_missile(state, weapon_stats),
-        WeaponType::Plasma => fire_plasma(state, weapon_stats),
-        WeaponType::Bombs => fire_bombs(state, weapon_stats),
-    }
-}
+    // Collect enemy positions for missile targeting
+    let enemy_positions: Vec<Vec2> = state.enemies.iter().map(|e| e.pos).collect();
 
-/// Fire a standard bullet projectile
-fn fire_bullet(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
-    let projectile = Projectile {
-        pos: state.player.pos,
-        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
-        damage: weapon_stats.damage,
-        weapon_type: WeaponType::Bullet,
-        owner: ProjectileOwner::Player,
-        piercing: false,
-        homing: false,
-        explosion_radius: 0.0,
-        locked_target_index: None,
-        lifetime: 0.0,
-        trail_timer: 0.0,
-    };
-
-    state.projectiles.push(projectile);
-}
-
-/// Fire a piercing laser beam (doesn't despawn on hit)
-fn fire_laser(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
-    let projectile = Projectile {
-        pos: state.player.pos,
-        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
-        damage: weapon_stats.damage,
-        weapon_type: WeaponType::Laser,
-        owner: ProjectileOwner::Player,
-        piercing: true, // Doesn't despawn on hit
-        homing: false,
-        explosion_radius: 0.0,
-        locked_target_index: None,
-        lifetime: 0.0,
-        trail_timer: 0.0,
-    };
-
-    state.projectiles.push(projectile);
-}
-
-/// Fire a homing missile that tracks enemies
-fn fire_missile(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
-    // Find nearest enemy to lock onto immediately
-    let nearest_idx = find_nearest_enemy_index(state.player.pos, &state.enemies);
-
-    let projectile = Projectile {
-        pos: state.player.pos,
-        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
-        damage: weapon_stats.damage,
-        weapon_type: WeaponType::Missile,
-        owner: ProjectileOwner::Player,
-        piercing: false,
-        homing: true, // Will track locked enemy
-        explosion_radius: 0.0,
-        locked_target_index: nearest_idx, // Lock onto target at spawn
-        lifetime: 0.0,
-        trail_timer: 0.0,
-    };
-
-    state.projectiles.push(projectile);
-}
-
-/// Fire plasma spread shot (3 projectiles in cone pattern)
-fn fire_plasma(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
-    let spread_angle = 15.0_f32.to_radians(); // ±15 degrees
-    let angles = [-spread_angle, 0.0, spread_angle]; // Left, center, right
-
-    for &angle in &angles {
-        let projectile = Projectile {
-            pos: state.player.pos,
-            velocity: Vec2::new(
-                weapon_stats.projectile_speed * angle.sin(),
-                -weapon_stats.projectile_speed * angle.cos(),
-            ),
-            damage: weapon_stats.damage,
-            weapon_type: WeaponType::Plasma,
+    // Use unified weapon system!
+    fire_weapon(
+        FireWeaponParams {
+            shooter_pos: state.player.pos,
             owner: ProjectileOwner::Player,
-            piercing: false,
-            homing: false,
-            explosion_radius: 0.0,
-            locked_target_index: None,
-            lifetime: 0.0,
-            trail_timer: 0.0,
-        };
-
-        state.projectiles.push(projectile);
-    }
-}
-
-/// Fire bomb with AOE explosion on impact
-fn fire_bombs(state: &mut GameState, weapon_stats: crate::models::WeaponStats) {
-    let projectile = Projectile {
-        pos: state.player.pos,
-        velocity: Vec2::new(0.0, -weapon_stats.projectile_speed),
-        damage: weapon_stats.damage,
-        weapon_type: WeaponType::Bombs,
-        owner: ProjectileOwner::Player,
-        piercing: false,
-        homing: false,
-        explosion_radius: 80.0, // AOE damage radius
-        locked_target_index: None,
-        lifetime: 0.0,
-        trail_timer: 0.0,
-    };
-
-    state.projectiles.push(projectile);
+            weapon,
+            direction: FiringDirection::Up, // Player shoots up
+            damage_multiplier: 1.0,         // Full damage
+            enemies: Some(enemy_positions),
+        },
+        state,
+    );
 }
 
 /// Update all projectile positions and remove off-screen ones
