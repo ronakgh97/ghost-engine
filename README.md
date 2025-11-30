@@ -3,7 +3,7 @@
 A fast-paced 2D top-down shooter where you pilot a ship alongside ghostly allies. Battle through waves of enemies—who
 can become your allies—while managing your energy and ghost formations.
 
-![demo](demo.gif)
+![demo](demo.png)
 
 ## Features
 
@@ -28,20 +28,11 @@ can become your allies—while managing your energy and ghost formations.
 - Change Formation: 1–3 (Line, Circle, V-shape)
 - Single Summon: F1–F6 for ghost types
 
-## Play the game
-
-1. Install [Rust](https://www.rust-lang.org/tools/install).
-2. Build and run:
-   ```bash
-   rustup update
-   cargo run --release
-   ```
-
 ## Customization
 
 - Enemy waves and behaviors are scripted in Lua under `scripts/waves/`.
 - Dash, formation, and weapon configs can be tweaked in `src/default.rs` and `config.toml`.
 
----
+## Contributing
 
-Your enemies don’t die—they obey.
+Contributions are welcome! Please fork the repository and submit a pull request with your changes. 🤧🏳️
