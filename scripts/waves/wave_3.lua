@@ -7,13 +7,13 @@ return {
 	spawns = {
 		{
 			type = "BasicFighter",
-			count = 8,
+			count = 10,
 			interval = 1.5,
 			delay = 0.0
 		},
 		{
 			type = "Sniper",
-			count = 3,
+			count = 5,
 			interval = 2.5,
 			delay = 2.5
 		},
@@ -31,7 +31,7 @@ return {
 		},
 		{
 			type = "Splitter",
-			count = 4,
+			count = 6,
 			interval = 2.0,
 			delay = 15.0
 		}
