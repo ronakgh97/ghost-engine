@@ -8,8 +8,8 @@ target_fps = 60
 
 [player]
 starting_health = 100.0
-max_health = 100.0
-starting_energy = 500.0
+max_health = 1000.0
+starting_energy = 200.0
 max_energy = 1000.0
 movement_speed = 250.0
 starting_weapons = ["Bullet", "Laser", "Missile", "Plasma"]
@@ -20,45 +20,45 @@ parry_window = 0.3
 parry_energy_cost = 5.0
 
 # Physics-based movement
-acceleration = 3000.0     
-friction = 0.97            
-responsiveness = 15.0     
+acceleration = 2500.0       # How fast you speed up (px/s²) - higher = more responsive
+friction = 0.96             # Momentum decay (0.96 = 4% slowdown/frame) - lower = more drift
+responsiveness = 12.0       # Turn speed (higher = tighter turns) - affects direction changes
 
 [energy]
-regen_rate_idle = 50.0
+regen_rate_idle = 30.0
 regen_rate_active = 1.0
 
 [entities.basic_fighter]
 health = 50.0
-damage = 0.0
+damage = 10.0
 energy_cost = 15.0
-fire_interval = 1.5
+fire_interval = 2.0
 weapons = ["Bullet"]  # Simple straight shots
 
 [entities.sniper]
 health = 30.0
-damage = 0.0
+damage = 25.0
 energy_cost = 25.0
-fire_interval = 3.0
+fire_interval = 4.0
 weapons = ["Laser"]  # Piercing beam
 
 [entities.tank]
 health = 150.0
-damage = 0.0
+damage = 15.0
 energy_cost = 40.0
-fire_interval = 2.0
-weapons = ["Missile", "Plasma"] 
+fire_interval = 1.5
+weapons = ["Missile", "Plasma"]  # Tank: Homing missiles + spread plasma
 
 [entities.elite]
-health = 250.0
-damage = 0.0
+health = 500.0
+damage = 50.0
 energy_cost = 80.0
-fire_interval = 1.0
+fire_interval = 0.8
 weapons = ["Laser", "Missile", "Plasma"]
 
 [entities.healer]
 health = 60.0
-damage = 0.0
+damage = 5.0
 energy_cost = 20.0
 fire_interval = 3.0
 weapons = ["Bullet"]
@@ -67,33 +67,33 @@ heal_radius = 150.0   # 150 pixel radius healing field
 
 [entities.splitter]
 health = 80.0
-damage = 0.0
+damage = 12.0
 energy_cost = 25.0
-fire_interval = 0.5
+fire_interval = 2.0
 weapons = ["Bullet"]
-split_count = 5
+split_count = 3
 split_health_ratio = 0.3
 split_speed_multiplier = 2.5
 
 # WEAPONS CONFIGURATION
 [weapons.bullet]
-damage = 15.0
-fire_rate = 0.15
+damage = 10.0
+fire_rate = 0.1
 projectile_speed = 500.0
 
 [weapons.laser]
-damage = 75.0
+damage = 60.0
 fire_rate = 1.5
 projectile_speed = 800.0
 
 [weapons.missile]
 damage = 30.0
-fire_rate = 1.5
+fire_rate = 0.5
 projectile_speed = 250.0
 
 [weapons.plasma]
 damage = 25.0
-fire_rate = 0.5
+fire_rate = 0.4
 projectile_speed = 500.0
 
 [weapons.bombs]
@@ -104,7 +104,7 @@ projectile_speed = 200.0
 [spawning]
 wave_mode = false             # true = Lua wave system, false = classic random spawning
 wave_count = 5               # Number of waves (if wave_mode = true)
-enemy_spawn_interval = 2.5   # Random spawn timer (if wave_mode = false)
+enemy_spawn_interval = 2.0   # Random spawn timer (if wave_mode = false)
 initial_delay = 3.0          # Delay before first spawn (random mode)
 
 [formations]
@@ -138,8 +138,8 @@ screen_boundary_top = -50.0
 # Enemy behavior settings
 [enemy_behavior]
 movement_threshold_y = 200.0
-fast_descent_speed = 75.0
-slow_hover_speed = 25.0
+fast_descent_speed = 100.0
+slow_hover_speed = 50.0
 fire_threshold_y = 50.0
 screen_boundary_bottom = 650.0
 basic_projectile_speed_y = 250.0
@@ -158,11 +158,11 @@ screen_edge_padding = 30.0
 off_screen_padding = 50.0
 player_projectile_speed_y = -400.0
 
-# Screen Shake
+# Screen Shake (Juice!)
 [screen_shake]
 # Weapon-specific shake (intensity scales with weapon damage/power)
 bullet_hit_intensity = 0.8
-laser_hit_intensity = 5.0
+laser_hit_intensity = 4.0
 missile_hit_intensity = 2.5
 plasma_hit_intensity = 1.5
 bomb_hit_intensity = 5.0
@@ -255,14 +255,14 @@ parry_failed_scale_min = 0.85       # Min scale during failed (defeat feeling)
 # Dash mechanic configuration (Shift + WASD)
 [dash]
 enabled = true                      # Master toggle for dash mechanic
-distance = 120.0                   
-duration = 0.15                    
-i_frame_duration = 0.3           
-energy_cost = 20.0                
+distance = 120.0                    # How far the dash travels
+duration = 0.15                     # Dash movement duration
+i_frame_duration = 0.2              # Invincibility window
+energy_cost = 30.0                  # Energy consumed per dash
 cooldown = 0.5
 
 # Visual effects
-trail_particle_count = 5
-trail_spawn_rate = 76.0
-glow_intensity = 0.75
+trail_particle_count = 3
+trail_spawn_rate = 60.0
+glow_intensity = 0.7
 cooldown_ring_thickness = 3.0
