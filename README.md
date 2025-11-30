@@ -5,7 +5,7 @@ can become your allies—while managing your energy and ghost formations.
 
 ![demo](demo.png)
 
-## Features
+## Current State
 
 - Unique mechanic: Summon ghost allies to fight for you.
 - Multiple ghost types: Basic, Sniper, Tank, Elite, Healer, Splitter.
@@ -16,6 +16,16 @@ can become your allies—while managing your energy and ghost formations.
 - Energy system: Summons, parries, and dashes consume energy.
 - Dynamic waves: Lua scripts define enemy waves and behaviors.
 - Parry, dash, and cancel summoning to adapt on the fly.
+
+## TODOs
+
+- More enemy types, weapons types and AI behavior tree.
+- Sprites and animations for ships and ghosts.
+- Sound effects and music.
+- Polish UI and visual effects.
+- Reward system for surviving waves.
+- Optimize performance for larger waves.
+- Multiplayer mode.
 
 ## Controls
 
