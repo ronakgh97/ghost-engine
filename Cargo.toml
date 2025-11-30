@@ -7,6 +7,15 @@ edition = "2024"
 name = "ghost-engine"
 path = "src/main.rs"
 
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false
+incremental = false
+debug = false
+
 [dependencies]
 mlua = { version = "0.11.4", features = ["lua54","vendored","async","macros"] }
 macroquad = "0.4.14"
