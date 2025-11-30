@@ -2,7 +2,6 @@ use macroquad::prelude::*;
 
 /// Easing functions for smooth animations
 /// All functions take normalized time t (0.0 to 1.0) and return eased value (0.0 to 1.0)
-
 /// Linear interpolation - no easing
 #[allow(dead_code)] //TODO: may be useful later
 pub fn linear(t: f32) -> f32 {

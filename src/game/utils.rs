@@ -124,7 +124,7 @@ fn calculate_v_formation(
     config: &crate::config::FormationSpacingConfig,
 ) -> Position {
     let spacing = config.v_shape_spacing;
-    let side = if index % 2 == 0 { -1.0 } else { 1.0 };
+    let side = if index.is_multiple_of(2) { -1.0 } else { 1.0 };
     let offset = (index / 2) as f32 + 1.0;
 
     Vec2::new(
